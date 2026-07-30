@@ -21,7 +21,7 @@ harder based on whether we have a pre-patch snapshot to diff against. Class A (p
 re-verifying every value in-game.
 
 ```bash
-pwsh -File "H:/Github Repositories/tfw-update-ops/tools/capture_baseline.ps1" -Label pre-24479102 -RunDecoderList
+powershell -File "H:/Github Repositories/tfw-update-ops/tools/capture_baseline.ps1" -Label pre-24479102 -RunDecoderList
 ```
 
 Read `docs/baseline-capture.md` first — particularly the "what NOT to capture" section, so nobody
@@ -30,7 +30,7 @@ tries to back up 48.5 GB of paks.
 ## First five actions for the next session
 
 1. **Verify the window is still open.**
-   `pwsh -File tools/steam_state.ps1` — confirm `Installed build: 24097213`. If it already reads
+   `powershell -File tools/steam_state.ps1` — confirm `Installed build: 24097213`. If it already reads
    `24479102`, we're past the window: skip to `docs/rollback.md` and decide whether a depot
    downgrade is worth it.
 

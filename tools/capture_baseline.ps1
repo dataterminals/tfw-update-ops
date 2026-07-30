@@ -15,7 +15,7 @@
     Directory name under state/baselines/. Convention: pre-<target build id>.
 
 .EXAMPLE
-    pwsh -File tools/capture_baseline.ps1 -Label pre-24479102
+    powershell -File tools/capture_baseline.ps1 -Label pre-24479102
 
 .NOTES
     Windows PowerShell 5.1 compatible. ASCII only (5.1 reads UTF-8 without BOM as ANSI).

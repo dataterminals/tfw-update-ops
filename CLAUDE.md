@@ -33,13 +33,13 @@ PowerShell 5.1 is the target. **ASCII only** — 5.1 reads UTF-8-without-BOM as 
 in a string is a parse error. Both existing scripts are ASCII-clean; keep them that way.
 
 ```bash
-pwsh -File tools/steam_state.ps1
+powershell -File tools/steam_state.ps1
 ```
 Read-only. Prints installed/target build, StateFlags, auto-update behavior, and the depot
 manifest ID (the rollback key).
 
 ```bash
-pwsh -File tools/capture_baseline.ps1 -Label pre-24479102 -RunDecoderList
+powershell -File tools/capture_baseline.ps1 -Label pre-24479102 -RunDecoderList
 ```
 Snapshots Steam state, pak inventory + SHA256, Win64 binary hashes, the MO2 deployment, the
 fwdata catalog, and the datamine git SHA into `state/baselines/<label>/`. Add `-SkipPakHashes`

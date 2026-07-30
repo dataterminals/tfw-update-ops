@@ -27,14 +27,14 @@ and route the answer at the exact mods that care.
 ## Procedure
 
 ```bash
-pwsh -File tools/steam_state.ps1
+powershell -File tools/steam_state.ps1
 ```
 
 Confirms the game is still on the old build. **If `buildid` already equals the target, stop —
 you're past the window; go to `docs/rollback.md`.**
 
 ```bash
-pwsh -File tools/capture_baseline.ps1 -Label pre-24479102
+powershell -File tools/capture_baseline.ps1 -Label pre-24479102
 ```
 
 Writes everything above to `state/baselines/pre-24479102/`. Read the summary it prints.
