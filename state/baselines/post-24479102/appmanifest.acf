@@ -1,0 +1,51 @@
+"AppState"
+{
+	"appid"		"2828860"
+	"universe"		"1"
+	"LauncherPath"		"C:\\Program Files (x86)\\Steam\\steam.exe"
+	"name"		"The Forever Winter"
+	"StateFlags"		"4"
+	"installdir"		"The Forever Winter"
+	"LastUpdated"		"1785447242"
+	"LastPlayed"		"1785163085"
+	"SizeOnDisk"		"50815237941"
+	"StagingSize"		"0"
+	"buildid"		"24479102"
+	"LastOwner"		"76561197995206449"
+	"DownloadType"		"1"
+	"UpdateResult"		"0"
+	"BytesToDownload"		"819642192"
+	"BytesDownloaded"		"819642192"
+	"BytesToStage"		"41265763431"
+	"BytesStaged"		"41265763431"
+	"TargetBuildID"		"24479102"
+	"AutoUpdateBehavior"		"1"
+	"AllowOtherDownloadsWhileRunning"		"2"
+	"ScheduledAutoUpdate"		"0"
+	"StagingFolder"		"2"
+	"InstalledDepots"
+	{
+		"2828861"
+		{
+			"manifest"		"6430523508700280691"
+			"size"		"50815237941"
+		}
+	}
+	"InstallScripts"
+	{
+		"2828861"		"installscript.vdf"
+	}
+	"SharedDepots"
+	{
+		"228989"		"228980"
+		"228990"		"228980"
+	}
+	"UserConfig"
+	{
+		"language"		"english"
+	}
+	"MountedConfig"
+	{
+		"language"		"english"
+	}
+}

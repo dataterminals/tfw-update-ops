@@ -1,0 +1,20 @@
+﻿
+  Steam state -- app 2828860 (The Forever Winter)
+  manifest file:   H:\SteamLibrary\steamapps\appmanifest_2828860.acf
+
+  Installed build: 24479102
+  Target build:    24479102
+  StateFlags:      4  [FullyInstalled]
+  Last updated:    2026-07-30 17:34:02 -04:00
+  Size on disk:    50815237941 bytes
+
+  Auto-update:     1 = only update when I launch it
+  Scheduled at:    (none)
+  To download:     819642192 bytes (downloaded so far: 819642192)
+
+  Depot manifests (THE ROLLBACK KEYS -- record these in state/build-history.md):
+    depot 2828861  manifest 6430523508700280691
+      download_depot 2828860 2828861 6430523508700280691
+
+  >> No update pending. Installed build is current.
+

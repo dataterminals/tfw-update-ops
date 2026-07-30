@@ -7,22 +7,26 @@ App `2828860` · Depot `2828861` · Install `H:\SteamLibrary\steamapps\common\Th
 
 | Build ID | Depot manifest | Steam `LastUpdated` | Size on disk | Notes |
 |---|---|---|---|---|
-| `24097213` | `7600230730618885177` | 2026-07-07 16:55 EDT | 50,779,543,727 B | Current baseline. Almanac data is stamped to this build. usmap `ForeverWinter-5.4.2.usmap` corresponds to it. |
-| `24479102` | *(unknown — capture after install)* | *pending* | — | **Queued, not applied.** ~820 MB download (819,646,731 B). |
+| `24097213` | `7600230730618885177` | 2026-07-07 16:55 EDT | 50,779,543,727 B | Previous baseline. Almanac data stamped to this build. usmap `ForeverWinter-5.4.2.usmap` corresponds to it. Datamine tagged `baseline-24097213`. |
+| `24479102` | `6430523508700280691` | 2026-07-30 17:34 EDT | 50,815,237,941 B | **Current.** Applied 2026-07-30 17:34 EDT. 819,642,192 B download; install grew 35,694,214 B. Weapons-systems overhaul — see [`patch-notes-24479102.md`](patch-notes-24479102.md). |
 
-## In-flight: 24097213 → 24479102
+## 24097213 → 24479102 — landed 2026-07-30 17:34 EDT
 
-Observed 2026-07-30 ~16:50 EDT from `appmanifest_2828860.acf`:
+**The window was not missed.** Baseline `pre-24479102` was captured, verified (0 warnings,
+76,589-entry filelist) and pushed *before* the patch was triggered; the datamine repo is tagged
+`baseline-24097213` at `36b068b8`. Sylvia then launched TFW from Steam deliberately to apply it.
 
-- `StateFlags` `6` — fully installed **+ update required**
-- `TargetBuildID` `24479102`, `BytesToDownload` `819646731`, `BytesDownloaded` `0`
-- `ScheduledAutoUpdate` `1785489964` → **2026-07-31 05:26 EDT** (a scheduled slot still exists)
-- `AutoUpdateBehavior` was `0` (always keep updated) on first read, then observed as **`1` — only
-  update when I launch it**. That setting neutralizes the 05:26 slot: the patch now lands only on
-  a deliberate launch. **So the hold is real, but launching the game applies the update.** Do not
-  launch TFW until the baseline is captured.
+Sequence of record:
 
-**Baseline capture: NOT YET RUN.** See [`../docs/baseline-capture.md`](../docs/baseline-capture.md).
+- Hold mechanism: `AutoUpdateBehavior` `1` (only update when I launch it) neutralized the
+  scheduled 2026-07-31 05:26 EDT slot, so the patch landed only on deliberate launch. Confirmed
+  working — the build sat at `24097213` for the whole capture.
+- Applied 17:34:02 EDT; `StateFlags` settled to `4` (FullyInstalled, nothing pending).
+- Download 819,642,192 B. Install grew 50,779,543,727 → 50,815,237,941 B (**+35,694,214 B**), which
+  is a small net delta for an 820 MB patch — consistent with rewriting existing assets rather than
+  adding bulk content.
+- **New rollback key `6430523508700280691`** captured immediately, before anything could overwrite
+  it. This is the key that recovers `24479102` after the *next* patch.
 
 **Patch notes reviewed 2026-07-30** (Discord announcement, archived with a blast-radius read in
 [`patch-notes-24479102.md`](patch-notes-24479102.md)). Characterization: **content patch** —
