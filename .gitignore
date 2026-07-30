@@ -1,0 +1,22 @@
+# Baselines are the point of this repo -- they are small (~450 KB each) and DO get committed.
+# What must never land here:
+
+# Raw game assets. Paks stay in the Steam install; the depot manifest ID is the backup.
+*.pak
+*.utoc
+*.ucas
+*.sig
+*.uasset
+*.uexp
+
+# Decoder scratch -- filelist.txt is copied INTO a baseline dir deliberately; the raw
+# out/ tree is not.
+out/
+**/decoder/out/
+
+# Local noise
+.DS_Store
+Thumbs.db
+*.tmp
+__pycache__/
+*.pyc
