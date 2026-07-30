@@ -17,6 +17,38 @@ The decoder mounted **76,309 files** from the new paks using the key hardcoded a
 Note this does **not** clear Gate 1b. `list` needs the key, not the `.usmap` — property decoding
 is untested until something is actually dumped.
 
+## Gate 1b — usmap: CLEARED
+
+Dumped all 43 `AIDEF_Sensor_*` assets against the existing
+`ForeverWinter-5.4.2.usmap`: **43 ok, 0 fail**, and — the part that actually proves it —
+**28 of the 43 are byte-identical to the committed pre-patch dumps**, with the other 15
+differing *coherently* rather than randomly.
+
+That distinction is the whole test. A stale usmap does not fail loudly; it yields plausible
+garbage. Twenty-eight exact matches plus fifteen semantically meaningful, internally consistent
+changes is not what a broken type layout produces. **The usmap survived; do not regenerate it.**
+
+### Free intel from the Gate 1b probe
+
+All 15 differing files are `AIDEF_Sensor_Vision_*`, and every one gained exactly the same new
+entry — one new gameplay tag, nothing removed:
+
+```
+Pawn.Player.HoldingPistol   AccumulationMultiplier 1.2   DecayMultiplier 0.8
+```
+
+Per `tools/parse_detection.py:87`, the multiplier applies to accumulation **time**, so
+`>1 = stealthier` and `decay <1 = stealthier`. Holding a pistol therefore makes you **~20%
+slower to be detected and your accumulated awareness fade ~20% faster**, across all 15 enemy
+vision profiles.
+
+That is the datamined confirmation of the patch note "smaller firearms draw less agro than
+bigger ones; agro accrued with these smaller weapons disperses more quickly" — and it is a
+**publishable almanac Detection-tab update** that costs nothing extra to ship.
+
+Worth stating: read the multiplier direction off the parser, not off intuition. The naive
+reading of "accumulation 1.2" is *faster* detection, which is backwards.
+
 ## The raw churn, and why the headline number is misleading
 
 The report says 1,013 added / 1,293 removed. Most of that is noise:

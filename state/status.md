@@ -17,7 +17,7 @@ These block whole classes. Nothing below them means anything until they're resol
 |---|---|---|---|
 | 0 | Baseline captured | 🟩 | Both sides captured, 0 warnings. `pre-24479102` (76,589 entries) + `post-24479102` (76,309). Datamine tagged `baseline-24097213` @ `36b068b8`. New rollback key `6430523508700280691`. |
 | 1a | AES key still valid | 🟩 | **Cleared.** Decoder mounted 76,309 files from the new paks with the key hardcoded at `decoder/Program.cs:28`. The IoStore index is AES-encrypted, so the mount *is* the test. No AESDumpster run needed. |
-| 1b | usmap valid (or regenerated) | ⬜ | **Not cleared by 1a** — `list` exercises the key, not the usmap. Needs a `dump` of a known asset with plausible values. |
+| 1b | usmap valid (or regenerated) | 🟩 | **Cleared.** Dumped all 43 `AIDEF_Sensor_*` (43 ok / 0 fail); **28 byte-identical** to the committed pre-patch dumps, 15 differing coherently. A stale usmap yields garbage, not 28 exact matches. **Do not regenerate.** No UE4SS needed. |
 | 2 | Re-decode + filelist diff | 🟨 | Filelist diff **done** — see [`stage2-findings.md`](stage2-findings.md). Force re-decode still outstanding; the catalog is stale (`tables.json` still stamps `24097213`). |
 | 3 | RE-UE4SS attaches to new exe | ⬜ | Gates all of Class B. Exe changed +70,144 B on 169 MB (0.04%) — a code patch, not an engine bump. Encouraging for AOB signatures; not proof. |
 | 3b | Signature Bypass matches new exe | ⬜ | Same exe change applies. |
@@ -43,9 +43,9 @@ individually until that clears.
 | `TFWCharModelSelFramework` | 🟨 | Only **case-only** renames touch its territory (`BagMan`→`BAGMAN` etc.). Package IDs are case-insensitive in UE5, so likely fine — **verify frozen slot paths explicitly** at smoke test. |
 | `UnkillablesRebalanceFix` | 🟨 | No boss BP appears in the real-removal list, but BP *contents* change without the path moving, and this mod silently reverts upstream BP edits. Path diff cannot clear it; needs a dump diff. |
 | `AllWeaponsUnlockableFix` | 🟨 | Its DataTable targets survived (`WeaponPartStatsData`, `ItemDetailsData` intact). Probably OK — confirm exact targets. Trees variant is the deployed one. |
-| `ScavgirlCarryPerks` | ⬜ | 5 deployed variants. Skill scaling was reworked (non-linear) — check whether perk tables moved. |
-| `TFWQuestGiverPortraitPatch` | ⬜ | Assumes 2:1 button brush + stable texture families. One UI texture removed (`T_Box_SkillsIcon_Small_Red`) — unrelated family, but check. |
-| `forever-winter-skin-mods` | 🟨 | 4 skins deployed. Slade/Luca/Kane show **zero** renamed paths, Bunco-chan one. Low exposure; verify at smoke test. |
+| `ScavgirlCarryPerks` | ⬜ | **Not enabled** — all 5 variants disabled in MO2. Lower urgency. Skill scaling was reworked (non-linear); check whether perk tables moved. |
+| `TFWQuestGiverPortraitPatch` | ⬜ | **Enabled.** Assumes 2:1 button brush + stable texture families. One UI texture removed (`T_Box_SkillsIcon_Small_Red`) — different family, but check. |
+| `forever-winter-skin-mods` | ⬛ | **Not deployed — registry was wrong.** Builds `SCVGIRL_UMP9_*` / `SHM_UMP45_*`; none in the MO2 store. The 4 enabled skins (`101`–`104`) are **third-party**, not ours. Not our fix, but they sit in the smoke-test loadout. |
 
 ## Class C — Datamine + data products
 

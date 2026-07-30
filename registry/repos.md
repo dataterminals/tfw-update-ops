@@ -103,9 +103,33 @@ The game directory is **clean by design** — mods live in the MO2 instance, nev
 - Load order: `H:\MO2Instance_ModData\ForeverWinter\profiles\Default\modlist.txt`
 - Game: `H:\SteamLibrary\steamapps\common\The Forever Winter`
 
-**Enabled as of 2026-07-30** (12 of 39 — the rest are probes/variants/controls):
-`CMSF v0.2 Framework`, `QuestGiver Portrait Patch`, `Recruiter Slade`, `Naughty Luca`,
-`Bunco-chan Texture Swap`, `Augmented Kane`, `HeavyRifleRebalanceFix`, `UnkillablesRebalanceFix`,
-`AllWeaponsUnlockableTrees`, `TFWWorkbench`, `RE-UE4SS`, `Signature Bypass`.
+**Enabled as of 2026-07-30** — 12 of 39, but **only 5 of them are ours.** Corrected after reading
+the actual pak filenames in the mod store; the earlier version of this section misattributed the
+four skins.
+
+| Enabled mod | Pak | Ours? |
+|---|---|---|
+| `CMSF v0.2 Framework` | — | **Yes** — `TFWCharModelSelFramework` |
+| `QuestGiver Portrait Patch` | `110_QuestGiverPortraitPatch_P` | **Yes** — `TFWQuestGiverPortraitPatch` |
+| `HeavyRifleRebalanceFix` | — | **Yes** |
+| `UnkillablesRebalanceFix` | — | **Yes** |
+| `AllWeaponsUnlockableTrees` | — | **Yes** — `AllWeaponsUnlockableFix`, Trees variant |
+| `Bunco-chan Texture Swap` | `101-Bunko-Chan_P` | No — third-party |
+| `Augmented Kane` | `102-kane_P` | No — third-party |
+| `Naughty Luca` | `103-Luca_P` | No — third-party |
+| `Recruiter Slade` | `104-Slade_P` | No — third-party |
+| `TFWWorkbench`, `RE-UE4SS`, `Signature Bypass` | — | No — third-party blockers |
 
 That enabled set is the **smoke-test loadout** — first thing to bring back up after a patch.
+
+Two corrections worth carrying forward, both of which change triage priority:
+
+- **`forever-winter-skin-mods` is NOT deployed.** It builds `SCVGIRL_UMP9_*_P` and `SHM_UMP45_*_P`
+  paks; none of those is in the store, and nothing in the repo references the `101`–`104` names.
+  The four enabled skins are somebody else's work. We are not on the hook to fix them, but they
+  are in the loadout, so they can still break a smoke test.
+- **No Class B mod is currently enabled.** `TFWLootAll`, `TFWStaggerControl` and
+  `TFWQuestHUDToggle` are all disabled, `TFWQuestItemTag` is not in the store at all, and all five
+  `ScavgirlCarryPerks` variants are disabled. "5 deployed variants" meant five *present*, not five
+  *enabled*. Nobody is running these right now, which lowers their user-facing urgency relative to
+  the five enabled Class A mods.
