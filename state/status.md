@@ -56,7 +56,7 @@ outcome, just not a useful one for Class A.
 
 | Repo | Status | Finding |
 |---|---|---|
-| `HeavyRifleRebalanceFix` | 🟥 | **DEAD — confirmed by diff.** Every target renamed or deleted: `DA_WPN_HRF*_v2` → `DA_WPN_PLAYER_HRF*`, all `FC_HRF*` curves and the `*_UpgradeTuning/` tree **deleted**. Fails silently. Needs a design decision before a rebuild — the curve-editing technique may no longer exist. |
+| `HeavyRifleRebalanceFix` | 🟥 | **DEAD — needs redesign, not a rebase.** 11 of its 13 override targets are gone (`build_fix.sh` names them). The 6 `DA_WPN_*_v2` are renamed → rebasable; but all 5 `FC_*_Damage` curves are **deleted**, and the curve layer is gone game-wide (`FC_*_Damage` 44→0; float curves under `FW/Weapons` 226→11). Per the mod's own `docs/diagnosis.md`, the **curve** is the real damage lever and the DA scalar is "cosmetic" — so a pure rebase would look rebuilt and do nothing. Hypothesis to test: `WeaponDamage` on `DA_WPN_PLAYER_*` is now authoritative. **Verify before building.** |
 | `TFWCharModelSelFramework` | 🟨 | Only **case-only** renames touch its territory (`BagMan`→`BAGMAN` etc.). Package IDs are case-insensitive in UE5, so likely fine — **verify frozen slot paths explicitly** at smoke test. |
 | `UnkillablesRebalanceFix` | 🟨 | No boss BP appears in the real-removal list, but BP *contents* change without the path moving, and this mod silently reverts upstream BP edits. Path diff cannot clear it; needs a dump diff. |
 | `AllWeaponsUnlockableFix` | 🟨 | Its DataTable targets survived (`WeaponPartStatsData`, `ItemDetailsData` intact). Probably OK — confirm exact targets. Trees variant is the deployed one. |

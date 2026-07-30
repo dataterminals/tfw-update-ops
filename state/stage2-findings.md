@@ -40,17 +40,40 @@ The full `CharacterWeaponAnimationSets` block also returns — six pawn entries 
 OldMan, Shaman, BagMan, MaskMan) with complete montage/anim-layer references. That is what the
 missing 20 KB was.
 
-### The HeavyRifle question, now answerable
+### The HeavyRifle question — ANSWERED: needs a redesign, not a rebase
 
-**The tuning levers survived.** `DA_WPN_PLAYER_HRF01` still carries `MaxDispersionRate`,
-`DispersionCoolDownStart`, `DispersionCoolDownRate`, the recoil block (`RecoilWristYaw`,
-`RecoilWristPitch`, `RecoilWristRecoveryBlend`, `RecoilArmAngle`, `ScaleRecoilADS`), the aim-lag
-spring block, and `StabilizeFireTime` / `StabilizeFireScaleAimLag`. The deleted `FC_*` curve tree
-was the *per-part upgrade* layer, not the base per-weapon stats.
+An earlier draft of this section guessed "rebuildable, provided it edited the weapon DataAsset."
+Checking the repo settled it, and the answer is the unfavourable branch of that conditional.
 
-So `HeavyRifleRebalanceFix` is **rebuildable, not architecturally dead** — provided it edited the
-weapon DataAsset. If it edited the `FC_*` curves, that half of its technique is gone. **Confirm
-which before planning the rebuild.**
+`tools/build_fix.sh` names the 152 pak's override set exactly. **11 of its 13 targets are gone:**
+
+| Target | Fate |
+|---|---|
+| `DA_WPN_HRF01..05_v2`, `DA_WPN_RFL29_v2` | **GONE** — renamed to `DA_WPN_PLAYER_*` (rebasable) |
+| `FC_HRF01..04_Damage`, `FC_RFL29_Damage` | **GONE — deleted, not renamed** |
+| `DT_CaliberToHeadshotMulti`, `MI_WPN_HRF03_UPP_01_RTC` | Survive |
+
+And the curve layer is gone **game-wide**, not relocated:
+
+- `FC_*_Damage` curves: **44 → 0**. Not one survives anywhere in the build.
+- Float curves under `FW/Weapons/`: **226 → 11** (~95% removed).
+
+This matters because of what the mod's own `docs/diagnosis.md:11` establishes: *"a heavy rifle's
+real per-shot damage comes from its `FC_*_Damage` **curve**, not the DA `WeaponDamage` scalar
+(vanilla `FC_HRF01` ramps 300→500 → the mod flattens it to 780 = the actual damage; the DA's 730
+is cosmetic)."* That was hard-won knowledge — v1.1 exists specifically because the Vykhlop didn't
+change until a flattened `FC_RFL29_Damage` was added.
+
+**So the mod's primary damage mechanism no longer has anything to act on.** Rebasing the DataAsset
+overrides onto the new `DA_WPN_PLAYER_*` names is mechanical, but on its own it would produce a mod
+that changes only the value the mod's own docs call *cosmetic* — i.e. it would look rebuilt and do
+nothing. That is the silent-failure trap again, one layer up.
+
+**The likely new design, stated as a hypothesis to test, not a conclusion:** with the curve layer
+deleted, `WeaponDamage` in `DA_WPN_PLAYER_HRF01` (now `270.0`) is probably authoritative — the devs
+appear to have replaced per-weapon damage curves with a scalar plus the reworked mod/customization
+system. If so the rebuild is *simpler* than the original technique. **Verify before building:**
+change `WeaponDamage` on one weapon, confirm in-game damage actually moves. Do not assume.
 
 ### Real HRF01 changes (now trustworthy)
 
