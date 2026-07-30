@@ -4,8 +4,20 @@
 
 Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 🟥 confirmed broken · ⬛ n/a this patch
 
-Last updated: 2026-07-30 17:40 EDT — **patch applied 17:34**, both baselines captured, Gate 1a
-cleared, filelist diff complete. Findings: [`stage2-findings.md`](stage2-findings.md).
+Last updated: 2026-07-30 17:55 EDT — **patch applied 17:34.** Gates 0, 1a, 1b, 3 and 3b all
+cleared; filelist diff complete. Findings: [`stage2-findings.md`](stage2-findings.md).
+
+**Where the logs actually live.** MO2 deploys RE-UE4SS and Signature Bypass via Root Builder,
+which *physically copies* them into the game `Binaries\Win64` for the session (USVFS cannot
+virtualize DLLs the OS loader pulls in before its hooks install). So during a session the logs
+are at the **real** game path, not MO2's overwrite:
+
+- `…\Binaries\Win64\ue4ss\UE4SS.log`
+- `…\Binaries\Win64\bitfix.txt` (append-only across sessions — filter by date)
+
+They land in `MO2Instance_ModData\ForeverWinter\overwrite\…` only after cleanup on exit. Reading
+the overwrite copy while the game is running gets you the **previous** session's log. Verified
+the deployed binaries are byte-identical to the MO2 mod's, so this tests the right build.
 
 ---
 
@@ -19,21 +31,23 @@ These block whole classes. Nothing below them means anything until they're resol
 | 1a | AES key still valid | 🟩 | **Cleared.** Decoder mounted 76,309 files from the new paks with the key hardcoded at `decoder/Program.cs:28`. The IoStore index is AES-encrypted, so the mount *is* the test. No AESDumpster run needed. |
 | 1b | usmap valid (or regenerated) | 🟩 | **Cleared.** Dumped all 43 `AIDEF_Sensor_*` (43 ok / 0 fail); **28 byte-identical** to the committed pre-patch dumps, 15 differing coherently. A stale usmap yields garbage, not 28 exact matches. **Do not regenerate.** No UE4SS needed. |
 | 2 | Re-decode + filelist diff | 🟨 | Filelist diff **done** — see [`stage2-findings.md`](stage2-findings.md). Force re-decode still outstanding; the catalog is stale (`tables.json` still stamps `24097213`). |
-| 3 | RE-UE4SS attaches to new exe | ⬜ | Gates all of Class B. Exe changed +70,144 B on 169 MB (0.04%) — a code patch, not an engine bump. Encouraging for AOB signatures; not proof. |
-| 3b | Signature Bypass matches new exe | ⬜ | Same exe change applies. |
+| 3 | RE-UE4SS attaches to new exe | 🟩 | **Cleared 2026-07-30 17:50.** Clean attach against the new exe (`169584128 B` confirmed in-log). PS scan finished 627 ms, `EngineVersion 5.4`, all symbols resolved, `PS scan successful`, `Event loop start`. The lone `FUObjectHashTables::Get()` miss is **pre-existing** — byte-for-byte the same line appears in the 2026-07-27 old-build log. **Class B is unblocked.** |
+| 3b | Signature Bypass matches new exe | 🟩 | **Cleared 2026-07-30 17:50:55.** bitfix AOB scan hit on the new exe (`scan results: [[7FF6E9560600, 7FF6E9560950]]`) and applied the patch (`writing C3`). Same shape as the 07-27 run at shifted addresses. |
 | 5a | TFWWorkbench reads new paks | ⬜ | Gates all of Class A rebuilds. |
 
 ## Class B — Lua (do first; cheap intel)
 
-All of Class B is **blocked on Gate 3** (does RE-UE4SS attach to the new exe). Do not triage
-individually until that clears.
+**Gates 3 and 3b are cleared — this class is UNBLOCKED and is now the cheapest intel available.**
+None of these is currently enabled in MO2, so no user is affected right now; the reason to run
+them next is doctrinal: their resolution failures name the exact paths that moved, which turns
+Class A from "diff everything" into "diff these."
 
 | Repo | Status | Finding |
 |---|---|---|
-| `TFWStaggerControl` | 🟦 | Blocked on Gate 3. Was never game-verified on the old build — verify fresh, don't assume regression. |
-| `TFWLootAll` | 🟦 | Blocked on Gate 3. Re-check `W_LootUI_C` still resolves — a UI crash fix shipped in this patch. |
-| `TFWQuestHUDToggle` | 🟦 | Blocked on Gate 3. |
-| `TFWQuestItemTag` | 🟦 | Blocked on Gate 3. Manifest must be regenerated after the re-decode regardless. |
+| `TFWStaggerControl` | ⬜ | Enable and read the log. Was never game-verified on the old build — verify fresh, don't assume regression. Pivots on the ungranted `Ability.HitReactionBlocked` tag. |
+| `TFWLootAll` | ⬜ | Enable and read the log. Re-check `W_LootUI_C` still resolves — a UI crash fix shipped in this patch. |
+| `TFWQuestHUDToggle` | ⬜ | Enable and read the log. |
+| `TFWQuestItemTag` | ⬜ | **Not in the MO2 store at all.** Manifest must be regenerated after the re-decode regardless. |
 
 ## Class A — Paks (expensive; diff-driven)
 
