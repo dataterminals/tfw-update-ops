@@ -245,6 +245,39 @@ The **DataTables survived**; the **per-weapon DataAssets and curves did not**. T
 routes the triage: mods keyed on DataTables are probably fine, mods keyed on per-weapon assets
 are not.
 
+## Class A sweep — every other mod's targets survive
+
+Same method as the HeavyRifle check: read each mod's build script for its exact override set, then
+probe those identifiers against both filelists. **HeavyRifle is the only casualty.**
+
+| Repo | Targets checked | Result |
+|---|---|---|
+| `UnkillablesRebalanceFix` | 6 boss BPs + `AIDEF_Euruska_Stalker` ×4 + `BPC_IncomingDamageMod` | **8/8 survive**, identical counts |
+| `AllWeaponsUnlockableFix` | 6 × `EarlyAccess_*_Root` skill trees | **6/6 survive** |
+| `TFWCharModelSelFramework` | `DT_SkinUIData`, `ST_FW_UI_Skins`, `GA_Player_ChangeSkin`, `SK_SCV_FL`, `BP_Player_*` | **5/5 survive** |
+| `TFWQuestGiverPortraitPatch` | `FW/UI/MainMenu/Textures/Quest` | **122 textures, count unchanged** |
+
+Caveat that keeps all four at 🟨 rather than 🟩: a surviving *path* is not a surviving *asset*.
+Blueprint graph contents and DataTable values change without the path moving, and
+`UnkillablesRebalanceFix` in particular silently reverts upstream BP edits. Clearing these needs a
+content diff, not a path diff.
+
+## A stable usmap filename is load-bearing
+
+The regenerated map was briefly installed as `ForeverWinter-5.4.2-24479102.usmap`. That broke
+**nine build scripts** across four repos which hardcode `ForeverWinter-5.4.2.usmap`
+(`AllWeaponsUnlockableFix` ×2, `ScavgirlCarryPerks` ×6, `TFWQuestGiverPortraitPatch` ×1), plus
+several READMEs.
+
+Resolved by inverting the convention: **the live map keeps the stable name**, and *archived* maps
+carry the build stamp (`mappings/archive/ForeverWinter-5.4.2-build24097213.usmap`). Provenance
+lives in the archive filename and git history instead of in the active path. Verified after the
+rename — decoder resolves one map and `DA_WPN_PLAYER_HRF01` still decodes clean
+(`ADSMovementSpeed 250.0`, `AimLagSpringStiffness 2000.0`).
+
+Worth remembering next patch: renaming the active usmap is a breaking change to every downstream
+build script, not a bookkeeping detail.
+
 ## Routing
 
 | Repo | Verdict | Why |
