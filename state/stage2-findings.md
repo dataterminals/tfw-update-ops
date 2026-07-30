@@ -17,7 +17,57 @@ The decoder mounted **76,309 files** from the new paks using the key hardcoded a
 Note this does **not** clear Gate 1b. `list` needs the key, not the `.usmap` — property decoding
 is untested until something is actually dumped.
 
-## Gate 1b — REOPENED: the usmap is partially stale
+## Gate 1b — RESOLVED (usmap regenerated 2026-07-30 18:15)
+
+Regenerated via the built-in UE4SS `DumpUSMAP` keybind (Ctrl+Numpad6, already bound in the
+`Keybinds` mod — no custom Lua mod was needed, contrary to the datamine README procedure).
+New map is `ForeverWinter-5.4.2-24479102.usmap`, 2,154,699 B (old: 2,152,882 B, delta +1,817).
+Old map archived to `mappings/archive/` and still reachable via the `baseline-24097213` tag.
+
+Re-decoding `DA_WPN_PLAYER_HRF01` with it fixes everything:
+
+| Property | Stale usmap | Regenerated | Old build |
+|---|---|---|---|
+| `ADSMovementSpeed` | `1.14637E-40` | `250.0` | `250.0` |
+| `OTAMovementSpeed` | `5.3264E-34` | `250.0` | `250.0` |
+| `MaxAimLagYaw` | `Y: 1.1709359E+17` | `{-75.0, 75.0}` | — |
+| `AimLagSpringStiffness` | `0.5` | `2000.0` | `2000.0` |
+| `AimLagSpringMass` | `2000.0` | `55.0` | `55.0` |
+| `NumberOfBurstShots` | `16288` | *(not a real property)* | — |
+| `NumberOfBuckshots` | *(absent)* | `1` | `1` |
+
+The full `CharacterWeaponAnimationSets` block also returns — six pawn entries (Girl, Gunhead,
+OldMan, Shaman, BagMan, MaskMan) with complete montage/anim-layer references. That is what the
+missing 20 KB was.
+
+### The HeavyRifle question, now answerable
+
+**The tuning levers survived.** `DA_WPN_PLAYER_HRF01` still carries `MaxDispersionRate`,
+`DispersionCoolDownStart`, `DispersionCoolDownRate`, the recoil block (`RecoilWristYaw`,
+`RecoilWristPitch`, `RecoilWristRecoveryBlend`, `RecoilArmAngle`, `ScaleRecoilADS`), the aim-lag
+spring block, and `StabilizeFireTime` / `StabilizeFireScaleAimLag`. The deleted `FC_*` curve tree
+was the *per-part upgrade* layer, not the base per-weapon stats.
+
+So `HeavyRifleRebalanceFix` is **rebuildable, not architecturally dead** — provided it edited the
+weapon DataAsset. If it edited the `FC_*` curves, that half of its technique is gone. **Confirm
+which before planning the rebuild.**
+
+### Real HRF01 changes (now trustworthy)
+
+| Property | Old | New |
+|---|---|---|
+| `WeaponDamage` | 300.0 | **270.0** (-10%) |
+| `DistanceToSphere` | 200.0 | **1000.0** (5x) |
+| `ScaleADSCameraBlendSpeed` | *(absent)* | **1.25** |
+| `ScaleADSExitCameraBlendSpeed` | *(absent)* | **1.125** |
+
+The two new properties are the patch note "each weapon now has its own appropriate enter / exit
+ADS speed", visible directly in the data. Dispersion values are **unchanged** (`3.0` / `0.333333`
+/ `0.175`) — the accuracy rework happened elsewhere, not in the base weapon stats.
+
+---
+
+## How the staleness was found (kept for doctrine)
 
 **Correcting an earlier call in this same document.** Gate 1b was marked cleared on the strength
 of the AI-sensor probe below. That evidence was real but the conclusion was over-generalised: a
