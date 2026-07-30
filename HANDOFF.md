@@ -1,52 +1,51 @@
 # HANDOFF — start here
 
-**Written:** 2026-07-30, end of the session that created this repo.
-**State:** repo scaffolded and pushed. Update **not applied**. Baseline **not captured**.
+**Written:** 2026-07-30, updated the same day as the patch was applied.
+**State:** baseline **captured and verified**. Patch **applied** (or applying) — Sylvia launched
+the game on 2026-07-30 after the baseline was confirmed safe.
 
 ---
 
 ## The situation in four lines
 
-- TFW is on build `24097213`. Build `24479102` (~820 MB) is downloaded-pending, **not applied**.
-- Steam is set to **"only update when I launch it"** — so the patch lands the moment the game is
-  launched, and not before. **Do not launch TFW.**
-- Nothing has been captured yet. The old build is still on disk; that window is open until launch.
+- Baseline `pre-24479102` is captured, verified, committed and pushed. **The window was not missed.**
+- The patch to build `24479102` was deliberately triggered afterwards by launching TFW from Steam.
+- Patch notes are known: a **content patch** — comprehensive weapons-systems overhaul. No engine bump.
 - 25 TFW repos are in scope, of which 12 mods are actively deployed in MO2.
 
 ## The single most important thing
 
-**Capture the baseline before the game is launched.** Everything about this update gets easier or
-harder based on whether we have a pre-patch snapshot to diff against. Class A (pak) mods fail
-*silently* — without a baseline you cannot tell a working mod from a dead one without manually
-re-verifying every value in-game.
+**Do not launch through MO2 until Gate 3.** The old-build loadout against a patched game either
+crashes or, worse, silently muddies triage. The first MO2 launch should carry **only RE-UE4SS +
+Signature Bypass** — that run is simultaneously the UE4SS gate test and the smoke test that MO2
+support still works on the new build.
 
-```bash
-powershell -File "H:/Github Repositories/tfw-update-ops/tools/capture_baseline.ps1" -Label pre-24479102 -RunDecoderList
-```
+## Where to pick up
 
-Read `docs/baseline-capture.md` first — particularly the "what NOT to capture" section, so nobody
-tries to back up 48.5 GB of paks.
+Follow [`docs/triage-pipeline.md`](docs/triage-pipeline.md) from **Stage 0**.
 
-## First five actions for the next session
+1. **Stage 0 — record the landing.** `powershell -File tools/steam_state.ps1`, then append the new
+   row to `state/build-history.md`. **The new depot manifest is the rollback key for the *next*
+   patch** — capture it while it is in front of you; Steam overwrites it on the following update.
 
-1. **Verify the window is still open.**
-   `powershell -File tools/steam_state.ps1` — confirm `Installed build: 24097213`. If it already reads
-   `24479102`, we're past the window: skip to `docs/rollback.md` and decide whether a depot
-   downgrade is worth it.
+2. **Capture the post baseline and diff it.** Both steps, in order:
+   ```bash
+   powershell -File tools/capture_baseline.ps1 -Label post-24479102 -RunDecoderList
+   powershell -File tools/diff_baseline.ps1 -Before pre-24479102 -After post-24479102
+   ```
+   The report lands in `state/diffs/pre-24479102__vs__post-24479102/REPORT.md`.
 
-2. **Run the capture** — the decoder prerequisite is already confirmed (see below), so go straight
-   to it with `-RunDecoderList`. Then check `state/baselines/pre-24479102/SUMMARY.md` — it prints its own
-   warnings. An incomplete baseline is decorative; fix the warnings before moving on.
+3. **Gate 1a / 1b — AES key and usmap.** If the diff says the shipping exe is byte-identical, the
+   AES key cannot have rotated and the UE4SS/Signature-Bypass signatures still match; the report
+   says so explicitly. Otherwise re-run AESDumpster. Then decode a known asset and check the
+   values are plausible before trusting anything downstream.
 
-3. **Sanity-check `filelist.txt`** — it should be tens of thousands of lines. If it's empty or
-   tiny, the decode failed silently and the baseline's most valuable piece is missing.
+4. **Route the diff at the mods.** Intersect the asset churn against
+   [`state/asset-dependencies.md`](state/asset-dependencies.md) — it maps every Class A/B mod to
+   the exact asset paths, DataTables, classes and gameplay tags it depends on. That intersection
+   is the Stage 5 work list. Update `state/status.md` as each row resolves.
 
-4. **Tag the datamine repo.** `git -C "H:/Github Repositories/forever-winter-datamine" tag baseline-24097213`
-   and push the tag. The dumps live there; this makes the pre-patch state addressable by name.
-   (Working tree was **clean** at HEAD `36b068b8` when checked.)
-
-5. **Then, and only then, tell Sylvia the baseline is safe** and let her launch the game to apply
-   the patch. From there, follow `docs/triage-pipeline.md` from Stage 0.
+5. **Then Gate 3** — the RE-UE4SS-only MO2 launch described above.
 
 ## Things established this session (don't re-derive)
 
@@ -61,26 +60,31 @@ tries to back up 48.5 GB of paks.
 - **`TFW_CyborgNerfFix` is an empty repo** — `.git` only, zero commits, no working tree. Needs a
   decision: build it or archive it.
 - **Pak set:** 118 files, 48,540,247,963 bytes. Not worth backing up; the manifest ID covers it.
-- **Both tools are tested and working.** `steam_state.ps1` ran clean; `capture_baseline.ps1` ran
-  clean end-to-end as a smoke test (~442 KB output, since deleted).
+- **All three tools are tested and working.** `steam_state.ps1` and `capture_baseline.ps1` both ran
+  clean on real data. `diff_baseline.ps1` was verified against a synthetic patched baseline that
+  exercised every branch (binary add/change/remove, pak churn, filelist add/remove, and all four
+  DataTable states) — not just the no-op self-diff.
 - **The decoder prerequisite is satisfied.** Both .NET SDK `8.0.420` and **`10.0.301`** are
-  installed, and `datamine/decoder/bin/Release/net10.0/fwextract.exe` exists (built 2026-07-27).
-  So `-RunDecoderList` should work. **The datamine README is stale on this point** — it says only
-  SDK 8 is installed, which is why `fwdata` shells out to the prebuilt exe instead of
-  `dotnet run`. Worth correcting there at some point; harmless either way.
+  installed. The stale datamine README claim about SDK 8 has been **corrected** (`5570d5d`), and
+  `Microsoft.Bcl.Memory` was bumped to `10.0.10` to clear a high-severity advisory — verified
+  non-disruptive: the regenerated filelist was byte-identical to the captured baseline.
+- **Patch notes are known and archived** in [`state/patch-notes-24479102.md`](state/patch-notes-24479102.md),
+  with a per-mod blast-radius read. Headline: weapons-systems overhaul, no engine bump.
 
 ## Known unknowns
 
-- **What's actually in the patch.** No patch notes reviewed. Worth 5 minutes before Stage 1 — a
-  content patch and an engine bump are very different days.
-- **Whether the usmap survives.** Unknowable until we decode against the new build.
+- **Whether the usmap survives.** Unknowable until we decode against the new build. The absence of
+  an engine bump in the notes is encouraging but not proof.
 - **Whether the AES key rotated.** Constant across every patch so far, but "so far" is load-bearing.
-- **Whether a compatible experimental RE-UE4SS build exists** for the new engine build. If not,
+  If the shipping exe turns out byte-identical, this is settled for free.
+- **Whether a compatible experimental RE-UE4SS build exists** for the new build. If not,
   Class B is blocked on upstream and should be parked, not stalled on.
+- **Whether weapon DataTables were retuned in place.** Near-certain from the patch notes, and
+  *invisible* to the catalog diff (same RowStruct, same row count). Requires a dump-value diff.
 
 ## What was deliberately not done
 
-- No mod code was touched. No repo other than this one was modified.
-- No Steam settings were changed — Sylvia set the update hold herself.
-- The game was not launched.
-- `state/status.md` was created but every row is ⬜. It is a plan, not a record.
+- No mod code was touched. Only this repo and `forever-winter-datamine` were modified.
+- No Steam settings were changed — Sylvia set the update hold herself, and triggered the patch
+  herself by launching from Steam once the baseline was confirmed safe.
+- The game has **not** been launched through MO2. Do not, until Gate 3.

@@ -36,8 +36,21 @@ cd "H:/Github Repositories/forever-winter-datamine/datamine/decoder"
 dotnet run -c Release -- list                        # new filelist.txt
 ```
 
-Diff the new `filelist.txt` against the baseline. **This is the intelligence product** — added,
-removed, and moved assets, which is exactly what Class A cares about.
+Capture a post-patch baseline, then diff the two:
+
+```bash
+powershell -File tools/capture_baseline.ps1 -Label post-24479102 -RunDecoderList
+powershell -File tools/diff_baseline.ps1 -Before pre-24479102 -After post-24479102
+```
+
+**This is the intelligence product** — added, removed, and moved assets, which is exactly what
+Class A cares about. Intersect the churn against [`../state/asset-dependencies.md`](../state/asset-dependencies.md),
+which maps every Class A/B mod to the specific asset paths, DataTables, classes and tags it
+depends on. That intersection *is* the Stage 5 work list.
+
+⚠️ The diff compares **schema and row counts**, not values. This patch is a weapons *tuning*
+pass, and a retuned DataTable that keeps its RowStruct and row count is invisible to it. Treat a
+clean catalog diff as "nothing was restructured," never as "nothing changed."
 
 Then force-re-decode every dumped family:
 

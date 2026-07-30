@@ -46,6 +46,16 @@ fwdata catalog, and the datamine git SHA into `state/baselines/<label>/`. Add `-
 for a fast pass (~118 pak files, 48.5 GB — hashing is the slow part). `-RunDecoderList` needs the
 .NET 10 SDK and produces `filelist.txt`, the most valuable diff input.
 
+```bash
+powershell -File tools/diff_baseline.ps1 -Before pre-24479102 -After post-24479102
+```
+Compares two baselines into `state/diffs/<before>__vs__<after>/` — a `REPORT.md` plus
+`filelist-added/removed.txt`, `paks-changed.csv`, `binaries-changed.csv`, `tables-changed.csv`.
+**This is the Stage 2 intelligence product.** Cross-reference its asset churn against
+[`state/asset-dependencies.md`](state/asset-dependencies.md) to get the per-mod hit list.
+Note what it does *not* tell you: it compares schema and row counts, so a tuning pass that
+rewrites values in place shows up as "no change." Only a dump diff proves values are intact.
+
 ## Conventions carried over from the other repos
 
 - Commit with `git commit -F <file>` — PowerShell mangles `-m` with quoted multi-line strings.
