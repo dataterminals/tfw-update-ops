@@ -1,0 +1,94 @@
+[
+  {
+    "Type": "FWWeaponDefinition",
+    "Name": "DA_WPN_PLAYER_HRF01",
+    "Flags": "RF_Public | RF_Standalone | RF_Transactional | RF_WasLoaded | RF_LoadCompleted",
+    "Class": "UScriptClass'FWWeaponDefinition'",
+    "Package": "/Game/FW/Weapons/Weapon_V2/HRF_HeavyRifles/HRF01/DA_WPN_PLAYER_HRF01",
+    "Properties": {
+      "WeaponTypeTag": {
+        "TagName": "Weapon.Type.Rifle"
+      },
+      "CharacterRightHand": "RightHand",
+      "SocketNameRightHand": "RightHandSocket_Rifle",
+      "SocketNameLeftHand": "IK_Hand_L",
+      "SocketNameVehicle": "ATT_OpticSocket",
+      "SocketOptic": "Optics",
+      "WeaponCameraWeaponSocket": "Camera",
+      "WeaponFireGameplayCue": {
+        "TagName": "GameplayCue.Weapon.HRF01.Fire"
+      },
+      "WeaponPassiveEffects": [
+        {
+          "ObjectName": "BlueprintGeneratedClass'GE_WPN_Passive_HRF_C'",
+          "ObjectPath": "/Game/FW/Weapons/Weapon_V2/HRF_HeavyRifles/GE_WPN_Passive_HRF.0"
+        }
+      ],
+      "AmmoTypeCaliber": {
+        "TagName": "Item.Ammo.50cal"
+      },
+      "MetaData": [
+        "Weapon.Threat.Low"
+      ],
+      "TraceLength": 100000.0,
+      "CrosshairGunFireFactorEndSpeed": 5.0,
+      "FireRate": 0.1,
+      "WeaponDamage": 270.0,
+      "DistanceToSphere": 1000.0,
+      "SphereRadius": 0.05,
+      "CrosshairSpreadScalar": 1.333333,
+      "MaxDispersionRate": 3.0,
+      "DispersionCoolDownStart": 0.333333,
+      "DispersionCoolDownRate": 0.175,
+      "FovHipFire": 90.0,
+      "FovADS": 60.0,
+      "FovOTS": 70.0,
+      "FovSprint": 110.0,
+      "FovSpeed": 8.0,
+      "FovSprintSpeed": 3.0,
+      "bUseSpreadShot": false,
+      "bUseRandomRadius": false,
+      "NumberOfBurstShots": 16288,
+      "ADSMovementSpeed": 1.14637E-40,
+      "OTAMovementSpeed": 5.3264E-34,
+      "MaxAimLagYaw": {
+        "X": 0.0,
+        "Y": 1.1709359E+17
+      },
+      "MaxAimLagYawADS": {
+        "X": 0.0,
+        "Y": 0.0
+      },
+      "MaxAimLagPitch": {
+        "X": 0.0,
+        "Y": 0.0
+      },
+      "ScaleAimLagPositionInADS": 3.2929688,
+      "AimLagSpringStiffness": 0.5,
+      "AimLagSpringDamping": 0.2,
+      "AimLagSpringMass": 2000.0,
+      "AimLagTurnSpeedContributionScalar": 0.85,
+      "AimLagIdleScale": 55.0,
+      "AimLagIdleStabilizeADSTime": 0.5,
+      "RecoilWristRecoveryBlend": 2.5,
+      "RecoilArmAngle": 0.0,
+      "ScaleRecoilADS": 0.2,
+      "StabilizeFireTime": 0.1,
+      "StabilizeFireScaleAimLag": 1.0,
+      "bAutomatic": false,
+      "bUseWeaponSocket": false,
+      "WeaponOffset": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0
+      },
+      "FireAnimationMontage": null,
+      "Fire1PADSCrouchedAnimationMontage": null,
+      "EquipAnimationMontage": null,
+      "UnequipAnimationMontage": null,
+      "BeamTraceEffect": null,
+      "WeaponPartTunableDataAsset": null,
+      "NativeClass": null
+    }
+  }
+]

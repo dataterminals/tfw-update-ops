@@ -17,7 +17,61 @@ The decoder mounted **76,309 files** from the new paks using the key hardcoded a
 Note this does **not** clear Gate 1b. `list` needs the key, not the `.usmap` — property decoding
 is untested until something is actually dumped.
 
-## Gate 1b — usmap: CLEARED
+## Gate 1b — REOPENED: the usmap is partially stale
+
+**Correcting an earlier call in this same document.** Gate 1b was marked cleared on the strength
+of the AI-sensor probe below. That evidence was real but the conclusion was over-generalised: a
+`.usmap` is a **per-struct** type map, so "it decoded one family correctly" says nothing about a
+family the patch actually restructured.
+
+Decoding `DA_WPN_PLAYER_HRF01` exposed it. The struct type name is unchanged
+(`FWWeaponDefinition`), it reports 57 properties, and the leading properties are perfect —
+`MaxDispersionRate 3.0`, `DispersionCoolDownStart 0.333333`, `DispersionCoolDownRate 0.175`,
+matching the documented pre-patch values exactly. Then it derails:
+
+```
+NumberOfBurstShots   16288           <- a 16,288-round burst
+ADSMovementSpeed     1.14637E-40     <- denormalized float
+OTAMovementSpeed     5.3264E-34      <- denormalized float
+MaxAimLagYaw.Y       1.1709359E+17
+```
+
+Comparing shared properties against the committed `DA_WPN_HRF01_v2.json` proves what happened —
+**the same distinctive values are present, bound to the wrong names:**
+
+| Old property | Value | New property now holding it |
+|---|---|---|
+| `AimLagSpringStiffness` | 2000.0 | `AimLagSpringMass` |
+| `AimLagSpringDamping` | 0.85 | `AimLagTurnSpeedContributionScalar` |
+| `AimLagSpringMass` | 55.0 | `AimLagIdleScale` |
+| `AimLagTurnSpeedContributionScalar` | 0.5 | `AimLagIdleStabilizeADSTime` |
+
+A spring with stiffness `0.5` and mass `2000.0` is physically absurd; stiffness `2000.0` with
+mass `55.0` is sensible. The **old** labelling is the correct one, so it is the new decode that
+is shifted — UE5 unversioned properties are positional, the real struct's property order changed,
+and the stale usmap maps the byte stream onto stale names.
+
+**Consequences, and they are serious:**
+
+1. **Every weapon value decoded with the current usmap is untrustworthy** — including the
+   `WeaponDamage 300 -> 270` "change" reported earlier in this document. That may be a real
+   nerf or may be a shift artifact; it cannot be distinguished until the usmap is regenerated.
+2. **The added/removed property lists are also artifacts.** `bUseSpreadShot`, `NumberOfBurstShots`
+   et al. are the stale map's guesses, not evidence about the real struct.
+3. This is precisely the failure mode the exposure model warns about — *"garbage that still
+   parses"*. It does not error. It produces confident, plausible, wrong numbers, which is exactly
+   what would have been published to the almanac.
+
+**Required before any weapons work:** regenerate the usmap with the experimental UE4SS
+`DumpUSMAP()` (datamine README procedure), then re-decode. This is now unblocked — Gate 3 proved
+UE4SS attaches to the patched exe. Remember UE4SS emits usmap **v4**, needing CUE4Parse
+`1.2.2.202607`, already pinned.
+
+**What is still safe:** structs the patch did not touch. The AI-sensor evidence below stands on
+its own — those 28 byte-identical dumps are genuinely valid, and the pistol-stealth finding is
+real. Treat per-family validity as something to be demonstrated, not assumed.
+
+## The AI-sensor probe (valid, and the basis of the original 1b call)
 
 Dumped all 43 `AIDEF_Sensor_*` assets against the existing
 `ForeverWinter-5.4.2.usmap`: **43 ok, 0 fail**, and — the part that actually proves it —
@@ -122,7 +176,7 @@ are not.
 
 | Repo | Verdict | Why |
 |---|---|---|
-| `HeavyRifleRebalanceFix` | **Dead — rebuild** | Every overlay target (`DA_WPN_HRF*_v2`, `FC_HRF*`, the HRF upgrade-tuning tree) is renamed or deleted. Fails **silently**. Worse than a rebuild: the curve-based technique itself may no longer exist, so this needs a design decision before a build. |
+| `HeavyRifleRebalanceFix` | **Dead — blocked on usmap** | Every overlay target (`DA_WPN_HRF*_v2`, `FC_HRF*`, the HRF upgrade-tuning tree) is renamed or deleted. Fails **silently**. The successor asset `DA_WPN_PLAYER_HRF01` exists and is far smaller (2.9 KB vs 22.7 KB), but **its contents cannot be read correctly until the usmap is regenerated** — so the design question "does an equivalent tuning lever still exist?" is currently unanswerable. Do not attempt a rebuild first. |
 | `forever-winter-datamine` | **Dumps invalid** | `DA_WPN_RFL01_v2` and `FC_RFL00_Stability` no longer exist. Weapon dumps describe a deleted system. Re-decode against the new `DA_WPN_PLAYER_*` layout; `assets.py` logical names need updating. |
 | `forever-winter-almanac` | **Rework, not restamp** | The published Stability analysis (dispersion curves, Stability 0->1 numbers) documents a system that is gone. Restamping it to `24479102` would make it *confidently wrong*. Gunsmith section likewise. |
 | `AllWeaponsUnlockableFix` | **Probably OK — verify** | Its DataTable targets survived. Confirm exact targets before clearing. |
