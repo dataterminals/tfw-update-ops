@@ -37,17 +37,20 @@ These block whole classes. Nothing below them means anything until they're resol
 
 ## Class B — Lua (do first; cheap intel)
 
-**Gates 3 and 3b are cleared — this class is UNBLOCKED and is now the cheapest intel available.**
-None of these is currently enabled in MO2, so no user is affected right now; the reason to run
-them next is doctrinal: their resolution failures name the exact paths that moved, which turns
-Class A from "diff everything" into "diff these."
+**Gates 3 and 3b cleared, and all three deployed Class B mods ran on the new build 2026-07-30
+17:57.** No class, Blueprint, widget or function any of them resolves has moved. Zero Lua errors
+in the session log.
+
+The hoped-for side benefit did not materialise — Class B failures were supposed to name the paths
+that moved and thereby sharpen Class A. Nothing failed, so there is no such intel. That is a good
+outcome, just not a useful one for Class A.
 
 | Repo | Status | Finding |
 |---|---|---|
-| `TFWStaggerControl` | ⬜ | Enable and read the log. Was never game-verified on the old build — verify fresh, don't assume regression. Pivots on the ungranted `Ability.HitReactionBlocked` tag. |
-| `TFWLootAll` | ⬜ | Enable and read the log. Re-check `W_LootUI_C` still resolves — a UI crash fix shipped in this patch. |
-| `TFWQuestHUDToggle` | ⬜ | Enable and read the log. |
-| `TFWQuestItemTag` | ⬜ | **Not in the MO2 store at all.** Manifest must be regenerated after the re-decode regardless. |
+| `TFWLootAll` | 🟨 | **Loads clean** — v0.1.0 PROBE, both keybinds bound, no errors. `W_LootUI.uasset` survives the patch. **Not functionally tested** — needs Ctrl+L at a real container to confirm the transfer path. |
+| `TFWQuestHUDToggle` | 🟨 | **Loads clean** — v0.1.1, both keybinds bound, no errors. **Not functionally tested** — needs Ctrl+Shift+Q in a quest HUD context. |
+| `TFWStaggerControl` | 🟩 | **Not broken by the patch.** Both hook targets survive (`GA_Player_HitReaction.uasset`, `BP_PlayerBase.uasset`) and both hooks **registered successfully in-game** at player restart (`hook (8,8)` / `(9,9)`); probes found a live `GA_Player_HitReaction_C`. The startup "FAILED to hook" lines are the mod's own deferred-retry design, not a regression. Separately: the mod is **incomplete by design state** and is developed/tested on another client — that is dev status, not patch damage, and must not be scored against this patch. |
+| `TFWQuestItemTag` | ⬜ | **Not in the MO2 store at all**, so untestable here. Manifest must be regenerated after the re-decode regardless. |
 
 ## Class A — Paks (expensive; diff-driven)
 
