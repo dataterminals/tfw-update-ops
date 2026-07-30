@@ -245,6 +245,60 @@ The **DataTables survived**; the **per-weapon DataAssets and curves did not**. T
 routes the triage: mods keyed on DataTables are probably fine, mods keyed on per-weapon assets
 are not.
 
+## Stage 2 complete — re-decode done, and it changed the answer
+
+The catalog is now genuinely rebuilt from freshly decoded data (build stamp `24097213` →
+`24479102`, and this time the *data* moved with the stamp).
+
+### The `--force` → `build all` workflow has a gap
+
+`fwdata get <asset> --force` re-decodes into the **build-namespaced cache**
+(`decoder/out/cache/24479102/dump/…`). `fwdata build all` globs **`datamine/dumps/`**. Nothing
+promotes cache → dumps, so running the documented sequence back-to-back produces a catalog stamped
+with the new build and populated from the old dumps — exactly the failure the datamine README
+warns about, reached by following the README's own remedy.
+
+Fixed here by promoting explicitly before rebuilding. **Worth a `fwdata` change** so the documented
+workflow is correct on its own rather than depending on someone knowing this.
+
+Promotion was not a blind copy:
+- **weapons** — deleted 14 dumps of now-nonexistent assets (`DA_WPN_HRF01–05_v2`, `DA_WPN_RFL01_v2`
+  + 3 variants, `DA_WPN_RFL29_v2`, 3× `FC_RFL00_Stability*`, `DA_WPN_RFL01_BaseTuning_..._Curves`),
+  promoted 74 fresh → **75 files**.
+- **items / ui_widgets** — straight promote (15 / 9).
+- **lootobjects** — refreshed only the **151 tracked** names; skipped 282 untracked. That subdir is a
+  deliberate 151-of-437 curation ("only the ones with loot wiring"), and a blind copy would have
+  silently tripled it with textures and widgets.
+
+### Real DataTable changes — invisible until now
+
+The earlier catalog diff reported "no table changes." That was wrong, and wrong for an instructive
+reason: **both sides were derived from the same stale dumps**, so it was comparing old data to old
+data. With a real re-decode:
+
+| Table | Before | After |
+|---|---|---|
+| `WeaponsDetailsData` | 56 rows | **53** |
+| `DT_TagToRowHandle` | 1176 rows | **1173** |
+
+Both lost the same three, and they are named: **`RFL01_Red`, `RFL01_Blue`, `RFL01_Green`** — the
+RFL01 colour variants, matching the deleted `DA_WPN_RFL01_v2_VariantA/B/C` assets exactly. Those
+weapons were cut from the game.
+
+**Check `AllWeaponsUnlockableFix` for references to those three rows** — its targets all survive,
+but a reference to a removed row is a different failure than a missing asset.
+
+`items.json` holds at 792 rows, so the item economy is untouched.
+
+### Still outstanding: dumps outside the taxonomy
+
+`fwdata`'s taxonomy covers 10 logical assets, but `datamine/dumps/` has **13 subdirs**. The nine not
+covered — `ai_noise`, `ai_sensors`, `bosses`, `containers`, `crafting`, `enemies`, `factions`,
+`hunterkillers`, `loot` — were **not** re-decoded here. Every asset they reference still exists
+(verified: 0 stale across all of them), and the AI-sensor family is known-good from the Gate 1b
+probe, so they are not suspect. But they were decoded under the old usmap and have not been
+re-verified value-by-value. **Adding taxonomy entries for them is the natural next cleanup.**
+
 ## Class A sweep — every other mod's targets survive
 
 Same method as the HeavyRifle check: read each mod's build script for its exact override set, then

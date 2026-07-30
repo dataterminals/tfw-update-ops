@@ -30,7 +30,7 @@ These block whole classes. Nothing below them means anything until they're resol
 | 0 | Baseline captured | 🟩 | Both sides captured, 0 warnings. `pre-24479102` (76,589 entries) + `post-24479102` (76,309). Datamine tagged `baseline-24097213` @ `36b068b8`. New rollback key `6430523508700280691`. |
 | 1a | AES key still valid | 🟩 | **Cleared.** Decoder mounted 76,309 files from the new paks with the key hardcoded at `decoder/Program.cs:28`. The IoStore index is AES-encrypted, so the mount *is* the test. No AESDumpster run needed. |
 | 1b | usmap valid (or regenerated) | 🟩 | **Resolved by regeneration 18:15.** Was found stale for `FWWeaponDefinition` (shifted values under wrong names). Dumped a fresh map via UE4SS `Ctrl+Numpad6` → `ForeverWinter-5.4.2-24479102.usmap`; re-decode is clean and round-trips against the old dump. Old map archived to `mappings/archive/`. |
-| 2 | Re-decode + filelist diff | 🟨 | Filelist diff **done** — see [`stage2-findings.md`](stage2-findings.md). Force re-decode still outstanding; the catalog is stale (`tables.json` still stamps `24097213`). |
+| 2 | Re-decode + filelist diff | 🟩 | **Complete.** Filelist diff + force re-decode + catalog rebuild from fresh dumps (stamp `24479102`, data to match). Real deltas found that the stale-vs-stale diff had missed: `WeaponsDetailsData` 56→53, `DT_TagToRowHandle` 1176→1173 (rows `RFL01_Red/Blue/Green` cut). Nine non-taxonomy dump subdirs not re-decoded — verified 0 stale, flagged as cleanup. |
 | 3 | RE-UE4SS attaches to new exe | 🟩 | **Cleared 2026-07-30 17:50.** Clean attach against the new exe (`169584128 B` confirmed in-log). PS scan finished 627 ms, `EngineVersion 5.4`, all symbols resolved, `PS scan successful`, `Event loop start`. The lone `FUObjectHashTables::Get()` miss is **pre-existing** — byte-for-byte the same line appears in the 2026-07-27 old-build log. **Class B is unblocked.** |
 | 3b | Signature Bypass matches new exe | 🟩 | **Cleared 2026-07-30 17:50:55.** bitfix AOB scan hit on the new exe (`scan results: [[7FF6E9560600, 7FF6E9560950]]`) and applied the patch (`writing C3`). Same shape as the 07-27 run at shifted addresses. |
 | 5a | TFWWorkbench reads new paks | ⬜ | Gates all of Class A rebuilds. |
@@ -68,7 +68,7 @@ outcome, just not a useful one for Class A.
 
 | Repo | Status | Finding |
 |---|---|---|
-| `forever-winter-datamine` | 🟥 | **Weapon dumps invalid.** `DA_WPN_RFL01_v2` and `FC_RFL00_Stability` no longer exist. Re-decode against the new `DA_WPN_PLAYER_*` / `DA_WPN_AI_*` layout; `assets.py` logical names need updating. Upstream of everything below. |
+| `forever-winter-datamine` | 🟩 | **Re-decoded and current.** usmap regenerated; 14 dumps of deleted assets removed, 74 fresh weapon dumps promoted; catalog rebuilt from fresh data at build `24479102`. `assets.py` gained `player_weapons` / `ai_weapons` / `weapon_tables` entries (weapons were previously ad-hoc, never in the taxonomy). Cleanup left: 9 dump subdirs still outside the taxonomy. |
 | `forever-winter-almanac` | 🟥 | **Rework, not restamp.** The published Stability analysis (dispersion curves, the Stability 0→1 numbers) documents a system that was deleted. Restamping would make it *confidently wrong*. Gunsmith section likewise. |
 | `forever-winter-maps` | ⬜ | |
 | `NewStefanMap` | ⬜ | |
