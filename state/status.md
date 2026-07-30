@@ -4,7 +4,7 @@
 
 Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · ⬛ n/a this patch
 
-Last updated: 2026-07-30 (repo created; update not yet applied)
+Last updated: 2026-07-30 (baseline captured + pushed; patch notes reviewed; update not yet applied)
 
 ---
 
@@ -14,7 +14,7 @@ These block whole classes. Nothing below them means anything until they're resol
 
 | # | Gate | Status | Notes |
 |---|---|---|---|
-| 0 | Baseline captured | ⬜ | **Do before giving Steam the go-ahead.** |
+| 0 | Baseline captured | 🟩 | `pre-24479102` captured 2026-07-30, 0 warnings; filelist 76,589 entries; datamine tagged `baseline-24097213` @ `36b068b8`. |
 | 1a | AES key still valid | ⬜ | Constant across patches so far. Re-verify with AESDumpster. |
 | 1b | usmap valid (or regenerated) | ⬜ | Regeneration needs experimental UE4SS + `DumpUSMAP()`. |
 | 2 | Re-decode + filelist diff | ⬜ | Force-decode; do **not** trust `fwdata build all` alone. |

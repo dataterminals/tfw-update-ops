@@ -1,0 +1,39 @@
+﻿AllWeaponsUnlockableFix
+AllWeaponsUnlockableTrees
+Augmented Kane
+Bunco-chan Texture Swap
+CMSF
+CMSF P7 Author
+CMSF P7 Core
+CMSF P9 IconSignal
+CMSF PoC
+CMSF PoC Fallback
+CMSF Probe
+CMSF Probe3 SamePak
+CMSF Probe45 Core
+CMSF Probe45 High
+CMSF Probe45 Low
+CMSF Probe6 Respawn
+CMSF Probe6b RollTest
+CMSF Roster Test
+CMSF Skin - Octogirl (Girl 00)
+CMSF Stress 384
+CMSF v0.2 Framework
+CMSFUnlock ONLY (control)
+FWStealth
+HeavyRifleRebalanceFix
+Naughty Luca
+QuestGiver Portrait Patch
+RE-UE4SS
+Recruiter Slade
+ScavgirlCarryPerks-Balanced
+ScavgirlCarryPerks-Combined-Balanced
+ScavgirlCarryPerks-Combined-Unbalanced
+ScavgirlCarryPerks-UE4SS
+ScavgirlCarryPerks-Unbalanced
+Signature Bypass
+TFWLootAll
+TFWQuestHUDToggle
+TFWStaggerControl
+TFWWorkbench
+UnkillablesRebalanceFix

@@ -24,9 +24,14 @@ Observed 2026-07-30 ~16:50 EDT from `appmanifest_2828860.acf`:
 
 **Baseline capture: NOT YET RUN.** See [`../docs/baseline-capture.md`](../docs/baseline-capture.md).
 
-Unknown until it lands: what the patch actually contains. No patch notes reviewed yet — worth
-reading before Stage 1, since a pure-content patch and an engine-version bump are very different
-days.
+**Patch notes reviewed 2026-07-30** (Discord announcement, archived with a blast-radius read in
+[`patch-notes-24479102.md`](patch-notes-24479102.md)). Characterization: **content patch** —
+comprehensive weapons-systems overhaul (recoil/bloom/ADS/sway, mod effects, non-linear skill
+scaling, DPM tuning pass on all weapons) + AI fixes + networking reliability + crash fixes. No
+engine-version bump mentioned; ~820 MB fits a data patch. Weapon/skill DataTables near-certainly
+changed → `HeavyRifleRebalanceFix`, `AllWeaponsUnlockableFix`, almanac gunsmith are the expected
+hot spots; AI BP fixes raise the prior on the `UnkillablesRebalanceFix` boss BPs. Still unknown
+until decode: AES key, usmap survival.
 
 ## Post-patch close-outs
 

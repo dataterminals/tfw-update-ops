@@ -1,0 +1,4 @@
+﻿datamine HEAD: 36b068b8ca162261454aee3d5b7a11c5c4f5d4f8
+
+working tree:
+  (clean)

@@ -1,0 +1,168 @@
+{
+ "_source": "every decoded DataTable under datamine/dumps",
+ "_note": "Index of DataTables -> RowStruct + row count + dump path.",
+ "build": 24097213,
+ "count": 32,
+ "tables": {
+  "CurrencyData": {
+   "row_struct": "Currency",
+   "rows": 10,
+   "dump": "items/CurrencyData.json"
+  },
+  "DT_CaliberToHeadshotMulti": {
+   "row_struct": "STRUCT_CaliberToHeadshotMulti",
+   "rows": 20,
+   "dump": "weapons/DT_CaliberToHeadshotMulti.json"
+  },
+  "DT_CategoryToItemTags": {
+   "row_struct": "FWCategoryItemTags",
+   "rows": 89,
+   "dump": "items/DT_CategoryToItemTags.json"
+  },
+  "DT_EnemyNameTagtoFactionScore": {
+   "row_struct": "STRUCT_EnemyNameTagtoFactionScore",
+   "rows": 18,
+   "dump": "factions/DT_EnemyNameTagtoFactionScore.json"
+  },
+  "DT_FactionDamageToFactionScore": {
+   "row_struct": "STRUCT_FactionDamageToFactionScore",
+   "rows": 5,
+   "dump": "factions/DT_FactionDamageToFactionScore.json"
+  },
+  "DT_FactionMapControl": {
+   "row_struct": "FWFactionMapControlTableRow",
+   "rows": 14,
+   "dump": "factions/DT_FactionMapControl.json"
+  },
+  "DT_FactionMapScopeTags": {
+   "row_struct": "GameplayTagTableRow",
+   "rows": 14,
+   "dump": "factions/DT_FactionMapScopeTags.json"
+  },
+  "DT_GachaLootTable": {
+   "row_struct": "FWGachaLoot",
+   "rows": 20,
+   "dump": "loot/DT_GachaLootTable.json"
+  },
+  "DT_ManufactoringGroups": {
+   "row_struct": "ManufactoringGroups",
+   "rows": 54,
+   "dump": "crafting/DT_ManufactoringGroups.json"
+  },
+  "DT_ManufactoringRecipies": {
+   "row_struct": "ManufactoringRecipies",
+   "rows": 106,
+   "dump": "crafting/DT_ManufactoringRecipies.json"
+  },
+  "DT_ManufactoringTags": {
+   "row_struct": "GameplayTagTableRow",
+   "rows": 50,
+   "dump": "crafting/DT_ManufactoringTags.json"
+  },
+  "DT_TagToRowHandle": {
+   "row_struct": "FWItemType",
+   "rows": 1176,
+   "dump": "items/DT_TagToRowHandle.json"
+  },
+  "DT_TugOfWar_LevelActions": {
+   "row_struct": "STRUCT_TugOfWar_LevelActions",
+   "rows": 18,
+   "dump": "factions/DT_TugOfWar_LevelActions.json"
+  },
+  "DT_TugOfWar_LevelPercentageChange": {
+   "row_struct": "STRUCT_TugOfWar_LevelPercents_Manual",
+   "rows": 34,
+   "dump": "factions/DT_TugOfWar_LevelPercentageChange.json"
+  },
+  "DT_TugOfWar_RadarKeys": {
+   "row_struct": "STRUCT_TugOfWar_RadarKeys",
+   "rows": 12,
+   "dump": "factions/DT_TugOfWar_RadarKeys.json"
+  },
+  "DanglyDetailsData": {
+   "row_struct": "InventoryDangly",
+   "rows": 65,
+   "dump": "items/DanglyDetailsData.json"
+  },
+  "DanglyDetailsData_DroppedWeapons": {
+   "row_struct": "InventoryDangly",
+   "rows": 69,
+   "dump": "items/DanglyDetailsData_DroppedWeapons.json"
+  },
+  "ItemDetailsData": {
+   "row_struct": "InventoryItemDetails",
+   "rows": 792,
+   "dump": "items/ItemDetailsData.json"
+  },
+  "LEGACY_ItemValueOverrideData": {
+   "row_struct": "ValueOverride",
+   "rows": 150,
+   "dump": "items/LEGACY_ItemValueOverrideData.json"
+  },
+  "QuestItemDetailsData": {
+   "row_struct": "InventoryItemDetails",
+   "rows": 6,
+   "dump": "items/QuestItemDetailsData.json"
+  },
+  "RandomContainerLootData": {
+   "row_struct": "FWRandomContainerLoot",
+   "rows": 562,
+   "dump": "loot/RandomContainerLootData.json"
+  },
+  "ValueV2_AMMO": {
+   "row_struct": "ValueOverride",
+   "rows": 18,
+   "dump": "items/ValueV2_AMMO.json"
+  },
+  "ValueV2_Ingredients": {
+   "row_struct": "ValueOverride",
+   "rows": 15,
+   "dump": "items/ValueV2_Ingredients.json"
+  },
+  "ValueV2_Junk": {
+   "row_struct": "ValueOverride",
+   "rows": 102,
+   "dump": "items/ValueV2_Junk.json"
+  },
+  "ValueV2_RIGEQUIPMENT": {
+   "row_struct": "ValueOverride",
+   "rows": 6,
+   "dump": "items/ValueV2_RIGEQUIPMENT.json"
+  },
+  "ValueV2_RIGS": {
+   "row_struct": "ValueOverride",
+   "rows": 20,
+   "dump": "items/ValueV2_RIGS.json"
+  },
+  "ValueV2_RareLoot": {
+   "row_struct": "ValueOverride",
+   "rows": 189,
+   "dump": "items/ValueV2_RareLoot.json"
+  },
+  "ValueV2_WEAPONS": {
+   "row_struct": "ValueOverride",
+   "rows": 53,
+   "dump": "items/ValueV2_WEAPONS.json"
+  },
+  "ValueV2_WEAPONS_DROPPED": {
+   "row_struct": "ValueOverride",
+   "rows": 45,
+   "dump": "items/ValueV2_WEAPONS_DROPPED.json"
+  },
+  "ValueV2_WEAPONS_PARTS": {
+   "row_struct": "ValueOverride",
+   "rows": 131,
+   "dump": "items/ValueV2_WEAPONS_PARTS.json"
+  },
+  "WeaponPartStatsData": {
+   "row_struct": "FWModifiedStatsPart",
+   "rows": 633,
+   "dump": "weapons/WeaponPartStatsData.json"
+  },
+  "WeaponsDetailsData": {
+   "row_struct": "InventoryDangly",
+   "rows": 56,
+   "dump": "weapons/WeaponsDetailsData.json"
+  }
+ }
+}
