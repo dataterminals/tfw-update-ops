@@ -20,3 +20,9 @@ Thumbs.db
 *.tmp
 __pycache__/
 *.pyc
+
+# CUE4Parse auto-downloads the Oodle decompressor into the process working directory on first
+# run. Running the decoder from a shell sitting in this repo drops it here. This repo holds no
+# decoding code -- it is never wanted.
+oodle-data-shared.dll
+*.dll
