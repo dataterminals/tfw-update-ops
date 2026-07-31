@@ -4,9 +4,14 @@
 
 Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 🟥 confirmed broken · ⬛ n/a this patch
 
-Last updated: 2026-07-31 (2) — **AWU regular regression caught & fixed pre-Nexus** (`d12007d`): the
-rebuild had resurrected Session 2's carry grafts; build now strips + asserts graft sets. Good
-`.ucas` = **110,000 B** (regressed = 110,008 — 8 bytes apart). Redeployed to MO2.
+Last updated: 2026-07-31 (3) — **permission gate closed by clean-room rebuild** (`5ed467c`):
+#110 author is **LassyMorphee**, page grants no permissions, so the regular Fix was rebuilt from
+current vanilla (5 assets, zero upstream bytes, A/B-identical). **Both AWU variants cleared to
+upload.** Good `.ucas` sizes: regular **75,174 B**, Trees **79,239 B** — everything else in the
+lineage (110,000 / 110,008 / 112,133 / 81,372) is superseded or broken. Community reports parsed
+(`community-reports.md`); replies owed to `4ce0fspades` + `Southperry88`.
+Earlier (2): AWU regular regression caught & fixed pre-Nexus (`d12007d`); build now strips +
+asserts graft sets.
 Earlier today: `ScavgirlCarryPerks` verified clean (🟩, no rebuild); `verify_softrefs.py`
 ported to it with a new reversion check; AWU permission gate recorded in the Ship table;
 `TFWQuestGiverPortraitPatch` "Enabled" corrected to disabled.
@@ -98,7 +103,7 @@ outcome, just not a useful one for Class A.
 
 | Repo | Rebuilt + verified | Deployed to MO2 | Permission to redistribute | Nexus updated |
 |---|---|---|---|---|
-| `AllWeaponsUnlockableFix` (regular) | 🟩 `d12007d` — 07-31 carry-graft regression fixed, 0 dangling, graft sets asserted | 🟩 2026-07-31 (redeployed) | 🟥 **NOT CLEARED — #110 (LassyMorphee) grants no permissions; ships 6 of their roots.** Paths: rebuild-from-vanilla / DM-and-wait / Trees-only — decision pending, see `AllWeaponsUnlockableFix/CREDITS.md` | ⬜ **users still on the broken pak** |
+| `AllWeaponsUnlockableFix` (regular) | 🟩 `5ed467c` — **clean-room rebuild from vanilla** (5 assets, zero upstream bytes), A/B-identical to prior build, 0 dangling, graft sets asserted | 🟩 2026-07-31 (clean-room deployed) | 🟩 **CLEARED by rebuild** — ships nothing of LassyMorphee's; design credited. DM still owed (their carry-slip bug relay) | ⬜ **users still on the broken pak — UNBLOCKED, upload when ready** |
 | `AllWeaponsUnlockableFix` (Trees) | 🟩 `3dafbc5`, ALL CHECKS PASSED | 🟩 2026-07-30 | 🟩 n/a — inherits no #110 content | ⬜ **users still on the broken pak** |
 | `HeavyRifleRebalanceFix` | ⬜ needs redesign — curve layer deleted | ⬜ | ⬜ | ⬜ |
 
