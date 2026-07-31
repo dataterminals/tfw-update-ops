@@ -1,90 +1,131 @@
 # HANDOFF — start here
 
-**Written:** 2026-07-30, updated the same day as the patch was applied.
-**State:** baseline **captured and verified**. Patch **applied** (or applying) — Sylvia launched
-the game on 2026-07-30 after the baseline was confirmed safe.
+**Written:** 2026-07-31, end of the session that applied the patch and did the first triage pass.
+**State:** patch **applied**. 6 of 7 gates green. One mod fixed and deployed but **not released**.
 
 ---
 
-## The situation in four lines
+## The situation in five lines
 
-- Baseline `pre-24479102` is captured, verified, committed and pushed. **The window was not missed.**
-- The patch to build `24479102` was deliberately triggered afterwards by launching TFW from Steam.
-- Patch notes are known: a **content patch** — comprehensive weapons-systems overhaul. No engine bump.
-- 25 TFW repos are in scope, of which 12 mods are actively deployed in MO2.
+- Build `24479102` landed 2026-07-30 17:34 EDT. Both baselines captured; the window was not missed.
+- **Gates 0, 1a, 1b, 2, 3, 3b are all green.** Only **5a** (TFWWorkbench reads the new paks) is open.
+- **`AllWeaponsUnlockableFix` is fixed** (both variants), verified, deployed to MO2, **not on Nexus**.
+- **`HeavyRifleRebalanceFix` is dead** and needs a *redesign*, not a rebase.
+- Everything else structurally survived. Class B is fully intact.
 
-## The single most important thing
+## Do this first
 
-**Do not launch through MO2 until Gate 3.** The old-build loadout against a patched game either
-crashes or, worse, silently muddies triage. The first MO2 launch should carry **only RE-UE4SS +
-Signature Bypass** — that run is simultaneously the UE4SS gate test and the smoke test that MO2
-support still works on the new build.
+**Nothing is blocked on analysis. The one user-facing gap is the Nexus upload.** Users are still
+downloading pre-patch paks that break the gun-customization UI. Files are built, verified and
+waiting in `AllWeaponsUnlockableFix/dist/`:
 
-## Where to pick up
+| Page | File | Sanity check |
+|---|---|---|
+| AWU | `dist/AllWeaponsUnlockableFix.zip` | inner `.ucas` = **110,008 B** |
+| AWUTrees | `dist/AllWeaponsUnlockableTrees.zip` | inner `.ucas` = **79,239 B** |
 
-Follow [`docs/triage-pipeline.md`](docs/triage-pipeline.md) from **Stage 0**.
+If you ever see `112,133` or `81,372`, that is the old broken build — do not ship it.
 
-1. **Stage 0 — record the landing.** `powershell -File tools/steam_state.ps1`, then append the new
-   row to `state/build-history.md`. **The new depot manifest is the rollback key for the *next*
-   patch** — capture it while it is in front of you; Steam overwrites it on the following update.
+**Release facts, already researched — do not re-derive:**
+- Versions: regular is on **1.1.0**, Trees on **1.0.0**. They are *not* in step. Suggested bumps
+  **1.2.0** and **1.1.0** (minor: behaviour unchanged, compatibility rebuild + filename change).
+  Sylvia had not confirmed these when the session ended.
+- **Dependency is Signature Bypass only.** Neither variant ships Lua or Workbench DataTable JSON,
+  so neither needs RE-UE4SS or TFWWorkbench. Saying otherwise sends users to install a pinned
+  UE4SS build for nothing.
+- Paks install to `...\The Forever Winter\Windows\ForeverWinter\Content\Paks\Mods\` — a folder
+  that **does not exist on a stock install**. Most common "nothing happened" cause.
+- **The pak filename changed** this session (`AllWeaponsUnlockable_P` → `AllWeaponsUnlockableFix_P`),
+  so new files do **not** overwrite old ones. Upgraders must delete the old set or double-install.
+  Covered in the readme; worth a changelog/sticky note too.
+- A Nexus reply to user `disxmfk` is owed — they reported the break and were correct.
 
-2. **Capture the post baseline and diff it.** Both steps, in order:
-   ```bash
-   powershell -File tools/capture_baseline.ps1 -Label post-24479102 -RunDecoderList
-   powershell -File tools/diff_baseline.ps1 -Before pre-24479102 -After post-24479102
-   ```
-   The report lands in `state/diffs/pre-24479102__vs__post-24479102/REPORT.md`.
+## What this patch actually did
 
-3. **Gate 1a / 1b — AES key and usmap.** If the diff says the shipping exe is byte-identical, the
-   AES key cannot have rotated and the UE4SS/Signature-Bypass signatures still match; the report
-   says so explicitly. Otherwise re-run AESDumpster. Then decode a known asset and check the
-   values are plausible before trusting anything downstream.
+Full analysis in [`state/stage2-findings.md`](state/stage2-findings.md); root cause of the
+user-visible break in [`state/rootcause-awu-customization-ui.md`](state/rootcause-awu-customization-ui.md).
 
-4. **Route the diff at the mods.** Intersect the asset churn against
-   [`state/asset-dependencies.md`](state/asset-dependencies.md) — it maps every Class A/B mod to
-   the exact asset paths, DataTables, classes and gameplay tags it depends on. That intersection
-   is the Stage 5 work list. Update `state/status.md` as each row resolves.
+- **Weapons were restructured, not just retuned.** `DA_WPN_<code>_v2` split into
+  `DA_WPN_PLAYER_<code>` + `DA_WPN_AI_<code>`, and the entire per-weapon `FC_*` curve tree was
+  **deleted game-wide** (`FC_*_Damage` 44 → 0).
+- **1,013 added / 1,293 removed is mostly noise** — 924 are case-only renames (`BagMan`→`BAGMAN`).
+  Real churn is 369 removals, **358 of them under `FW/Weapons/`**.
+- `WeaponsDetailsData` 56 → 53 rows; `DT_TagToRowHandle` 1176 → 1173. The cut rows are
+  `RFL01_Red/Blue/Green`, unused dev-test entries.
+- The AI vision sensors gained `Pawn.Player.HoldingPistol` (accum 1.2 / decay 0.8) — holding a
+  pistol makes you **~20% slower to detect**. Publishable almanac Detection-tab update.
 
-5. **Then Gate 3** — the RE-UE4SS-only MO2 launch described above.
+## Two hard-won lessons this patch taught
 
-## Things established this session (don't re-derive)
+**1. A `.usmap` is per-struct.** Gate 1b was marked cleared on the strength of AI sensors decoding
+perfectly (28 dumps byte-identical). That was real evidence and the wrong conclusion —
+`FWWeaponDefinition` decoded to *shifted garbage*: correct values bound to neighbouring property
+names, no error, entirely plausible. Regenerated via UE4SS `Ctrl+Numpad6` (already bound in the
+built-in Keybinds mod — the README's "install experimental UE4SS + write a Lua mod" procedure is
+more work than needed). **Never generalise usmap validity from one struct family.**
 
-- **Rollback key:** app `2828860`, depot `2828861`, manifest `7600230730618885177` for build
-  `24097213`. Recorded in `state/build-history.md`. This is what makes the old build recoverable.
-- **Deployment is MO2**, base `H:\MO2Instance_ModData\ForeverWinter`. 39 mod folders, **12 enabled**
-  — that enabled set is the smoke-test loadout, listed in `registry/repos.md`.
-- **Three third-party blockers** gate large chunks of work: RE-UE4SS (all of Class B), Signature
-  Bypass, and TFWWorkbench (all Class A rebuilds). Test these before triaging our own mods.
-- **`CleanUIRecipeTooltipFix` is a Project Zomboid mod**, not TFW. The name misleads. Excluded from
-  the registry.
-- **`TFW_CyborgNerfFix` is an empty repo** — `.git` only, zero commits, no working tree. Needs a
-  decision: build it or archive it.
-- **Pak set:** 118 files, 48,540,247,963 bytes. Not worth backing up; the manifest ID covers it.
-- **All three tools are tested and working.** `steam_state.ps1` and `capture_baseline.ps1` both ran
-  clean on real data. `diff_baseline.ps1` was verified against a synthetic patched baseline that
-  exercised every branch (binary add/change/remove, pak churn, filelist add/remove, and all four
-  DataTable states) — not just the no-op self-diff.
-- **The decoder prerequisite is satisfied.** Both .NET SDK `8.0.420` and **`10.0.301`** are
-  installed. The stale datamine README claim about SDK 8 has been **corrected** (`5570d5d`), and
-  `Microsoft.Bcl.Memory` was bumped to `10.0.10` to clear a high-severity advisory — verified
-  non-disruptive: the regenerated filelist was byte-identical to the captured baseline.
-- **Patch notes are known and archived** in [`state/patch-notes-24479102.md`](state/patch-notes-24479102.md),
-  with a per-mod blast-radius read. Headline: weapons-systems overhaul, no engine bump.
+**2. Verification that doesn't check references isn't verification.** Three layers passed a pak in
+which every weapon pointed at a deleted asset. A user found it. `tools/verify_softrefs.py` now
+gates both AWU builds — it asserts every `AssetPathName`/`ObjectPath` resolves against a filelist
+**regenerated from the live game each run**. Proven: 63 dangling on the broken pak, 0 on both
+rebuilds. **It is mod-agnostic — porting it to the other pak mods is the highest-leverage
+remaining work.**
 
-## Known unknowns
+## Work remaining, roughly in value order
 
-- **Whether the usmap survives.** Unknowable until we decode against the new build. The absence of
-  an engine bump in the notes is encouraging but not proof.
-- **Whether the AES key rotated.** Constant across every patch so far, but "so far" is load-bearing.
-  If the shipping exe turns out byte-identical, this is settled for free.
-- **Whether a compatible experimental RE-UE4SS build exists** for the new build. If not,
-  Class B is blocked on upstream and should be parked, not stalled on.
-- **Whether weapon DataTables were retuned in place.** Near-certain from the patch notes, and
-  *invisible* to the catalog diff (same RowStruct, same row count). Requires a dump-value diff.
+1. **Nexus upload** (above). Only user-facing gap.
+2. **Port `verify_softrefs.py`** to `UnkillablesRebalanceFix`, `HeavyRifleRebalanceFix`,
+   `TFWQuestGiverPortraitPatch`, CMSF. Just needs calling.
+3. **`HeavyRifleRebalanceFix` redesign.** 11 of its 13 targets are gone. The DataAssets are
+   renamed (rebasable) but all 5 `FC_*_Damage` curves are **deleted**, and per the mod's own
+   `docs/diagnosis.md` the *curve* was the real damage lever while the DA scalar is "cosmetic".
+   A pure rebase would look rebuilt and do nothing. **Hypothesis to test, not assume:**
+   `WeaponDamage` on `DA_WPN_PLAYER_*` (270.0 for HRF01) may now be authoritative. Verify by
+   changing it on one weapon and confirming in-game damage moves.
+4. **Gate 5a** — does TFWWorkbench read the new paks. Gates Class A rebuilds. Needs a launch.
+5. **Content diff for the 🟨 Class A mods.** Their paths all survive, but a surviving path is not
+   a surviving asset — BP graphs and DataTable values change without paths moving.
+   `UnkillablesRebalanceFix` silently reverts upstream BP edits by construction.
+6. **Nine dump subdirs sit outside `fwdata`'s taxonomy** (`ai_sensors`, `bosses`, `enemies`, …)
+   and were not re-decoded. Verified 0 stale, so not suspect — but adding taxonomy entries is the
+   natural cleanup.
+7. **In-game test** of the AWU fixes. Static verification is not play.
 
-## What was deliberately not done
+## Things established — don't re-derive
 
-- No mod code was touched. Only this repo and `forever-winter-datamine` were modified.
-- No Steam settings were changed — Sylvia set the update hold herself, and triggered the patch
-  herself by launching from Steam once the baseline was confirmed safe.
-- The game has **not** been launched through MO2. Do not, until Gate 3.
+- **Rollback key for `24479102`: manifest `6430523508700280691`** (app `2828860`, depot `2828861`).
+  Recorded in `state/build-history.md`. Previous build's key is there too.
+- **MO2 deploys RE-UE4SS / Signature Bypass via Root Builder**, which physically copies them into
+  `Binaries\Win64` for the session. **During a session the live logs are at the real game path**
+  (`…\Binaries\Win64\ue4ss\UE4SS.log`, `…\bitfix.txt`); they only reach MO2's `overwrite\` after
+  cleanup on exit. Reading the overwrite copy mid-session gets you the *previous* session's log.
+- **`forever-winter-skin-mods` is NOT deployed.** The four enabled skins (`101`–`104`) are
+  third-party. Registry corrected. Only **5** of the 12 enabled mods are ours.
+- **The MAY skin set is not new** — 179 assets before and after this patch, 0 added. It has rows
+  in `DT_SkinUIData` for Girl/Gunhead/Shaman. Note the casing inconsistency: `Skin.Girl.MAY` but
+  `Skin.Gunhead.May` / `Skin.Shaman.May`. Your repo covers ScavGirl and Shaman May but **not
+  Gunhead** — a real gap.
+- **The live usmap keeps a stable filename** (`ForeverWinter-5.4.2.usmap`); archived ones carry
+  the build stamp in `mappings/archive/`. Nine build scripts hardcode the stable name — renaming
+  the active file is a **breaking change**, not bookkeeping.
+- **`fwdata get --force` does not update `datamine/dumps/`.** It writes to a build-namespaced
+  cache while `build all` globs `dumps/`, so running the README's own remedy back-to-back yields
+  a catalog stamped new and populated old. Promote manually. `fwdata` should be fixed.
+- `dumps/lootobjects` is a deliberate **151-of-437 curation** — never blind-copy the cache over it.
+
+## Tooling added this session
+
+- `tools/diff_baseline.ps1` — diffs two baselines into `state/diffs/`. Tested against a synthetic
+  patched baseline so every branch fired, not just the no-op path.
+- `AllWeaponsUnlockableFix/tools/verify_softrefs.py` — the dangling-reference check.
+- `assets.py` gained `player_weapons` / `ai_weapons` / `weapon_tables` (weapons were never in the
+  taxonomy; they were ad-hoc decoder pulls).
+
+## Current MO2 state
+
+Both AWU variants are **disabled** in the Default profile — re-enable before testing. The three
+Class B mods (`TFWLootAll`, `TFWStaggerControl`, `TFWQuestHUDToggle`) were enabled for the Gate 3
+test and may still be. `TFWStaggerControl` runs in `mode=blanket`, which suppresses **all**
+stagger — fine for a controlled test, not something to leave on for normal play.
+
+Previous MO2 paks are backed up under the session scratchpad, but git is the durable copy.
