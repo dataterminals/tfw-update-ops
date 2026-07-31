@@ -25,24 +25,24 @@ waiting in `AllWeaponsUnlockableFix/dist/`:
 
 | Page | File | Sanity check |
 |---|---|---|
-| AWU | `dist/AllWeaponsUnlockableFix.zip` | inner `.ucas` = **110,000 B** (exactly — see below) |
+| AWU | `dist/AllWeaponsUnlockableFix.zip` | inner `.ucas` = **75,174 B** (clean-room build, 5 assets) |
 | AWUTrees | `dist/AllWeaponsUnlockableTrees.zip` | inner `.ucas` = **79,239 B** |
 
-Known-bad sizes, check **exactly**: `110,008` is the 07-31 morning build that silently
-**resurrected the Session-2 carry grafts** (regression found 07-31, fixed `d12007d` — eight bytes
-from the good build, so eyeballing is not checking). `112,133` / `81,372` are the pre-patch
-builds with the dead DataAsset pointers. Ship only `110,000` / `79,239`.
+Ship **only** `75,174` / `79,239`. Every other size in the lineage is superseded or broken:
+`110,000` (07-31, correct but ships LassyMorphee's roots — not cleared), `110,008` (07-31 am,
+**carry-graft regression**), `112,133` / `81,372` (pre-patch, dead DataAsset pointers).
 
-**Permission gate — RESOLVED to a decision, 2026-07-31.** The #110 author is **LassyMorphee**
-and their page **grants no permissions**, so the regular Fix (which ships six of their skill
-roots) is **not cleared for upload as built**. Trees inherits nothing and is free to ship — it is
-also the variant `disxmfk` was running. Paths, Sylvia's call (recorded in
-`AllWeaponsUnlockableFix/CREDITS.md`): **(1) rebuild regular from vanilla** via `skillpatch add` +
-`fix_expected_grafts.json`, zero LassyMorphee bytes, permission-independent — recommended;
-**(2) DM LassyMorphee and wait** (author may be inactive since April); **(3) Trees-only**.
-The courtesy/bug-relay DM to LassyMorphee is owed on every path.
-**Page numbers now known: AWU = mods/133, SCP = mods/135** (SCP *is* released — its worklog's
-"optional upload" box was stale). Community reports parsed in `state/community-reports.md`.
+**Permission gate — CLOSED 2026-07-31.** The #110 author is **LassyMorphee**; their page grants
+no permissions; Sylvia chose **rebuild from vanilla**, and it is **done** (`5ed467c`): the regular
+Fix is now clean-room like Trees — 4 vanilla roots + own grafts via `skillpatch add`, AllowTags
+derived by rule, 5 shipped assets, **zero upstream bytes**. A/B-verified functionally identical
+(every root's children equal; all 53 table rows equal on every field). Deployed to MO2.
+**Both variants are cleared to upload.** Still owed: the courtesy/bug-relay DM to LassyMorphee
+(their ScavGirl carry slip).
+**Page numbers: AWU = mods/133, SCP = mods/135** (SCP *is* released — its worklog's
+"optional upload" box was stale). Community reports parsed in `state/community-reports.md`;
+live replies owed to `4ce0fspades` (base-game carry bug, confirmed by their wording) and
+`Southperry88` (one diagnostic question) — substance pre-written there.
 
 **Release facts, already researched — do not re-derive:**
 - Versions: regular is on **1.1.0**, Trees on **1.0.0**. They are *not* in step. Suggested bumps
