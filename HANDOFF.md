@@ -45,9 +45,8 @@ live replies owed to `4ce0fspades` (base-game carry bug, confirmed by their word
 `Southperry88` (one diagnostic question) — substance pre-written there.
 
 **Release facts, already researched — do not re-derive:**
-- Versions: regular is on **1.1.0**, Trees on **1.0.0**. They are *not* in step. Suggested bumps
-  **1.2.0** and **1.1.0** (minor: behaviour unchanged, compatibility rebuild + filename change).
-  Sylvia had not confirmed these when the session ended.
+- Versions: **decided 2026-07-31 — regular uploads as 1.2.1, Trees as 1.1.1** (from 1.1.0 and
+  1.0.0; the pages are *not* in step and that is fine).
 - **Dependency is Signature Bypass only.** Neither variant ships Lua or Workbench DataTable JSON,
   so neither needs RE-UE4SS or TFWWorkbench. Saying otherwise sends users to install a pinned
   UE4SS build for nothing.
