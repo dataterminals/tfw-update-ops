@@ -290,6 +290,47 @@ but a reference to a removed row is a different failure than a missing asset.
 
 `items.json` holds at 792 rows, so the item economy is untouched.
 
+### Follow-up resolved: `AllWeaponsUnlockableFix` and the three cut rows
+
+Checked. The answer is nuanced and worth stating precisely, because "its targets all survive" and
+"it is fine" are not the same claim.
+
+**The mod's core edits are unaffected.** `tools/mod_allowtags.json` carries 53 rownames and its
+only RFL01 keys are `RFL01`, `RFL01A_Surplus`, `RFL01B` — none of the cut rows. All 6
+`EarlyAccess_*_Root` skill trees survive.
+
+**But the deployed variant is the Trees one**, and `tools/trees_allowtags.json` carries **56**
+rownames — including `RFL01_Red`, `RFL01_Blue` and `RFL01_Green`, each granted all six pawn
+classes. So the shipped pak overrides `WeaponsDetailsData` with a 56-row table against a base that
+is now 53: **it re-adds three rows the devs deleted.**
+
+There is a sharper edge than "extra rows". Those rows point at `BP_WPN_RFL01_VariantB/C` and the
+placeholder texture `VT_Placeholder_Blue` — and `VT_Placeholder_Blue` is in this patch's real-removal
+list (`.uasset` + `.ubulk`). So the re-added rows now carry **dangling asset references**.
+
+Live risk stays low: the mod's own investigation (`WORKLOG.md:79-91`) searched `BP_PlayerLoadout`,
+`BP_CustomRigLoadouts` and `DT_GachaLootTable` and found **nothing references** these rows — they
+are dev-test leftovers ("AK BLUE VARIANT", *"for testing. blue ak"*, `Value=0`). Rows nothing
+resolves never have their asset pointers followed. But the status changed from *harmless orphan
+rows* to *orphan rows pointing at deleted assets*, and that is worth not shipping indefinitely.
+
+**The build will fail loudly, which is the good news.** `tools/verify_trees.py` hard-asserts:
+
+```python
+check(len(ours) == 56, ...)
+check(set(ours) == set(base), "row set identical to base")
+for rn in ("RFL01_Blue", "RFL01_Green", "RFL01_Red"):
+    check(rn in ours, f"{rn} preserved")
+check(len(tag_changed) == 31, ...)
+```
+
+Three of those four break against a 53-row base. This mod cannot be silently rebuilt wrong — a
+genuinely good property, and the opposite of HeavyRifle's failure mode.
+
+**Fix at rebuild:** rebase onto the 53-row base, delete the three `RFL01_*` entries from
+`trees_allowtags.json`, and update the verifier's constants — `56` → `53`, drop the presence
+check, and `31` → likely `28` (confirm; the three cut rows were probably among the widened set).
+
 ### Still outstanding: dumps outside the taxonomy
 
 `fwdata`'s taxonomy covers 10 logical assets, but `datamine/dumps/` has **13 subdirs**. The nine not
