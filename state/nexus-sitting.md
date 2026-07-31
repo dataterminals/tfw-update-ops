@@ -5,9 +5,10 @@
 
 ## Paste these back (4 things)
 
-1. ✅ **#110**: author is **LassyMorphee**; the page has **no permission block** → no rights
-   granted → the regular Fix is **not cleared for upload as built**. Decision recorded in
-   `AllWeaponsUnlockableFix/CREDITS.md`: rebuild-from-vanilla / DM-and-wait / Trees-only.
+1. ✅ **#110**: author is **LassyMorphee**; no permission block → no rights granted. **Decision
+   made and implemented same day** (`5ed467c`): the regular Fix was rebuilt clean-room from
+   vanilla — zero upstream bytes, A/B-identical. **Both variants cleared to upload.**
+   New sanity size: regular inner `.ucas` = **75,174 B** (Trees unchanged, 79,239).
 
 2. ✅ **SCP reports**: captured in `runninglog.txt`, parsed per-commenter in
    [`community-reports.md`](community-reports.md). Live items: reply to `4ce0fspades`
