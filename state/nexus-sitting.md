@@ -67,9 +67,11 @@ likeliest cause of the "SCP needs an update" reports, so posting it may close th
 1.2.0 (regular) / 1.1.0 (Trees); dependency is Signature Bypass **only**; the `Paks\Mods\` folder
 doesn't exist on stock installs; **the pak filename changed** so upgraders must delete the old
 `AllWeaponsUnlockable_P.*` / `AllSkills_P.*` files — changelog + sticky-worthy.
-Sanity sizes before upload, exact match required: regular `.ucas` = **110,000 B**,
-Trees = **79,239 B**. (110,008 = the regressed build. 8 bytes. Check, don't eyeball.)
-Regular upload additionally waits on item 1 above (permission). **Trees waits on nothing.**
+Sanity sizes before upload, exact match required: regular `.ucas` = **75,174 B** (the clean-room
+build), Trees = **79,239 B**. Anything else (110,000 / 110,008 / 112,133 / 81,372) is superseded
+or broken — do not ship. **Neither variant waits on anything anymore.** Worth one changelog line
+on the regular page: this build ships 5 assets instead of 8 (BagMan/Gunhead trees untouched now)
+and contains no files from the original mod.
 
 ## Parked (needs a launch session, ~30–60 min, another day)
 
