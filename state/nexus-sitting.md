@@ -1,26 +1,26 @@
 # The one Nexus sitting — 2026-07-31
 
-Everything currently blocked on Sylvia fits in one ~10-minute browser sitting. Open the tabs,
-paste the answers into chat, done. Nothing here needs thought — it is all reading and copying.
-(Claude can't do it: Cloudflare blocks fetches and the in-app browser crashes the app.)
+**Answered same day** — items 1–3 came back; analysis of the comment log is in
+[`community-reports.md`](community-reports.md). What remains below is marked.
 
 ## Paste these back (4 things)
 
-1. **From mod #110's page** (<https://www.nexusmods.com/theforeverwinter/mods/110>):
-   - the author's **username**
-   - the **"Permissions and credits"** block, verbatim
-   - *Why: gates whether the regular AWU Fix may be uploaded at all. Trees is exempt.*
+1. ✅ **#110**: author is **LassyMorphee**; the page has **no permission block** → no rights
+   granted → the regular Fix is **not cleared for upload as built**. Decision recorded in
+   `AllWeaponsUnlockableFix/CREDITS.md`: rebuild-from-vanilla / DM-and-wait / Trees-only.
 
-2. **From your SCP page**: the **report comment(s)** about AWU compat — wording as-is, plus the
-   commenter names. If they say which variant they run (Balanced / Unbalanced / Combined-*), grab
-   that too.
-   - *Why: decides which of three causes they're hitting; the replies differ.*
+2. ✅ **SCP reports**: captured in `runninglog.txt`, parsed per-commenter in
+   [`community-reports.md`](community-reports.md). Live items: reply to `4ce0fspades`
+   (base-game bug, confirmed by their own wording) and `Southperry88` (needs one diagnostic
+   question).
 
-3. **Your page numbers**, all of them: SCP, AWU regular, AWU Trees (just the `mods/NNN` numbers).
-   - *Why: the repos reference "the Nexus pages" and record none of them. Same gap as the #110
-     username — gets written into the record once, never asked again.*
+3. ✅ **Page numbers**: AWU = **mods/133**, SCP = **mods/135**. ⚠ Open sub-questions: does 133
+   host BOTH variants or does Trees have its own page? And **what is mods/136** — fenixt34
+   recommended it as "author's mod … adds rigs to the perks tree", which *describes SCP*.
 
-4. **Yes/no**: is the carry-capacity warning posted anywhere on the SCP page?
+4. ⬜ **Still open**: is the carry-capacity warning posted on the SCP page? (The comment log
+   suggests not.) If not, the substance below goes up — it likely closes `4ce0fspades` and
+   possibly `Southperry88` outright.
 
 ## Optional while you're there: post the carry warning
 
