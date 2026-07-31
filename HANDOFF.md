@@ -15,6 +15,10 @@
 
 ## Do this first
 
+**Everything blocked on Sylvia fits in one 10-minute browser sitting —
+[`state/nexus-sitting.md`](state/nexus-sitting.md) is the crib sheet** (permission block, report
+comments, page numbers, carry warning). Reply substance for both pages is pre-written there.
+
 **Nothing is blocked on analysis. The one user-facing gap is the Nexus upload.** Users are still
 downloading pre-patch paks that break the gun-customization UI. Files are built, verified and
 waiting in `AllWeaponsUnlockableFix/dist/`:
