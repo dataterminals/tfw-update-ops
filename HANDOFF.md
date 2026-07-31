@@ -26,6 +26,16 @@ waiting in `AllWeaponsUnlockableFix/dist/`:
 
 If you ever see `112,133` or `81,372`, that is the old broken build — do not ship it.
 
+**Permission gate found 2026-07-31 — read before uploading the regular variant.** The two builds
+are not in the same copyright position. The **regular Fix ships six skill roots converted out of
+the #110 author's own pak** (`build_fix.sh:42-46`) plus their AllowTags edits, so redistributing it
+depends on their permission. **Trees inherits nothing from #110** but the concept and is free to
+ship. Two facts needed and recorded nowhere: the author's **username** and their page's
+**Permissions and credits** block — both one page-load from mod #110, but Cloudflare blocks
+automated fetches, so it needs a logged-in browser. Full write-up in
+`AllWeaponsUnlockableFix/CREDITS.md`. **If the answer is slow, ship Trees alone** — it is the
+variant `disxmfk` was running.
+
 **Release facts, already researched — do not re-derive:**
 - Versions: regular is on **1.1.0**, Trees on **1.0.0**. They are *not* in step. Suggested bumps
   **1.2.0** and **1.1.0** (minor: behaviour unchanged, compatibility rebuild + filename change).

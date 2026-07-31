@@ -90,15 +90,41 @@ outcome, just not a useful one for Class A.
 
 ## Ship
 
-| Repo | Rebuilt + verified | Deployed to MO2 | Nexus updated |
-|---|---|---|---|
-| `AllWeaponsUnlockableFix` (regular) | 🟩 `fe522fb`, 0 dangling | 🟩 2026-07-30 | ⬜ **users still on the broken pak** |
-| `AllWeaponsUnlockableFix` (Trees) | 🟩 `3dafbc5`, ALL CHECKS PASSED | 🟩 2026-07-30 | ⬜ **users still on the broken pak** |
-| `HeavyRifleRebalanceFix` | ⬜ needs redesign — curve layer deleted | ⬜ | ⬜ |
+| Repo | Rebuilt + verified | Deployed to MO2 | Permission to redistribute | Nexus updated |
+|---|---|---|---|---|
+| `AllWeaponsUnlockableFix` (regular) | 🟩 `fe522fb`, 0 dangling | 🟩 2026-07-30 | 🟦 **UNVERIFIED — ships #110's assets** | ⬜ **users still on the broken pak** |
+| `AllWeaponsUnlockableFix` (Trees) | 🟩 `3dafbc5`, ALL CHECKS PASSED | 🟩 2026-07-30 | 🟩 n/a — inherits no #110 content | ⬜ **users still on the broken pak** |
+| `HeavyRifleRebalanceFix` | ⬜ needs redesign — curve layer deleted | ⬜ | ⬜ | ⬜ |
 
 **Release is the remaining user-facing gap.** The Nexus pages still serve the pre-patch paks, so
 every downloader still hits the customization-UI break. Nexus prose + upload are Sylvia's; the
 plain-language substance is in [`rootcause-awu-customization-ui.md`](rootcause-awu-customization-ui.md).
+
+### New blocker found 2026-07-31: the two variants differ on permission
+
+Provenance was audited and written up in
+[`AllWeaponsUnlockableFix/CREDITS.md`](../../AllWeaponsUnlockableFix/CREDITS.md) (`8ae8a17`).
+The finding is that **one repo holds two different copyright positions**:
+
+- **Regular Fix ships #110's work.** `build_fix.sh:42` stages the author's `AllSkills_P` pak and
+  `:44` `to-legacy`s **6 skill roots out of it**; `tools/mod_allowtags.json` is their AllowTags
+  edits "vendored from the mod decode". Redistributing this build depends on their permission.
+- **Trees ships none of it.** Built from current vanilla, inherits only the concept
+  (`AllWeaponsUnlockableFix/WORKLOG.md:305`), which is not protectable. Free to upload.
+
+**Two facts are needed and are not recorded anywhere:** the #110 author's *username*, and their
+page's *Permissions and credits* block. Both are one page-load from
+<https://www.nexusmods.com/theforeverwinter/mods/110>. Automated fetches get Cloudflare 403 /
+bot-check — this needs a logged-in browser, i.e. Sylvia. Three WORKLOG entries carry an unchecked
+"(optional) confirm original-author permission" box; it was fair while local-only, and stops being
+optional at upload.
+
+**Trees is not blocked by this.** If the permission answer is slow or unfavourable, Trees can ship
+alone — and it is the variant `disxmfk` was running when they hit the break.
+
+`AllWeaponsUnlockableFix` also gained a scoped MIT `LICENSE` (same text as CMSF/LootAll/
+QuestHUDToggle, but carved out so it does not appear to license Fun Dog assets, #110's content, or
+the built paks). The four other derivative pak repos still have no licence file at all.
 
 Version numbers were **not** bumped — do that at upload time rather than guessing a scheme here.
 Both layouts (manual-install default + MO2-compatible) are produced by the build scripts as
