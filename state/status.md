@@ -59,7 +59,7 @@ outcome, just not a useful one for Class A.
 | `HeavyRifleRebalanceFix` | 🟥 | **DEAD — needs redesign, not a rebase.** 11 of its 13 override targets are gone (`build_fix.sh` names them). The 6 `DA_WPN_*_v2` are renamed → rebasable; but all 5 `FC_*_Damage` curves are **deleted**, and the curve layer is gone game-wide (`FC_*_Damage` 44→0; float curves under `FW/Weapons` 226→11). Per the mod's own `docs/diagnosis.md`, the **curve** is the real damage lever and the DA scalar is "cosmetic" — so a pure rebase would look rebuilt and do nothing. Hypothesis to test: `WeaponDamage` on `DA_WPN_PLAYER_*` is now authoritative. **Verify before building.** |
 | `TFWCharModelSelFramework` | 🟨 | **All 5 core deps survive** with identical counts: `DT_SkinUIData`, `ST_FW_UI_Skins`, `GA_Player_ChangeSkin`, `SK_SCV_FL` (7), `BP_Player_*` (6). Only case-only renames touch its territory. Structurally intact — still **verify frozen slot paths** at smoke test, since those are the third-party contract. |
 | `UnkillablesRebalanceFix` | 🟨 | **All 8 override targets survive** with identical counts (`build_fix.sh`): the 6 boss BPs (`MeatMan`, `OrgaMech`, `ShieldOfficer`, `Mech_Toothy`, `MotherCourage`, `Opal`), `AIDEF_Euruska_Stalker` ×4, `BPC_IncomingDamageMod`. Path diff clean — but BP *contents* change without the path moving, and this mod silently reverts upstream BP edits, so this still needs a dump diff to clear. |
-| `AllWeaponsUnlockableFix` | 🟩 | **BOTH VARIANTS FIXED** (`fe522fb`). User-confirmed break: every `WeaponsDetailsData` row pinned `DataAsset` → `DA_WPN_<code>_v2`, all renamed to `DA_WPN_PLAYER_<code>` by the patch, so every weapon lost its definition pointer. Measured in a full mount — deployed Trees **56/56 dangling**, regular **56/56 dangling**; **both rebuilds now 0/53** ✅. Root cause + ruled-out alternatives: [`rootcause-awu-customization-ui.md`](rootcause-awu-customization-ui.md). **Not deployed and not released** — MO2 holds the 07-20 pak, Nexus serves both old paks. Follow-up: neither verifier checks soft-object refs resolve; add that. |
+| `AllWeaponsUnlockableFix` | 🟩 | **BOTH VARIANTS FIXED** (`fe522fb`). User-confirmed break: every `WeaponsDetailsData` row pinned `DataAsset` → `DA_WPN_<code>_v2`, all renamed to `DA_WPN_PLAYER_<code>` by the patch, so every weapon lost its definition pointer. Measured in a full mount — deployed Trees **56/56 dangling**, regular **56/56 dangling**; **both rebuilds now 0/53** ✅. Root cause + ruled-out alternatives: [`rootcause-awu-customization-ui.md`](rootcause-awu-customization-ui.md). **Deployed to MO2 2026-07-30** (both variants, hash-verified; previous paks backed up). **Not yet released on Nexus** — users are still served the broken paks. Both mods are currently **disabled** in the profile, so re-enable before testing. Follow-up: neither verifier checks soft-object refs resolve; add that. |
 | `ScavgirlCarryPerks` | ⬜ | **Not enabled** — all 5 variants disabled in MO2. Lower urgency. Skill scaling was reworked (non-linear); check whether perk tables moved. |
 | `TFWQuestGiverPortraitPatch` | 🟨 | **Enabled.** Its whole source dir `FW/UI/MainMenu/Textures/Quest` survives — **122 textures, count unchanged**. Structurally intact. Still assumes a 2:1 button brush; the one removed UI texture (`T_Box_SkillsIcon_Small_Red`) is a different family. |
 | `forever-winter-skin-mods` | ⬛ | **Not deployed — registry was wrong.** Builds `SCVGIRL_UMP9_*` / `SHM_UMP45_*`; none in the MO2 store. The 4 enabled skins (`101`–`104`) are **third-party**, not ours. Not our fix, but they sit in the smoke-test loadout. |
@@ -90,6 +90,16 @@ outcome, just not a useful one for Class A.
 
 ## Ship
 
-| Repo | Version bumped | Both layouts packaged | Nexus updated |
+| Repo | Rebuilt + verified | Deployed to MO2 | Nexus updated |
 |---|---|---|---|
-| *(fill as Class A/B clear)* | | | |
+| `AllWeaponsUnlockableFix` (regular) | 🟩 `fe522fb`, 0 dangling | 🟩 2026-07-30 | ⬜ **users still on the broken pak** |
+| `AllWeaponsUnlockableFix` (Trees) | 🟩 `3dafbc5`, ALL CHECKS PASSED | 🟩 2026-07-30 | ⬜ **users still on the broken pak** |
+| `HeavyRifleRebalanceFix` | ⬜ needs redesign — curve layer deleted | ⬜ | ⬜ |
+
+**Release is the remaining user-facing gap.** The Nexus pages still serve the pre-patch paks, so
+every downloader still hits the customization-UI break. Nexus prose + upload are Sylvia's; the
+plain-language substance is in [`rootcause-awu-customization-ui.md`](rootcause-awu-customization-ui.md).
+
+Version numbers were **not** bumped — do that at upload time rather than guessing a scheme here.
+Both layouts (manual-install default + MO2-compatible) are produced by the build scripts as
+`dist/<name>/` plus the `.zip`; the zip already nests paks under `Mods/` so it satisfies both.
