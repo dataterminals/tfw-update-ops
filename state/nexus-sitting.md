@@ -63,8 +63,8 @@ likeliest cause of the "SCP needs an update" reports, so posting it may close th
 - Their report also led to a permanent automated check in the build, so this whole class of break
   gets caught before upload from now on.
 
-**AWU upload facts** — already researched, in [`HANDOFF.md`](../HANDOFF.md): suggested bumps
-1.2.0 (regular) / 1.1.0 (Trees); dependency is Signature Bypass **only**; the `Paks\Mods\` folder
+**AWU upload facts** — already researched, in [`HANDOFF.md`](../HANDOFF.md): versions decided —
+**1.2.1 (regular) / 1.1.1 (Trees)**; dependency is Signature Bypass **only**; the `Paks\Mods\` folder
 doesn't exist on stock installs; **the pak filename changed** so upgraders must delete the old
 `AllWeaponsUnlockable_P.*` / `AllSkills_P.*` files — changelog + sticky-worthy.
 Sanity sizes before upload, exact match required: regular `.ucas` = **75,174 B** (the clean-room
