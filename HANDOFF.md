@@ -33,15 +33,16 @@ Known-bad sizes, check **exactly**: `110,008` is the 07-31 morning build that si
 from the good build, so eyeballing is not checking). `112,133` / `81,372` are the pre-patch
 builds with the dead DataAsset pointers. Ship only `110,000` / `79,239`.
 
-**Permission gate found 2026-07-31 — read before uploading the regular variant.** The two builds
-are not in the same copyright position. The **regular Fix ships six skill roots converted out of
-the #110 author's own pak** (`build_fix.sh:42-46`) plus their AllowTags edits, so redistributing it
-depends on their permission. **Trees inherits nothing from #110** but the concept and is free to
-ship. Two facts needed and recorded nowhere: the author's **username** and their page's
-**Permissions and credits** block — both one page-load from mod #110, but Cloudflare blocks
-automated fetches, so it needs a logged-in browser. Full write-up in
-`AllWeaponsUnlockableFix/CREDITS.md`. **If the answer is slow, ship Trees alone** — it is the
-variant `disxmfk` was running.
+**Permission gate — RESOLVED to a decision, 2026-07-31.** The #110 author is **LassyMorphee**
+and their page **grants no permissions**, so the regular Fix (which ships six of their skill
+roots) is **not cleared for upload as built**. Trees inherits nothing and is free to ship — it is
+also the variant `disxmfk` was running. Paths, Sylvia's call (recorded in
+`AllWeaponsUnlockableFix/CREDITS.md`): **(1) rebuild regular from vanilla** via `skillpatch add` +
+`fix_expected_grafts.json`, zero LassyMorphee bytes, permission-independent — recommended;
+**(2) DM LassyMorphee and wait** (author may be inactive since April); **(3) Trees-only**.
+The courtesy/bug-relay DM to LassyMorphee is owed on every path.
+**Page numbers now known: AWU = mods/133, SCP = mods/135** (SCP *is* released — its worklog's
+"optional upload" box was stale). Community reports parsed in `state/community-reports.md`.
 
 **Release facts, already researched — do not re-derive:**
 - Versions: regular is on **1.1.0**, Trees on **1.0.0**. They are *not* in step. Suggested bumps

@@ -98,7 +98,7 @@ outcome, just not a useful one for Class A.
 
 | Repo | Rebuilt + verified | Deployed to MO2 | Permission to redistribute | Nexus updated |
 |---|---|---|---|---|
-| `AllWeaponsUnlockableFix` (regular) | 🟩 `d12007d` — 07-31 carry-graft regression fixed, 0 dangling, graft sets asserted | 🟩 2026-07-31 (redeployed) | 🟦 **UNVERIFIED — ships #110's assets** | ⬜ **users still on the broken pak** |
+| `AllWeaponsUnlockableFix` (regular) | 🟩 `d12007d` — 07-31 carry-graft regression fixed, 0 dangling, graft sets asserted | 🟩 2026-07-31 (redeployed) | 🟥 **NOT CLEARED — #110 (LassyMorphee) grants no permissions; ships 6 of their roots.** Paths: rebuild-from-vanilla / DM-and-wait / Trees-only — decision pending, see `AllWeaponsUnlockableFix/CREDITS.md` | ⬜ **users still on the broken pak** |
 | `AllWeaponsUnlockableFix` (Trees) | 🟩 `3dafbc5`, ALL CHECKS PASSED | 🟩 2026-07-30 | 🟩 n/a — inherits no #110 content | ⬜ **users still on the broken pak** |
 | `HeavyRifleRebalanceFix` | ⬜ needs redesign — curve layer deleted | ⬜ | ⬜ | ⬜ |
 
