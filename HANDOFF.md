@@ -21,10 +21,13 @@ waiting in `AllWeaponsUnlockableFix/dist/`:
 
 | Page | File | Sanity check |
 |---|---|---|
-| AWU | `dist/AllWeaponsUnlockableFix.zip` | inner `.ucas` = **110,008 B** |
+| AWU | `dist/AllWeaponsUnlockableFix.zip` | inner `.ucas` = **110,000 B** (exactly — see below) |
 | AWUTrees | `dist/AllWeaponsUnlockableTrees.zip` | inner `.ucas` = **79,239 B** |
 
-If you ever see `112,133` or `81,372`, that is the old broken build — do not ship it.
+Known-bad sizes, check **exactly**: `110,008` is the 07-31 morning build that silently
+**resurrected the Session-2 carry grafts** (regression found 07-31, fixed `d12007d` — eight bytes
+from the good build, so eyeballing is not checking). `112,133` / `81,372` are the pre-patch
+builds with the dead DataAsset pointers. Ship only `110,000` / `79,239`.
 
 **Permission gate found 2026-07-31 — read before uploading the regular variant.** The two builds
 are not in the same copyright position. The **regular Fix ships six skill roots converted out of
