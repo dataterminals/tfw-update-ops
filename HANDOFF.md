@@ -140,6 +140,45 @@ remaining work.**
 
 ## Current MO2 state
 
+**There are two MO2 instances and they are not the same.** Everything below the SylDesk
+heading was recorded on the desktop; it does not describe the laptop.
+
+| | SylDesk (desktop) | SylG5 (laptop) |
+|---|---|---|
+| Instance | `H:\MO2Instance_ModData\ForeverWinter\` | `D:\MO2_InstanceData\TheForeverWinter\` |
+| Mods installed | 12 enabled incl. 4 third-party skins (`101`–`104`) | **17 installed, 5 enabled** |
+
+### SylG5 (laptop) — audited 2026-08-01
+
+Enabled: `AllWeaponsUnlockableFix`, `CMSF v0.2.1 dev`, `TFWWorkbench`, `RE-UE4SS`,
+`Signature Bypass`. Everything else disabled. No third-party skins here; `AWU Trees` is not
+deployed at all.
+
+**Fixed this session: AWU was serving the broken pak.** The deployment held
+`AllWeaponsUnlockable_P.ucas` at **112,133 B** — the pre-patch build with the dead
+`DataAsset` pointers — under the *old* filename, and it was **enabled**. This is the upgrade
+trap the changelog warns users about, landing on our own machine: the pak was renamed during
+the fix, so the new files were never going to overwrite the old ones, and the corrected
+deployment had only ever been done on SylDesk. The old trio was removed (backup in the session
+scratchpad) and `AllWeaponsUnlockableFix_P.*` copied in from `dist/`, **hash-verified identical
+on all three files**. `meta.ini` was stale in the same direction — version `1.1.0`, build
+`24097213`, a 56-row table — and now records `1.2.1`, modid `133`, and the clean-room
+provenance.
+
+Everything else on this machine is byte-identical to its repo build: `UnkillablesRebalanceFix`,
+`HeavyRifleRebalanceFix` (both paks), all four `ScavGirlCarryPerks` variants, CMSF. Note
+"matches the repo" is not "good" — **URF matches a stale repo build that reverts the
+`24501089` hotfix** (see the board). It is disabled, which is fortunate.
+
+The two CMSF entries are not redundant: `v0.2.1 dev` ships a different `CMSFUnlock/main.lua`
+plus a `CMSFTime` module over the same pak, and `v0.2 Framework` is correctly disabled.
+
+No stray paks: the game's `Content\Paks\Mods\` does not exist (correct — MO2 deploys at
+runtime), and no old-named pak survives anywhere in the mod store. `_attic\AllSkills_P.ucas`
+is the deliberately-retired orphan, not a stray; `_attic` is not a mod dir.
+
+### SylDesk (desktop) — as of 2026-07-31, not re-checked since
+
 Both AWU variants are **disabled** in the Default profile — re-enable before testing. The three
 Class B mods (`TFWLootAll`, `TFWStaggerControl`, `TFWQuestHUDToggle`) were enabled for the Gate 3
 test and may still be. `TFWStaggerControl` runs in `mode=blanket`, which suppresses **all**
