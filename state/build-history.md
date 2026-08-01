@@ -3,12 +3,18 @@
 Ledger of TFW builds and their depot manifest IDs. **The manifest ID is the rollback key** —
 record it while the build is installed, because Steam overwrites it on patch.
 
-App `2828860` · Depot `2828861` · Install `H:\SteamLibrary\steamapps\common\The Forever Winter`
+App `2828860` · Depot `2828861` · Install `D:\SteamLibrary\steamapps\common\The Forever Winter`
+
+> **Install path moved.** Every entry below 2026-08-01 was recorded when the library was on
+> `H:\`. That drive is no longer present on this machine; Steam's `libraryfolders.vdf` now lists
+> only `C:\Program Files (x86)\Steam` and `D:\SteamLibrary`, and there is exactly one
+> `appmanifest_2828860.acf`. See the 24501089 section for the toolchain fallout.
 
 | Build ID | Depot manifest | Steam `LastUpdated` | Size on disk | Notes |
 |---|---|---|---|---|
 | `24097213` | `7600230730618885177` | 2026-07-07 16:55 EDT | 50,779,543,727 B | Previous baseline. Almanac data stamped to this build. usmap `ForeverWinter-5.4.2.usmap` corresponds to it. Datamine tagged `baseline-24097213`. |
-| `24479102` | `6430523508700280691` | 2026-07-30 17:34 EDT | 50,815,237,941 B | **Current.** Applied 2026-07-30 17:34 EDT. 819,642,192 B download; install grew 35,694,214 B. Weapons-systems overhaul — see [`patch-notes-24479102.md`](patch-notes-24479102.md). |
+| `24479102` | `6430523508700280691` | 2026-07-30 17:34 EDT | 50,815,237,941 B | Applied 2026-07-30 17:34 EDT. 819,642,192 B download; install grew 35,694,214 B. Weapons-systems overhaul — see [`patch-notes-24479102.md`](patch-notes-24479102.md). All Session-1/2 triage work is stamped to this build. |
+| `24501089` | `6443337773729671953` | 2026-08-01 06:42 (file mtime; no `LastUpdated` key in the acf) | 50,812,092,213 B | **Current.** Auto-applied 2026-08-01 06:42. 686,534,560 B download; install **shrank** 3,145,728 B (exactly 3 MiB). Patch notes not yet reviewed. |
 
 ## 24097213 → 24479102 — landed 2026-07-30 17:34 EDT
 
@@ -36,6 +42,50 @@ engine-version bump mentioned; ~820 MB fits a data patch. Weapon/skill DataTable
 changed → `HeavyRifleRebalanceFix`, `AllWeaponsUnlockableFix`, almanac gunsmith are the expected
 hot spots; AI BP fixes raise the prior on the `UnkillablesRebalanceFix` boss BPs. Still unknown
 until decode: AES key, usmap survival.
+
+## 24479102 → 24501089 — landed 2026-08-01 06:42, auto-applied
+
+**The pre-patch window was not missed, but only by luck of prior work.** No `pre-24501089`
+capture was taken, because the patch installed unattended. The `post-24479102` baseline
+(76,309-entry filelist, catalog, binary hashes, MO2 state) is complete and serves as the
+"before" side of this diff. Nothing is lost.
+
+**Rollback key for `24501089`: `6443337773729671953`.** The previous build's key
+(`6430523508700280691`, → `24479102`) is in the table above and remains usable.
+
+Facts of record, read from the acf and the installed files:
+
+- `StateFlags 4` (FullyInstalled, nothing pending), `UpdateResult 0`,
+  `BytesDownloaded == BytesToDownload == 686,534,560`. The patch completed.
+- **`AutoUpdateBehavior` is `0`** — "always keep this game updated". It was `1`
+  ("only update when I launch it") through the 24479102 cycle, and that setting is what held
+  the previous patch open long enough to capture a baseline. The hold is currently off.
+- **The shipping executable changed.** Byte size is identical (`169,584,128`) but the SHA256
+  is not:
+  - `24479102`: `58EE4F8DFDE093E5C60D25DB7FEC780803EEF75A40062E40C43A03BA2D287875`
+  - `24501089`: `E4E76D0E37782EA8E846CF21369BDDEB230BA219999B67A4C03CEBDF55A41C1E`
+
+  Same size with different contents is a recompile that did not move the layout. **Gates 3
+  (RE-UE4SS attach) and 3b (Signature Bypass AOB scan) both revert to unknown** — 3b in
+  particular scans for a byte pattern and patches a fixed address, and that is the one
+  dependency `AllWeaponsUnlockableFix` declares.
+
+### Toolchain fallout: the `H:` → `D:` move
+
+Every hardcoded path in the tooling points at a drive that no longer exists. Current locations:
+
+| Thing | Hardcoded as | Actually at |
+|---|---|---|
+| Repos | `H:\Github Repositories` | `D:\Github Repositories` |
+| Game | `H:\SteamLibrary\steamapps\common\The Forever Winter` | `D:\SteamLibrary\steamapps\common\The Forever Winter` |
+| Steam acf | `H:\SteamLibrary\steamapps\appmanifest_2828860.acf` | `D:\SteamLibrary\steamapps\appmanifest_2828860.acf` |
+| MO2 instance | `H:\MO2Instance_ModData\ForeverWinter\` | `D:\MO2_InstanceData\TheForeverWinter\` |
+
+`tools/steam_state.ps1` does not merely miss the library — it **throws** on
+`Join-Path` against the absent `H:` drive (line 37) before reaching its other candidate roots,
+so the repo's own state check is dead until the roots are fixed. `tools/capture_baseline.ps1`
+defaults (lines 28–29) are stale the same way, as are the `REPO` / `GAME_PAKS` assignments in
+every mod repo's `build_fix.sh` and `ScavgirlCarryPerks/tools/verify_build.sh`.
 
 ## Post-patch close-outs
 
