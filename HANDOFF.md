@@ -1,7 +1,12 @@
 # HANDOFF — start here
 
 **Written:** 2026-07-31, end of the session that applied the patch and did the first triage pass.
-**State:** patch **applied**. 6 of 7 gates green. One mod fixed and deployed but **not released**.
+**State:** patch **applied**. 6 of 7 gates green. One mod fixed, deployed and **released**.
+
+> **Update 2026-08-01:** AWU **shipped**. Sylvia uploaded both variants the night of 2026-07-31 —
+> regular **1.2.1**, Trees **1.1.1**. Everything below that reads "not on Nexus" / "the one
+> user-facing gap is the upload" is superseded. **Nexus publication state is never recorded by
+> these repos** — uploads happen in a browser and the checkboxes go stale. Ask, don't infer.
 
 ---
 
@@ -9,7 +14,8 @@
 
 - Build `24479102` landed 2026-07-30 17:34 EDT. Both baselines captured; the window was not missed.
 - **Gates 0, 1a, 1b, 2, 3, 3b are all green.** Only **5a** (TFWWorkbench reads the new paks) is open.
-- **`AllWeaponsUnlockableFix` is fixed** (both variants), verified, deployed to MO2, **not on Nexus**.
+- **`AllWeaponsUnlockableFix` is fixed** (both variants), verified, deployed to MO2, and **on Nexus
+  since 2026-07-31** (regular 1.2.1 / Trees 1.1.1).
 - **`HeavyRifleRebalanceFix` is dead** and needs a *redesign*, not a rebase.
 - Everything else structurally survived. Class B is fully intact.
 
@@ -19,9 +25,18 @@
 [`state/nexus-sitting.md`](state/nexus-sitting.md) is the crib sheet** (permission block, report
 comments, page numbers, carry warning). Reply substance for both pages is pre-written there.
 
-**Nothing is blocked on analysis. The one user-facing gap is the Nexus upload.** Users are still
-downloading pre-patch paks that break the gun-customization UI. Files are built, verified and
-waiting in `AllWeaponsUnlockableFix/dist/`:
+**~~Nothing is blocked on analysis. The one user-facing gap is the Nexus upload.~~ Uploaded
+2026-07-31 17:25Z — and VERIFIED 2026-08-01.** Both files were re-downloaded from the live page
+and compared entry-by-entry against the repo's tracked zips. **All three container entries in each
+are byte-identical**, inner `.ucas` = 75,174 and 79,239 as required — the stale-*pak* failure class
+did not occur. **Page 133 hosts BOTH variants** — that open question is answered.
+
+⚠ **One real miss: the Trees `readme.txt` shipped stale** (the 07-20 copy — `build_trees.sh` was
+never re-run after `3808a4d`/`591a233`). It tells users to remove `AllWeaponsUnlockable_P.*`, a
+name the regular variant no longer uses, and it omits LassyMorphee. Fixed in `dist/` on 2026-08-01
+with the pak entries copied through untouched; **re-uploading Trees is owed** (Regular is fine).
+Root fix: nothing asserts a build artifact is newer than its inputs — re-run both builds before
+any upload. Sources of truth in `AllWeaponsUnlockableFix/dist/`:
 
 | Page | File | Sanity check |
 |---|---|---|
@@ -45,8 +60,8 @@ live replies owed to `4ce0fspades` (base-game carry bug, confirmed by their word
 `Southperry88` (one diagnostic question) — substance pre-written there.
 
 **Release facts, already researched — do not re-derive:**
-- Versions: **decided 2026-07-31 — regular uploads as 1.2.1, Trees as 1.1.1** (from 1.1.0 and
-  1.0.0; the pages are *not* in step and that is fine).
+- Versions: **regular 1.2.1, Trees 1.1.1 — decided 2026-07-31 and uploaded the same night**
+  (from 1.1.0 and 1.0.0; the pages are *not* in step and that is fine).
 - **Dependency is Signature Bypass only.** Neither variant ships Lua or Workbench DataTable JSON,
   so neither needs RE-UE4SS or TFWWorkbench. Saying otherwise sends users to install a pinned
   UE4SS build for nothing.
@@ -90,7 +105,9 @@ remaining work.**
 
 ## Work remaining, roughly in value order
 
-1. **Nexus upload** (above). Only user-facing gap.
+1. ~~**Nexus upload**~~ — **done 2026-07-31 night** (regular 1.2.1 / Trees 1.1.1). What's left is
+   the post-upload pass: confirm the served files match `75,174` / `79,239`, and the replies owed
+   on both pages (`disxmfk`, `4ce0fspades`, `Southperry88`) plus the courtesy DM to LassyMorphee.
 2. **Port `verify_softrefs.py`** to `UnkillablesRebalanceFix`, `HeavyRifleRebalanceFix`,
    `TFWQuestGiverPortraitPatch`, CMSF. Just needs calling.
 3. **`HeavyRifleRebalanceFix` redesign.** 11 of its 13 targets are gone. The DataAssets are

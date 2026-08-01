@@ -31,7 +31,8 @@ Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 
 >
 > - **`AllWeaponsUnlockableFix` is CLEAR on this build** — verified directly, not inferred:
 >   both variants decoded in a full live mount, **381 / 383 references checked, 0 dangling**.
->   `WeaponsDetailsData` is byte-identical to base. **The upload hold is lifted.**
+>   `WeaponsDetailsData` is byte-identical to base. **The upload hold is lifted** — and the upload
+>   happened the night of 2026-07-31 (regular 1.2.1 / Trees 1.1.1).
 > - **The HRF hypothesis gained real evidence.** Fun Dog retuned damage by editing
 >   `WeaponDamage` on `DA_WPN_PLAYER_*` and nothing else — the exact field the board flagged as
 >   "may now be authoritative, verify before building". Redesign targets moved: HRF01 → 300.0,
@@ -237,13 +238,18 @@ outcome, just not a useful one for Class A.
 
 | Repo | Rebuilt + verified | Deployed to MO2 | Permission to redistribute | Nexus updated |
 |---|---|---|---|---|
-| `AllWeaponsUnlockableFix` (regular) | 🟩 `5ed467c` — **clean-room rebuild from vanilla** (5 assets, zero upstream bytes), A/B-identical, graft sets asserted. **Re-verified on `24501089` 2026-08-01: 381 refs checked, 0 dangling** | 🟩 2026-07-31 (clean-room deployed) | 🟩 **CLEARED by rebuild** — ships nothing of LassyMorphee's; design credited. DM still owed (their carry-slip bug relay) | ⬜ **users still on the broken pak — CLEARED ON THE CURRENT BUILD, upload when ready** |
-| `AllWeaponsUnlockableFix` (Trees) | 🟩 `3dafbc5`, ALL CHECKS PASSED. **Re-verified on `24501089` 2026-08-01: 383 refs checked, 0 dangling** | 🟩 2026-07-30 | 🟩 n/a — inherits no #110 content | ⬜ **users still on the broken pak — CLEARED ON THE CURRENT BUILD** |
+| `AllWeaponsUnlockableFix` (regular) | 🟩 `5ed467c` — **clean-room rebuild from vanilla** (5 assets, zero upstream bytes), A/B-identical, graft sets asserted. **Re-verified on `24501089` 2026-08-01: 381 refs checked, 0 dangling** | 🟩 2026-07-31 (clean-room deployed) | 🟩 **CLEARED by rebuild** — ships nothing of LassyMorphee's; design credited. DM still owed (their carry-slip bug relay) | 🟩 **SHIPPED 2026-07-31 17:25Z as `1.2.1`** (from 1.1.0), on page **133**. **Verified 2026-08-01** by re-downloading from the live page: all 4 zip entries byte-identical to `dist/`, inner `.ucas` = 75,174 B |
+| `AllWeaponsUnlockableFix` (Trees) | 🟩 `3dafbc5`, ALL CHECKS PASSED. **Re-verified on `24501089` 2026-08-01: 383 refs checked, 0 dangling** | 🟩 2026-07-30 | 🟩 n/a — inherits no #110 content | 🟨 **SHIPPED 2026-07-31 17:25Z as `1.1.1`** (from 1.0.0), on page **133** alongside Regular. Pak verified 2026-08-01: 3 container entries byte-identical to `dist/`, `.ucas` = 79,239 B. **But the shipped `readme.txt` is the 07-20 copy** — `build_trees.sh` never re-run after `3808a4d`/`591a233`, so it names the pre-rename pak in the uninstall step and omits LassyMorphee. Fixed in `dist/`; **re-upload owed** |
 | `HeavyRifleRebalanceFix` | 🟨 **v2.0 redesigned and rebuilt** — 8 packages, zero 0.9.2 bytes, 7/7 static checks green. **Blocked on one in-game number** (HRF01 = 780 vs 300) | ⬜ not deployed — left disabled in MO2 as found | ⬜ same open question as the others (original mod by *Meganiikko*, #76) | ⬜ **users are on a v1.1 build that is inert and, via its JSON, actively breaks the six rifles.** Upload v2.0 once the lever is confirmed, with a "do not run on 24097213" note |
 
-**Release is the remaining user-facing gap.** The Nexus pages still serve the pre-patch paks, so
-every downloader still hits the customization-UI break. Nexus prose + upload are Sylvia's; the
-plain-language substance is in [`rootcause-awu-customization-ui.md`](rootcause-awu-customization-ui.md).
+~~**Release is the remaining user-facing gap.**~~ **Released 2026-07-31 night** (regular 1.2.1 /
+Trees 1.1.1). AWU downloaders now get the rebuilt paks; `HeavyRifleRebalanceFix` is the only mod
+still serving a broken build. Plain-language substance for the pages, if any prose is still owed,
+is in [`rootcause-awu-customization-ui.md`](rootcause-awu-customization-ui.md).
+
+**Record-keeping note:** these repos do not observe Nexus. This table's "Nexus updated" column is
+only ever as fresh as the last time Sylvia said something — on 2026-08-01 it read ⬜ for both AWU
+variants that had already been live for a day. Ask before asserting publication state.
 
 ### New blocker found 2026-07-31: the two variants differ on permission
 
