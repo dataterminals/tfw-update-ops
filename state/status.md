@@ -11,9 +11,16 @@ Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 
 > Released Friday 2026-07-31; auto-applied on SylG5 2026-08-01 06:42. Full analysis in
 > [`hotfix-24501089-findings.md`](hotfix-24501089-findings.md).
 >
-> **It is a player weapon damage buff and nothing else.** `WeaponDamage` on 32
-> `DA_WPN_PLAYER_*` assets is the only field that changed. Filelist identical (76,309 entries,
+> **Within the weapon set it is a damage buff and nothing else** — `WeaponDamage` on 32
+> `DA_WPN_PLAYER_*` is the only field changed there. Filelist identical (76,309 entries,
 > 0 added / 0 removed / 0 renamed), AES key still valid, AI weapons untouched.
+>
+> A full re-decode of all **722** tracked dumps found **72** differing from live, not 32 —
+> also `bosses` 18, `ai_sensors` 15, `enemies` 5, `items` 1, `factions` 1. **Only the weapons
+> are attributable to this build**: 24479102 promoted weapons alone, so every other subdir's
+> diff spans two patches. The `ai_sensors` block is provably older — it is the
+> `Pawn.Player.HoldingPistol` accumulator already documented as a 24479102 finding.
+> Notable: **Pistol Ammo 23,000 → 46,000**, extraction XP 200 → 400.
 >
 > - **`AllWeaponsUnlockableFix` is CLEAR on this build** — verified directly, not inferred:
 >   both variants decoded in a full live mount, **381 / 383 references checked, 0 dangling**.
@@ -115,7 +122,7 @@ outcome, just not a useful one for Class A.
 
 | Repo | Status | Finding |
 |---|---|---|
-| `forever-winter-datamine` | 🟩 | **Re-decoded and current.** usmap regenerated; 14 dumps of deleted assets removed, 74 fresh weapon dumps promoted; catalog rebuilt from fresh data at build `24479102`. `assets.py` gained `player_weapons` / `ai_weapons` / `weapon_tables` entries (weapons were previously ad-hoc, never in the taxonomy). Cleanup left: 9 dump subdirs still outside the taxonomy. |
+| `forever-winter-datamine` | 🟩 | **Re-decoded and current at `24501089`** (`c56bb36`). All **722** tracked dumps re-decoded from the live game, **72 promoted**, catalog rebuilt and stamped `24501089`; `lootobjects` held at its curated 151-of-437. The staleness gap is closed: the 9 non-taxonomy subdirs are now current for the first time since before 24479102. **Added `tools/redecode_check.py`** — decodes by committed basename rather than by filter, so curation is preserved by construction and no subdir can silently widen; re-running it after promotion reports 0 changed across all 13 subdirs. `FALLBACK_BUILD` bumped. Earlier at `24479102`: usmap regenerated, 14 dumps of deleted assets removed, 74 weapon dumps promoted — **weapons only**, which is what cost the attribution on the other 40 this cycle. |
 | `forever-winter-almanac` | 🟥 | **Rework, not restamp.** The published Stability analysis (dispersion curves, the Stability 0→1 numbers) documents a system that was deleted. Restamping would make it *confidently wrong*. Gunsmith section likewise. |
 | `forever-winter-maps` | ⬜ | |
 | `NewStefanMap` | ⬜ | |
