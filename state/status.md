@@ -113,7 +113,17 @@ Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 
 
 ---
 
-Last updated: 2026-08-01 — **`HeavyRifleRebalanceFix` redesigned and rebuilt as v2.0**, clearing the
+Last updated: 2026-08-01 — **`HeavyRifleRebalanceFix` v2.0 is live on Nexus #123** (Sylvia
+reported; version string and upload time not captured, not yet verified by re-download). That
+closes the release gap for every mod we own — nothing we ship is still broken on `24501089`.
+**It went out ahead of its one in-game measurement**, which is a deliberate trade, not an
+oversight: what it replaced was inert *and* actively breaking the six heavy rifles via a dead
+`DataAsset` pointer, so v2.0 is an improvement under every outcome. The open question is narrow —
+whether `WeaponDamage` is the per-shot damage field. The DataAsset is certainly loaded, so mag
+sizes, fire rate, recoil and the headshot table apply regardless; only the damage figures are at
+risk, and the failure mode is a partial mod plus a page correction. **The check is one number:
+HRF01 deals ~780 or ~300.**
+Earlier 2026-08-01 — **`HeavyRifleRebalanceFix` redesigned and rebuilt as v2.0**, clearing the
 board's only remaining 🟥. It was dead **four** ways, not two: the two renames/deletions already on the
 hit list, plus **an `FWWeaponDefinition` schema shift** (two properties inserted at index 44, shifting
 52 more) that makes any rebase *worse than inert* — the mod's own cook now decodes with 30 of 57
@@ -240,12 +250,17 @@ outcome, just not a useful one for Class A.
 |---|---|---|---|---|
 | `AllWeaponsUnlockableFix` (regular) | 🟩 `5ed467c` — **clean-room rebuild from vanilla** (5 assets, zero upstream bytes), A/B-identical, graft sets asserted. **Re-verified on `24501089` 2026-08-01: 381 refs checked, 0 dangling** | 🟩 2026-07-31 (clean-room deployed) | 🟩 **CLEARED by rebuild** — ships nothing of LassyMorphee's; design credited. DM still owed (their carry-slip bug relay) | 🟩 **SHIPPED 2026-07-31 17:25Z as `1.2.1`** (from 1.1.0), on page **133**. **Verified 2026-08-01** by re-downloading from the live page: all 4 zip entries byte-identical to `dist/`, inner `.ucas` = 75,174 B |
 | `AllWeaponsUnlockableFix` (Trees) | 🟩 `3dafbc5`, ALL CHECKS PASSED. **Re-verified on `24501089` 2026-08-01: 383 refs checked, 0 dangling** | 🟩 2026-07-30 | 🟩 n/a — inherits no #110 content | 🟨 **SHIPPED 2026-07-31 17:25Z as `1.1.1`** (from 1.0.0), on page **133** alongside Regular. Pak verified 2026-08-01: 3 container entries byte-identical to `dist/`, `.ucas` = 79,239 B. **But the shipped `readme.txt` is the 07-20 copy** — `build_trees.sh` never re-run after `3808a4d`/`591a233`, so it names the pre-rename pak in the uninstall step and omits LassyMorphee. Fixed in `dist/`; **re-upload owed** |
-| `HeavyRifleRebalanceFix` | 🟨 **v2.0 redesigned and rebuilt** — 8 packages, zero 0.9.2 bytes, 7/7 static checks green. **Blocked on one in-game number** (HRF01 = 780 vs 300) | ⬜ not deployed — left disabled in MO2 as found | ⬜ same open question as the others (original mod by *Meganiikko*, #76) | ⬜ **users are on a v1.1 build that is inert and, via its JSON, actively breaks the six rifles.** Upload v2.0 once the lever is confirmed, with a "do not run on 24097213" note |
+| `HeavyRifleRebalanceFix` | 🟨 **v2.0 redesigned and rebuilt** — 8 packages, zero 0.9.2 bytes, 7/7 static checks green. **The one in-game number is still unrecorded** (HRF01 = 780 vs 300) | ⬜ not deployed — left disabled in MO2 as found | ⬜ same open question as the others (original mod by *Meganiikko*, #76); note the `191` mesh pak ships Meganiikko's cooked content verbatim, so unlike AWU-regular this one was **not** cleared by a clean-room rebuild | 🟨 **SHIPPED 2026-08-01, Sylvia reported** — on page **123**, superseding the v1.1 build that was inert and breaking the six rifles. **Version string and upload time not recorded; not yet verified by re-download.** Page needs the "requires 24501089, do not run on 24097213" note if it does not already carry one |
 
-~~**Release is the remaining user-facing gap.**~~ **Released 2026-07-31 night** (regular 1.2.1 /
-Trees 1.1.1). AWU downloaders now get the rebuilt paks; `HeavyRifleRebalanceFix` is the only mod
-still serving a broken build. Plain-language substance for the pages, if any prose is still owed,
-is in [`rootcause-awu-customization-ui.md`](rootcause-awu-customization-ui.md).
+~~**Release is the remaining user-facing gap.**~~ **All three are now released** — AWU regular
+1.2.1 / Trees 1.1.1 on 2026-07-31 night, `HeavyRifleRebalanceFix` v2.0 on 2026-08-01. **No mod we
+own is still serving a build that is broken on `24501089`.** Plain-language substance for the
+pages, if any prose is still owed, is in
+[`rootcause-awu-customization-ui.md`](rootcause-awu-customization-ui.md).
+
+Two upload-side items remain open, neither of them a broken pak: AWU-Trees ships a stale
+`readme.txt` (re-upload owed), and HRF shipped **before** its damage lever was measured in-game —
+so if that check comes back wrong, the page needs a correction rather than a rebuild-and-hope.
 
 **Record-keeping note:** these repos do not observe Nexus. This table's "Nexus updated" column is
 only ever as fresh as the last time Sylvia said something — on 2026-08-01 it read ⬜ for both AWU
