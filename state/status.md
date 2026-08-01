@@ -20,7 +20,14 @@ Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 
 > are attributable to this build**: 24479102 promoted weapons alone, so every other subdir's
 > diff spans two patches. The `ai_sensors` block is provably older — it is the
 > `Pawn.Player.HoldingPistol` accumulator already documented as a 24479102 finding.
-> Notable: **Pistol Ammo 23,000 → 46,000**, extraction XP 200 → 400.
+> ~~Notable: **Pistol Ammo 23,000 → 46,000**, extraction XP 200 → 400.~~
+> **Correction (2026-08-01, almanac cycle):** that item is **Thermite**, not Pistol Ammo.
+> The `items` diff across both patches is two lines in `ValueV2_RareLoot.json` — Thermite
+> `Value` 23,000 → 46,000 and `ExtractionExperienceValue` 200 → 400, which moves it from
+> the *valuable* tier to *prime* (11,787 → 23,575 cr). Pistol ammo is unchanged: the
+> generic row is `Value` 12 / XP 1, and `ValueV2_AMMO` has no pistol row at those numbers.
+> There is no economy leg to the "pistols had a good two patches" story — the pistol
+> damage buffs are just the near-global ×10/9 restoration, and 5 of 9 pistols got nothing.
 >
 > - **`AllWeaponsUnlockableFix` is CLEAR on this build** — verified directly, not inferred:
 >   both variants decoded in a full live mount, **381 / 383 references checked, 0 dangling**.
@@ -186,7 +193,7 @@ outcome, just not a useful one for Class A.
 | Repo | Status | Finding |
 |---|---|---|
 | `forever-winter-datamine` | 🟩 | **Re-decoded and current at `24501089`** (`c56bb36`). All **722** tracked dumps re-decoded from the live game, **72 promoted**, catalog rebuilt and stamped `24501089`; `lootobjects` held at its curated 151-of-437. The staleness gap is closed: the 9 non-taxonomy subdirs are now current for the first time since before 24479102. **Added `tools/redecode_check.py`** — decodes by committed basename rather than by filter, so curation is preserved by construction and no subdir can silently widen; re-running it after promotion reports 0 changed across all 13 subdirs. `FALLBACK_BUILD` bumped. Earlier at `24479102`: usmap regenerated, 14 dumps of deleted assets removed, 74 weapon dumps promoted — **weapons only**, which is what cost the attribution on the other 40 this cycle. |
-| `forever-winter-almanac` | 🟥 | **Rework, not restamp.** The published Stability analysis (dispersion curves, the Stability 0→1 numbers) documents a system that was deleted. Restamping would make it *confidently wrong*. Gunsmith section likewise. |
+| `forever-winter-almanac` | 🟩 | **Current at `24501089`** (`a47659e`, `51beb91`, `d89021e`). The Stability rework landed as a rework, not a restamp: the published dispersion analysis is **retired**, replaced by the evidence that the system was removed — 0 of 76,309 live files match `*Stability*`, 0 `UpgradeTuning`, 0 player `DA_WPN_PLAYER_*_v2`, and the 20 surviving `FC_*` are all global. The stat still exists on attachments (`WeaponPartStatsData`, 324 of 633 rows non-zero, byte-identical to the previous build), so the page states that the input survives and the transfer function is gone, with the caveat that this only disproves the *data-driven* path — the logic may have moved to compiled C++. **Root cause of the drift was not staleness:** `weapons.json` was a wiki scrape, so it is now generated from `DA_WPN_PLAYER_*` + `WeaponsDetailsData` + `ValueV2_WEAPONS`, wiki kept only for name/class/accuracy/recoil/stability. That found **more than the damage refresh** — 17 of 51 damage wrong *and* **44 of 51 XP wrong**, plus 3 magazines, 3 rates of fire, 2 values. Shotguns were a units mismatch, not an 11% drift: damage is stored **per pellet** with `NumberOfBuckshots` 20, so the app now shows per-pellet, pellet count and spread total. Detection gained the `HoldingPistol` modifier (1.2/0.8 on all 15 sensors with a modifier table — identical to a Stealth Rig), recorded without a build claim since it spans two patches. **Two board corrections:** there is no Gunsmith section in this repo (`grep -ri gunsmith` is empty), and see the Pistol Ammo/Thermite correction above. Also disarmed `tools/fetch_items.py`, which still rebuilt the datamined `economy.json` from the wiki. |
 | `forever-winter-maps` | ⬜ | |
 | `NewStefanMap` | ⬜ | |
 | `fwact` | ⬛ | Can't build/test on this desktop (Rust toolchain can't link). |
