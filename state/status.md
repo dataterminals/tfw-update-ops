@@ -4,6 +4,33 @@
 
 Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 🟥 confirmed broken · ⬛ n/a this patch
 
+---
+
+> ## ⛔ SUPERSEDED 2026-08-01 — a new build landed before this board was finished
+>
+> **Build `24501089` auto-installed 2026-08-01 06:42.** Everything below this line is verified
+> against `24479102`, which is no longer the installed build and is no longer what users are
+> running. Treat every 🟩 on this board as **provisional** until re-checked.
+>
+> - **Rollback key captured: `6443337773729671953`.** Recorded in
+>   [`build-history.md`](build-history.md) with the full read-out.
+> - **The shipping exe changed** (same size, different SHA256). **Gates 3 and 3b revert to
+>   unknown.** 3b is Signature Bypass — `AllWeaponsUnlockableFix`'s only declared dependency.
+> - **Do not upload the AWU paks.** They are verified 0-dangling against `24479102`. Users are
+>   on `24501089` within hours of launching, so shipping now risks a second silent break of the
+>   same class the last one was. Rolling the local install back does **not** change this: the
+>   pak has to be correct against the build users actually have.
+> - **`AutoUpdateBehavior` is `0`** ("always keep updated"). It was `1` through the last cycle,
+>   which is what held that patch open for a baseline capture. The hold is off.
+> - **The `H:` drive is gone**; repos, game and MO2 are all on `D:`. Every hardcoded path in the
+>   tooling is dead, `tools/steam_state.ps1` included — it throws rather than reports. Path
+>   table in [`build-history.md`](build-history.md). **This blocks every script until fixed.**
+>
+> The `post-24479102` baseline is complete and is the "before" side of the new diff, so the
+> capture window was not lost.
+
+---
+
 Last updated: 2026-07-31 (3) — **permission gate closed by clean-room rebuild** (`5ed467c`):
 #110 author is **LassyMorphee**, page grants no permissions, so the regular Fix was rebuilt from
 current vanilla (5 assets, zero upstream bytes, A/B-identical). **Both AWU variants cleared to
