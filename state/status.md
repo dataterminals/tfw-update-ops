@@ -6,28 +6,37 @@ Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 
 
 ---
 
-> ## ⛔ SUPERSEDED 2026-08-01 — a new build landed before this board was finished
+> ## 🔺 NEW BUILD 24501089 — hotfix, measured 2026-08-01
 >
-> **Build `24501089` auto-installed 2026-08-01 06:42.** Everything below this line is verified
-> against `24479102`, which is no longer the installed build and is no longer what users are
-> running. Treat every 🟩 on this board as **provisional** until re-checked.
+> Released Friday 2026-07-31; auto-applied on SylG5 2026-08-01 06:42. Full analysis in
+> [`hotfix-24501089-findings.md`](hotfix-24501089-findings.md).
 >
-> - **Rollback key captured: `6443337773729671953`.** Recorded in
->   [`build-history.md`](build-history.md) with the full read-out.
-> - **The shipping exe changed** (same size, different SHA256). **Gates 3 and 3b revert to
->   unknown.** 3b is Signature Bypass — `AllWeaponsUnlockableFix`'s only declared dependency.
-> - **Do not upload the AWU paks.** They are verified 0-dangling against `24479102`. Users are
->   on `24501089` within hours of launching, so shipping now risks a second silent break of the
->   same class the last one was. Rolling the local install back does **not** change this: the
->   pak has to be correct against the build users actually have.
-> - **`AutoUpdateBehavior` is `0`** ("always keep updated"). It was `1` through the last cycle,
->   which is what held that patch open for a baseline capture. The hold is off.
-> - **The `H:` drive is gone**; repos, game and MO2 are all on `D:`. Every hardcoded path in the
->   tooling is dead, `tools/steam_state.ps1` included — it throws rather than reports. Path
->   table in [`build-history.md`](build-history.md). **This blocks every script until fixed.**
+> **It is a player weapon damage buff and nothing else.** `WeaponDamage` on 32
+> `DA_WPN_PLAYER_*` assets is the only field that changed. Filelist identical (76,309 entries,
+> 0 added / 0 removed / 0 renamed), AES key still valid, AI weapons untouched.
 >
-> The `post-24479102` baseline is complete and is the "before" side of the new diff, so the
-> capture window was not lost.
+> - **`AllWeaponsUnlockableFix` is CLEAR on this build** — verified directly, not inferred:
+>   both variants decoded in a full live mount, **381 / 383 references checked, 0 dangling**.
+>   `WeaponsDetailsData` is byte-identical to base. **The upload hold is lifted.**
+> - **The HRF hypothesis gained real evidence.** Fun Dog retuned damage by editing
+>   `WeaponDamage` on `DA_WPN_PLAYER_*` and nothing else — the exact field the board flagged as
+>   "may now be authoritative, verify before building". Redesign targets moved: HRF01 → 300.0,
+>   HRF02 → 1800.0, HRF05 → 10000.0.
+> - **The almanac needs a damage refresh** on top of its existing Stability rework. Published
+>   figures are low by ~11%, and `HRF02` / `HMG01` are wrong by half.
+> - **Gates 3 and 3b revert to unknown** — the shipping exe changed (same size, different
+>   SHA256). 3b is Signature Bypass, AWU's only declared dependency. Both need a launch.
+> - **Rollback key captured: `6443337773729671953`** ([`build-history.md`](build-history.md)).
+> - **`AutoUpdateBehavior` is `0`** ("always keep updated"); it was `1` through the last cycle,
+>   which is what held that patch open for a baseline capture. SylDesk is reported paused.
+> - **The tooling is single-machine.** `H:` is SylDesk's NVMe and does not exist on SylG5, so
+>   every hardcoded path fails here — `tools/steam_state.ps1` throws rather than reports. The
+>   fix is per-machine resolution, **not** a find-and-replace, which would just break SylDesk.
+>   Path table in [`build-history.md`](build-history.md).
+>
+> The `post-24479102` baseline is complete and served as the "before" side, so no capture
+> window was lost. Everything below this line is still stamped to `24479102` — treat 🟩 marks
+> on the **pak** mods as provisional until re-checked against this build.
 
 ---
 
@@ -130,8 +139,8 @@ outcome, just not a useful one for Class A.
 
 | Repo | Rebuilt + verified | Deployed to MO2 | Permission to redistribute | Nexus updated |
 |---|---|---|---|---|
-| `AllWeaponsUnlockableFix` (regular) | 🟩 `5ed467c` — **clean-room rebuild from vanilla** (5 assets, zero upstream bytes), A/B-identical to prior build, 0 dangling, graft sets asserted | 🟩 2026-07-31 (clean-room deployed) | 🟩 **CLEARED by rebuild** — ships nothing of LassyMorphee's; design credited. DM still owed (their carry-slip bug relay) | ⬜ **users still on the broken pak — UNBLOCKED, upload when ready** |
-| `AllWeaponsUnlockableFix` (Trees) | 🟩 `3dafbc5`, ALL CHECKS PASSED | 🟩 2026-07-30 | 🟩 n/a — inherits no #110 content | ⬜ **users still on the broken pak** |
+| `AllWeaponsUnlockableFix` (regular) | 🟩 `5ed467c` — **clean-room rebuild from vanilla** (5 assets, zero upstream bytes), A/B-identical, graft sets asserted. **Re-verified on `24501089` 2026-08-01: 381 refs checked, 0 dangling** | 🟩 2026-07-31 (clean-room deployed) | 🟩 **CLEARED by rebuild** — ships nothing of LassyMorphee's; design credited. DM still owed (their carry-slip bug relay) | ⬜ **users still on the broken pak — CLEARED ON THE CURRENT BUILD, upload when ready** |
+| `AllWeaponsUnlockableFix` (Trees) | 🟩 `3dafbc5`, ALL CHECKS PASSED. **Re-verified on `24501089` 2026-08-01: 383 refs checked, 0 dangling** | 🟩 2026-07-30 | 🟩 n/a — inherits no #110 content | ⬜ **users still on the broken pak — CLEARED ON THE CURRENT BUILD** |
 | `HeavyRifleRebalanceFix` | ⬜ needs redesign — curve layer deleted | ⬜ | ⬜ | ⬜ |
 
 **Release is the remaining user-facing gap.** The Nexus pages still serve the pre-patch paks, so
