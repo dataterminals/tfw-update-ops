@@ -9,9 +9,37 @@ Released Friday 2026-07-31; auto-applied on SylG5 2026-08-01 06:42. 686,534,560 
 
 ## One-line answer
 
-**It is a player weapon damage buff and nothing else.** `WeaponDamage` on 32
-`DA_WPN_PLAYER_*` assets is the only field that changed anywhere in the weapon set. No asset
-was added, removed or renamed anywhere in the build.
+**Within the weapon set, it is a damage buff and nothing else** — `WeaponDamage` on 32
+`DA_WPN_PLAYER_*` assets is the only field that changed there. No asset was added, removed or
+renamed anywhere in the build.
+
+> **Correction, recorded 2026-08-01 after the full re-decode.** This section originally read
+> "a player weapon damage buff and nothing else" as a whole-game claim. That was wrong, and it
+> was wrong because it generalised from the only subdir whose dumps were current. A full
+> re-decode of all 722 tracked dumps found **72** differing from the live game, not 32 —
+> the rest in `bosses` (18), `ai_sensors` (15), `enemies` (5), `items` (1) and `factions` (1).
+>
+> **Those 40 are not attributable to this hotfix.** See [Attribution](#attribution-limit)
+> below: only `weapons` was promoted last cycle, so every other subdir's diff spans two
+> patches. At least the `ai_sensors` block is provably older — it is the
+> `Pawn.Player.HoldingPistol` accumulator already documented as a **24479102** finding in
+> [`stage2-findings.md`](stage2-findings.md).
+
+## Attribution limit
+
+Build 24479102 promoted **weapons only** (status board: "74 fresh weapon dumps promoted").
+Everything else in `datamine/dumps/` was left at whatever build it was last pulled from, on the
+reasoning that a path-level check had found "0 stale". That check proved every referenced asset
+still *existed*; it asserted nothing about values.
+
+The consequence is now concrete: for 40 of the 72 changed dumps the gap spans two patches at
+once, so this build cannot be separated from the previous one within them. Intel that arrives
+without a build number attached is much weaker intel.
+
+`forever-winter-datamine/tools/redecode_check.py` was added to stop this recurring. It decodes
+by committed basename rather than by filter — which preserves curated subdirs like
+`lootobjects` (151 of 437) by construction — and promotes only what differs. Run it every
+patch, on everything, and attribution stays free.
 
 ## Evidence
 
@@ -19,10 +47,27 @@ was added, removed or renamed anywhere in the build.
 |---|---|
 | Filelist, live vs `post-24479102` | **Identical.** 76,309 entries, 0 added / 0 removed / 0 renamed |
 | AES key | **Still valid.** Decoder mounted all 76,309 files; the IoStore index is AES-encrypted, so the mount is the test |
-| Weapon dumps, 72 comparable | 40 identical, **32 changed** |
+| Full re-decode, all 722 tracked dumps | 650 identical, **72 changed**, 0 no-longer-present |
+| Weapon dumps (attributable to this build) | 43 identical, **32 changed** |
 | Fields changed across all 32 | **`WeaponDamage` only.** Nothing else differs in any weapon asset |
 | AI weapons (`DA_WPN_AI_*`) | **Untouched** |
 | `WeaponsDetailsData` | **Identical** — the table `AllWeaponsUnlockableFix` overrides did not move |
+| `lootobjects` | **151 identical** — the curated 151-of-437 selection held; nothing widened |
+
+### The other 40 changed dumps (attribution spans two builds)
+
+| Subdir | Changed | What |
+|---|---|---|
+| `bosses` | 18 | Opal AIDEFs (`AIDEF_Eurasia_Opal`, `_HK`), MediumMech weapon BPs (LongRifle / MiniGun / QuadGun, incl. Ratking variants), `BP_WPN_Toothy_RailGun`, `BP_WPN_Toothy_ShoulderMachineGun`, `BP_WPN_Opal_GunHand`, `BP_WPN_Tripod_missile`, `BP_AI_Tripod`, `GA_AI_Maneuver` |
+| `ai_sensors` | 15 | All `AIDEF_Sensor_Vision_*`. This is the `Pawn.Player.HoldingPistol` accumulator (1.2 accum / 0.8 decay) — **a documented 24479102 finding**, surfacing now only because these dumps were never refreshed |
+| `enemies` | 5 | `BP_AI_CharacterBase`, `BP_AI_Eurasia_Heavy_EOD`, `BP_AI_Europa_Turret`, `BP_AI_TankBase`, `BP_AI_Tripod` |
+| `items` | 1 | `ValueV2_RareLoot` — **Pistol Ammo value 23,000 → 46,000, extraction XP 200 → 400** |
+| `factions` | 1 | `BPC_TugOfWar` |
+
+**`UnkillablesRebalanceFix` note:** boss Blueprints moved in this set. The changed entries are
+Opal's AI definitions and various *weapon* BPs — not, on this evidence, the six boss BPs the mod
+overrides (`MeatMan`, `OrgaMech`, `ShieldOfficer`, `Mech_Toothy`, `MotherCourage`, `Opal`) or
+`BPC_IncomingDamageMod`. That still wants a targeted check rather than an inference from names.
 
 ## The 32 changed values
 
