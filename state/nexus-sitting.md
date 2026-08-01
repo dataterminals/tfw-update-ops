@@ -1,5 +1,14 @@
 # The one Nexus sitting — 2026-07-31
 
+> **Outcome (recorded 2026-08-01):** the sitting happened and **both variants went up that night**
+> — regular **1.2.1**, Trees **1.1.1**. The "AWU upload facts" section below is kept as the record
+> of what was decided, not as pending work. Uploaded **17:25Z**; both files re-downloaded and
+> **verified byte-identical to the repo's zips** on 2026-08-01.
+> **Answered: page 133 hosts BOTH variants** — "(Regular)" and "(Skilltrees)" are two files on
+> the one page, so Trees has no separate page. Still open from this list: item 4 (is the carry
+> warning posted on the SCP page), the replies owed, the courtesy DM to LassyMorphee, and what
+> mods/136 is.
+
 **Answered same day** — items 1–3 came back; analysis of the comment log is in
 [`community-reports.md`](community-reports.md). What remains below is marked.
 
