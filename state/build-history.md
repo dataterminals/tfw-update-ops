@@ -70,22 +70,34 @@ Facts of record, read from the acf and the installed files:
   particular scans for a byte pattern and patches a fixed address, and that is the one
   dependency `AllWeaponsUnlockableFix` declares.
 
-### Toolchain fallout: the `H:` → `D:` move
+### Toolchain fallout: the tooling is single-machine
 
-Every hardcoded path in the tooling points at a drive that no longer exists. Current locations:
+**There are two work machines, and every script hardcodes the desktop's layout.**
 
-| Thing | Hardcoded as | Actually at |
+| Thing | SylDesk (desktop) — what the scripts assume | SylG5 (laptop) — where this was run |
 |---|---|---|
 | Repos | `H:\Github Repositories` | `D:\Github Repositories` |
-| Game | `H:\SteamLibrary\steamapps\common\The Forever Winter` | `D:\SteamLibrary\steamapps\common\The Forever Winter` |
+| Game | `H:\SteamLibrary\...\The Forever Winter` | `D:\SteamLibrary\...\The Forever Winter` |
 | Steam acf | `H:\SteamLibrary\steamapps\appmanifest_2828860.acf` | `D:\SteamLibrary\steamapps\appmanifest_2828860.acf` |
 | MO2 instance | `H:\MO2Instance_ModData\ForeverWinter\` | `D:\MO2_InstanceData\TheForeverWinter\` |
 
-`tools/steam_state.ps1` does not merely miss the library — it **throws** on
-`Join-Path` against the absent `H:` drive (line 37) before reaching its other candidate roots,
-so the repo's own state check is dead until the roots are fixed. `tools/capture_baseline.ps1`
-defaults (lines 28–29) are stale the same way, as are the `REPO` / `GAME_PAKS` assignments in
-every mod repo's `build_fix.sh` and `ScavgirlCarryPerks/tools/verify_build.sh`.
+`H:` is the desktop's NVMe and is not a drive letter on the laptop at all. So these paths are
+not stale — they are correct on SylDesk and absent on SylG5. **The fix is per-machine
+resolution, not a global find-and-replace**, which would just invert the breakage.
+
+Failure modes observed on SylG5:
+
+- `tools/steam_state.ps1` **throws** on `Join-Path` against the absent `H:` (line 37) before
+  reaching its other candidate roots, so it dies instead of falling through to the roots that
+  do exist. The candidate list is right; the iteration is not drive-safe.
+- `tools/capture_baseline.ps1` defaults (lines 28–29) point at `H:` with no fallback.
+- Every mod repo's `build_fix.sh` assigns `REPO` / `GAME_PAKS` to `H:` paths, as does
+  `ScavgirlCarryPerks/tools/verify_build.sh` (which at least reads them from the environment
+  first, so it is overridable today; the `build_fix.sh` scripts are not).
+
+**Consequence for the ledger:** builds recorded before 2026-08-01 were measured on SylDesk.
+`24501089` was read on SylG5. The two installs are independent Steam copies and **can sit at
+different builds** — do not assume a build row describes both machines.
 
 ## Post-patch close-outs
 
