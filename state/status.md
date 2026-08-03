@@ -6,6 +6,39 @@ Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 
 
 ---
 
+> ## 🖥 SylDesk caught up to 24501089 — 2026-08-03 11:36:51 EDT
+>
+> The desktop had been sitting on `24479102` with the hotfix pending since 2026-08-01
+> (`AutoUpdateBehavior` is **`1`** here, not the `0` read on SylG5). Pushed through on request,
+> **without launching the game** — via the Steam client's Downloads page, not `steam://install`,
+> which Steam silently ignores. Verified: `StateFlags 4`, size on disk and shipping-exe SHA256
+> both **exact matches** for the figures recorded from the laptop, rollback key
+> `6443337773729671953` identical. Full sequence in [`build-history.md`](build-history.md).
+>
+> **Consequence for the board: the "never launch while an update is pending" hazard is gone on
+> this machine.** A launch is now an ordinary launch. That unblocks, in one sitting, everything
+> the board has been holding: the HRF damage number (780 vs 300), Gates 3/3b re-clear against the
+> new exe, Gate 5a, and the two Class B functional tests.
+>
+> ### ⚠ BLOCKER BEFORE ANY IN-GAME MEASUREMENT — the executable reverts itself
+>
+> Measured before the update, the game-dir exe was the **`24097213`** binary (169,513,984 B,
+> mtime 2026-07-07, matching `baselines/pre-24479102/binaries-win64.csv`) — while Steam's
+> manifest had read `24479102` for four days. The real `24479102` exe is **hash-proven to be
+> sitting in MO2's overwrite** at
+> `overwrite\Root\Windows\ForeverWinter\Binaries\Win64\ForeverWinter-Win64-Shipping.exe`
+> (`58EE4F8D…`, mtime 2026-07-30 17:22:43). Root Builder displaced the patched exe into overwrite
+> and restored its stale pre-patch backup over it, on exit from the Gate 3/3b session.
+>
+> **`overwrite\` deploys at the highest priority, so the next session copies that `24479102` exe
+> over the `24501089` one Steam just wrote.** Any measurement taken then is against the wrong
+> binary and is worthless — silently, with nothing in any log naming it. **Clear it first**, and
+> clear the `GameData.json` cache with it: removing the backup alone leaves the cache
+> authoritative. Not done here — MO2 was running.
+>
+> This also scopes the Gate 3/3b greens: they were taken *during* that session, so they did test
+> the correct `24479102` binary. They are still unknown against `24501089`.
+
 > ## 🔺 NEW BUILD 24501089 — hotfix, measured 2026-08-01
 >
 > Released Friday 2026-07-31; auto-applied on SylG5 2026-08-01 06:42. Full analysis in
@@ -113,7 +146,10 @@ Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 
 
 ---
 
-Last updated: 2026-08-01 — **`HeavyRifleRebalanceFix` v2.0 is live on Nexus #123 as `2.0.0`**
+Last updated: 2026-08-03 — **SylDesk applied `24501089`** (11:36:51 EDT), verified against the
+laptop's figures; and the stale-executable blocker above was found in the process. No mod status
+changed today — nothing was rebuilt, deployed or launched.
+Earlier 2026-08-01 — **`HeavyRifleRebalanceFix` v2.0 is live on Nexus #123 as `2.0.0`**
 (Sylvia reported; upload time not captured, not yet verified by re-download). That
 closes the release gap for every mod we own — nothing we ship is still broken on `24501089`.
 **It went out ahead of its one in-game measurement**, which is a deliberate trade, not an
