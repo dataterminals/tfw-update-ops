@@ -35,19 +35,45 @@ Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 
 > patch until the cache is cleared**, and it explains the SylDesk executable finding as the same
 > bug rather than a one-off.
 >
-> ### Remedy, in this order
+> ### The mechanism, proven from the cache file itself
 >
-> 1. **Steam → TFW → Properties → Installed Files → Verify integrity of game files.** Restores the
->    exe, the 20 paks and `FWPakManifest.json` authoritatively. Do this *before* deleting anything,
->    so there is never a moment when the only good copy is the one being deleted.
-> 2. **Delete the Root Builder cache** at the `5_4_2_0\GameData.json` path above, so it rebuilds
->    from current state instead of a July snapshot.
-> 3. **Clear the displaced game files** out of `overwrite\Root\Windows\` — they are duplicates of
->    what Steam just restored. The regenerated usmap is already committed to the datamine repo, so
->    nothing in there is needed any more.
+> `GameData.json` stores `{Relative, Hash (md5), Modified, Size}` per game file. **Every reverted
+> file is recorded at its `24097213` size with a July timestamp** — exe `169513984` @ 2026-07-07
+> 22:33, `global.ucas` `3012304` @ 2026-07-04 06:08, `pakchunk0_s1` `1769239392` @ 2026-07-07.
+> The file's own mtime was 23:05:47 (session start), so **Root Builder rewrote the file while
+> keeping July contents**: it captures each game file's "original" state once and never re-checks
+> it against a patch.
 >
-> **SylDesk needs steps 2 and 3 too** — its cache lives under an `H:`-keyed directory and its
-> displaced exe is still armed.
+> The bytes themselves lived in a sibling **`5_4_2_0\Backup\` — 274 files, 50,781,752,235 B
+> (47.29 GB), created 2026-07-12**, a full copy of the game root. Its exe hashed to `CAEFF67E…`,
+> byte-for-byte what was found in the game directory after the session. Not inferred — measured.
+>
+> **Why it never self-corrected:** the cache directory is keyed on `5_4_2_0`, the *engine* version,
+> which has been identical across `24097213` → `24479102` → `24501089` → `24536482`. Content
+> patches never invalidate it.
+>
+> ### Remediation — DONE on SylG5 2026-08-04
+>
+> 1. 🟩 **Steam verify** run by Sylvia (`StateFlags 1190`, ~5.9 GB re-downloaded). Restores the
+>    exe, the 20 paks and `FWPakManifest.json` authoritatively.
+> 2. 🟩 **`GameData.json` and `Backup\` both deleted** — together, which is the point: removing
+>    only the cache leaves 47 GB of July files ready to restore, removing only the backup leaves
+>    the cache asserting the game looks like July. **46.7 GB reclaimed on `C:`.** Root Builder
+>    rebuilds both from the correct install on next launch. The two Cyberpunk instances under the
+>    same plugin directory were left untouched.
+> 3. ⬜ **`overwrite\Root\Windows\` still holds 47 files / 38.52 GB** of displaced game content.
+>    Redundant now that Steam has restored it, but harmless. Tonight's gate evidence was copied
+>    out first — `UE4SS-gate3.log` and `bitfix-gate3b.txt` are in `baselines/post-24536482/`,
+>    matching the `post-24479102` convention, and the usmap is committed to the datamine repo.
+>
+> **⚠ SylDesk needs steps 2 and 3** — its cache and backup live under an `H:`-keyed directory,
+> almost certainly also ~47 GB, and its displaced exe is still armed. **It has not been done.**
+>
+> ### Add to the pre-launch routine
+>
+> **Compare the shipping exe's SHA256 against the current baseline before every session.** The
+> baselines have always captured it; nothing ever read it. That single check would have caught
+> this on SylDesk four days earlier, and would catch any future recurrence immediately.
 >
 > ### What this does and does not invalidate
 >

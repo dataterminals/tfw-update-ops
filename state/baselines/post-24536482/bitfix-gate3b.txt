@@ -1,0 +1,143 @@
+2026-07-16 01:51:51.591275100 [INFO] <bitfix:102>:bitfix v0.1.0-a2df008 loaded
+2026-07-16 01:51:51.591540900 [INFO] <bitfix:150>:loading lua patches
+2026-07-16 01:51:51.593845400 [INFO] <bitfix:282>:loaded "sig"
+2026-07-16 01:51:51.594030200 [INFO] <bitfix:154>:executing patches
+2026-07-16 01:51:51.594375100 [INFO] <bitfix:306>:entered lua context
+2026-07-16 01:51:51.594554400 [INFO] <bitfix:352>:scanning page: 0
+2026-07-16 01:51:51.650423100 [INFO] <bitfix:356>:scan results: [[7FF71EB9FF40, 7FF71EBA0290]]
+2026-07-16 01:51:51.650591000 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF71EB9FF40
+2026-07-16 01:51:51.650623800 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF71EBA0290
+2026-07-16 01:51:51.650640200 [INFO] <bitfix:218>:writing C3 to 7FF71EBA0290
+2026-07-16 01:51:51.650897200 [INFO] <bitfix:156>:done executing
+2026-07-16 02:02:29.621549500 [INFO] <bitfix:102>:bitfix v0.1.0-a2df008 loaded
+2026-07-16 02:02:29.621873000 [INFO] <bitfix:150>:loading lua patches
+2026-07-16 02:02:29.623573200 [INFO] <bitfix:282>:loaded "sig"
+2026-07-16 02:02:29.623711400 [INFO] <bitfix:154>:executing patches
+2026-07-16 02:02:29.624076800 [INFO] <bitfix:306>:entered lua context
+2026-07-16 02:02:29.624217600 [INFO] <bitfix:352>:scanning page: 0
+2026-07-16 02:02:29.776705900 [INFO] <bitfix:356>:scan results: [[7FF7DA76FF40, 7FF7DA770290]]
+2026-07-16 02:02:29.776806300 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF7DA76FF40
+2026-07-16 02:02:29.776838700 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF7DA770290
+2026-07-16 02:02:29.776853800 [INFO] <bitfix:218>:writing C3 to 7FF7DA770290
+2026-07-16 02:02:29.776959900 [INFO] <bitfix:156>:done executing
+2026-07-21 23:41:03.852911800 [INFO] <bitfix:102>:bitfix v0.1.0-a2df008 loaded
+2026-07-21 23:41:03.853357900 [INFO] <bitfix:150>:loading lua patches
+2026-07-21 23:41:03.855403500 [INFO] <bitfix:282>:loaded "sig"
+2026-07-21 23:41:03.855471300 [INFO] <bitfix:154>:executing patches
+2026-07-21 23:41:03.855805300 [INFO] <bitfix:306>:entered lua context
+2026-07-21 23:41:03.855946800 [INFO] <bitfix:352>:scanning page: 0
+2026-07-21 23:41:04.022702800 [INFO] <bitfix:356>:scan results: [[7FF6EB6EFF40, 7FF6EB6F0290]]
+2026-07-21 23:41:04.022847300 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF6EB6EFF40
+2026-07-21 23:41:04.022876600 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF6EB6F0290
+2026-07-21 23:41:04.022891300 [INFO] <bitfix:218>:writing C3 to 7FF6EB6F0290
+2026-07-21 23:41:04.023079000 [INFO] <bitfix:156>:done executing
+2026-07-22 00:05:38.005789200 [INFO] <bitfix:102>:bitfix v0.1.0-a2df008 loaded
+2026-07-22 00:05:38.006264200 [INFO] <bitfix:150>:loading lua patches
+2026-07-22 00:05:38.020509400 [INFO] <bitfix:282>:loaded "sig"
+2026-07-22 00:05:38.020623700 [INFO] <bitfix:154>:executing patches
+2026-07-22 00:05:38.020880000 [INFO] <bitfix:306>:entered lua context
+2026-07-22 00:05:38.020984600 [INFO] <bitfix:352>:scanning page: 0
+2026-07-22 00:05:38.111587200 [INFO] <bitfix:356>:scan results: [[7FF77C82FF40, 7FF77C830290]]
+2026-07-22 00:05:38.111786700 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF77C82FF40
+2026-07-22 00:05:38.111828200 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF77C830290
+2026-07-22 00:05:38.111841600 [INFO] <bitfix:218>:writing C3 to 7FF77C830290
+2026-07-22 00:05:38.111987500 [INFO] <bitfix:156>:done executing
+2026-07-22 20:29:24.006277900 [INFO] <bitfix:102>:bitfix v0.1.0-a2df008 loaded
+2026-07-22 20:29:24.006514600 [INFO] <bitfix:150>:loading lua patches
+2026-07-22 20:29:24.007893500 [INFO] <bitfix:282>:loaded "sig"
+2026-07-22 20:29:24.007960600 [INFO] <bitfix:154>:executing patches
+2026-07-22 20:29:24.008277900 [INFO] <bitfix:306>:entered lua context
+2026-07-22 20:29:24.008434200 [INFO] <bitfix:352>:scanning page: 0
+2026-07-22 20:29:24.146649300 [INFO] <bitfix:356>:scan results: [[7FF6F2ACFF40, 7FF6F2AD0290]]
+2026-07-22 20:29:24.146756600 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF6F2ACFF40
+2026-07-22 20:29:24.146777300 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF6F2AD0290
+2026-07-22 20:29:24.146785900 [INFO] <bitfix:218>:writing C3 to 7FF6F2AD0290
+2026-07-22 20:29:24.146939500 [INFO] <bitfix:156>:done executing
+2026-07-22 23:42:48.328202100 [INFO] <bitfix:102>:bitfix v0.1.0-a2df008 loaded
+2026-07-22 23:42:48.328444700 [INFO] <bitfix:150>:loading lua patches
+2026-07-22 23:42:48.330009900 [INFO] <bitfix:282>:loaded "sig"
+2026-07-22 23:42:48.330110900 [INFO] <bitfix:154>:executing patches
+2026-07-22 23:42:48.330359800 [INFO] <bitfix:306>:entered lua context
+2026-07-22 23:42:48.330451200 [INFO] <bitfix:352>:scanning page: 0
+2026-07-22 23:42:48.398143600 [INFO] <bitfix:356>:scan results: [[7FF6D954FF40, 7FF6D9550290]]
+2026-07-22 23:42:48.398249700 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF6D954FF40
+2026-07-22 23:42:48.398279200 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF6D9550290
+2026-07-22 23:42:48.398288200 [INFO] <bitfix:218>:writing C3 to 7FF6D9550290
+2026-07-22 23:42:48.398405900 [INFO] <bitfix:156>:done executing
+2026-07-23 00:18:55.994666500 [INFO] <bitfix:102>:bitfix v0.1.0-a2df008 loaded
+2026-07-23 00:18:55.995074400 [INFO] <bitfix:150>:loading lua patches
+2026-07-23 00:18:56.008218400 [INFO] <bitfix:282>:loaded "sig"
+2026-07-23 00:18:56.008287800 [INFO] <bitfix:154>:executing patches
+2026-07-23 00:18:56.008545100 [INFO] <bitfix:306>:entered lua context
+2026-07-23 00:18:56.008655900 [INFO] <bitfix:352>:scanning page: 0
+2026-07-23 00:18:56.078867300 [INFO] <bitfix:356>:scan results: [[7FF6A94EFF40, 7FF6A94F0290]]
+2026-07-23 00:18:56.078986900 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF6A94EFF40
+2026-07-23 00:18:56.079012500 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF6A94F0290
+2026-07-23 00:18:56.079022400 [INFO] <bitfix:218>:writing C3 to 7FF6A94F0290
+2026-07-23 00:18:56.079173300 [INFO] <bitfix:156>:done executing
+2026-07-23 00:22:47.631677600 [INFO] <bitfix:102>:bitfix v0.1.0-a2df008 loaded
+2026-07-23 00:22:47.632123400 [INFO] <bitfix:150>:loading lua patches
+2026-07-23 00:22:47.634256900 [INFO] <bitfix:282>:loaded "sig"
+2026-07-23 00:22:47.634322600 [INFO] <bitfix:154>:executing patches
+2026-07-23 00:22:47.634582100 [INFO] <bitfix:306>:entered lua context
+2026-07-23 00:22:47.634686800 [INFO] <bitfix:352>:scanning page: 0
+2026-07-23 00:22:47.721881300 [INFO] <bitfix:356>:scan results: [[7FF6A94EFF40, 7FF6A94F0290]]
+2026-07-23 00:22:47.722008500 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF6A94EFF40
+2026-07-23 00:22:47.722029600 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF6A94F0290
+2026-07-23 00:22:47.722038900 [INFO] <bitfix:218>:writing C3 to 7FF6A94F0290
+2026-07-23 00:22:47.722121600 [INFO] <bitfix:156>:done executing
+2026-07-23 00:38:31.727719700 [INFO] <bitfix:102>:bitfix v0.1.0-a2df008 loaded
+2026-07-23 00:38:31.728097900 [INFO] <bitfix:150>:loading lua patches
+2026-07-23 00:38:31.729549800 [INFO] <bitfix:282>:loaded "sig"
+2026-07-23 00:38:31.729608500 [INFO] <bitfix:154>:executing patches
+2026-07-23 00:38:31.729857500 [INFO] <bitfix:306>:entered lua context
+2026-07-23 00:38:31.729951500 [INFO] <bitfix:352>:scanning page: 0
+2026-07-23 00:38:31.895972700 [INFO] <bitfix:356>:scan results: [[7FF76423FF40, 7FF764240290]]
+2026-07-23 00:38:31.896488500 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF76423FF40
+2026-07-23 00:38:31.896532100 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF764240290
+2026-07-23 00:38:31.896541600 [INFO] <bitfix:218>:writing C3 to 7FF764240290
+2026-07-23 00:38:31.896630200 [INFO] <bitfix:156>:done executing
+2026-07-23 00:58:13.876099200 [INFO] <bitfix:102>:bitfix v0.1.0-a2df008 loaded
+2026-07-23 00:58:13.876276000 [INFO] <bitfix:150>:loading lua patches
+2026-07-23 00:58:13.886949500 [INFO] <bitfix:282>:loaded "sig"
+2026-07-23 00:58:13.887016300 [INFO] <bitfix:154>:executing patches
+2026-07-23 00:58:13.887261900 [INFO] <bitfix:306>:entered lua context
+2026-07-23 00:58:13.887358400 [INFO] <bitfix:352>:scanning page: 0
+2026-07-23 00:58:14.021819500 [INFO] <bitfix:356>:scan results: [[7FF6CD11FF40, 7FF6CD120290]]
+2026-07-23 00:58:14.021909900 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF6CD11FF40
+2026-07-23 00:58:14.021978700 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF6CD120290
+2026-07-23 00:58:14.021991400 [INFO] <bitfix:218>:writing C3 to 7FF6CD120290
+2026-07-23 00:58:14.022079900 [INFO] <bitfix:156>:done executing
+2026-07-26 12:59:45.793605700 [INFO] <bitfix:102>:bitfix v0.1.0-a2df008 loaded
+2026-07-26 12:59:45.793848800 [INFO] <bitfix:150>:loading lua patches
+2026-07-26 12:59:45.795290000 [INFO] <bitfix:282>:loaded "sig"
+2026-07-26 12:59:45.795367200 [INFO] <bitfix:154>:executing patches
+2026-07-26 12:59:45.795677700 [INFO] <bitfix:306>:entered lua context
+2026-07-26 12:59:45.795808400 [INFO] <bitfix:352>:scanning page: 0
+2026-07-26 12:59:45.958476100 [INFO] <bitfix:356>:scan results: [[7FF76C07FF40, 7FF76C080290]]
+2026-07-26 12:59:45.958589300 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF76C07FF40
+2026-07-26 12:59:45.958616000 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF76C080290
+2026-07-26 12:59:45.958627400 [INFO] <bitfix:218>:writing C3 to 7FF76C080290
+2026-07-26 12:59:45.958746800 [INFO] <bitfix:156>:done executing
+2026-07-26 13:25:04.058370300 [INFO] <bitfix:102>:bitfix v0.1.0-a2df008 loaded
+2026-07-26 13:25:04.058516300 [INFO] <bitfix:150>:loading lua patches
+2026-07-26 13:25:04.059987400 [INFO] <bitfix:282>:loaded "sig"
+2026-07-26 13:25:04.060120300 [INFO] <bitfix:154>:executing patches
+2026-07-26 13:25:04.060614000 [INFO] <bitfix:306>:entered lua context
+2026-07-26 13:25:04.060810400 [INFO] <bitfix:352>:scanning page: 0
+2026-07-26 13:25:04.137035000 [INFO] <bitfix:356>:scan results: [[7FF79C31FF40, 7FF79C320290]]
+2026-07-26 13:25:04.137151600 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF79C31FF40
+2026-07-26 13:25:04.137176300 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF79C320290
+2026-07-26 13:25:04.137186500 [INFO] <bitfix:218>:writing C3 to 7FF79C320290
+2026-07-26 13:25:04.137286700 [INFO] <bitfix:156>:done executing
+2026-08-03 23:05:50.218456900 [INFO] <bitfix:102>:bitfix v0.1.0-a2df008 loaded
+2026-08-03 23:05:50.218766300 [INFO] <bitfix:150>:loading lua patches
+2026-08-03 23:05:50.220928300 [INFO] <bitfix:282>:loaded "sig"
+2026-08-03 23:05:50.221043400 [INFO] <bitfix:154>:executing patches
+2026-08-03 23:05:50.221526000 [INFO] <bitfix:306>:entered lua context
+2026-08-03 23:05:50.221675900 [INFO] <bitfix:352>:scanning page: 0
+2026-08-03 23:05:50.405248500 [INFO] <bitfix:356>:scan results: [[7FF702860AF0, 7FF702860E40]]
+2026-08-03 23:05:50.405357000 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF702860AF0
+2026-08-03 23:05:50.405377800 [INFO] <bitfix:367>:calling patcher sig/1: on 7FF702860E40
+2026-08-03 23:05:50.405387000 [INFO] <bitfix:218>:writing C3 to 7FF702860E40
+2026-08-03 23:05:50.405474400 [INFO] <bitfix:156>:done executing
