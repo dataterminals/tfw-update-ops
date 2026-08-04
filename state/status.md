@@ -61,10 +61,31 @@ Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 
 >    the cache asserting the game looks like July. **46.7 GB reclaimed on `C:`.** Root Builder
 >    rebuilds both from the correct install on next launch. The two Cyberpunk instances under the
 >    same plugin directory were left untouched.
-> 3. ⬜ **`overwrite\Root\Windows\` still holds 47 files / 38.52 GB** of displaced game content.
->    Redundant now that Steam has restored it, but harmless. Tonight's gate evidence was copied
->    out first — `UE4SS-gate3.log` and `bitfix-gate3b.txt` are in `baselines/post-24536482/`,
->    matching the `post-24479102` convention, and the usmap is committed to the datamine repo.
+> 3. 🟩 **`overwrite\Root` deleted** — 47 files / 38.52 GB of displaced game content, reclaimed on
+>    `D:`. Everything unique was preserved first: `UE4SS-gate3.log` and `bitfix-gate3b.txt` into
+>    `baselines/post-24536482/` (matching the `post-24479102` convention), and the usmap into the
+>    datamine repo — hash-compared `E80B0E79…` before removal, not assumed. `overwrite\` retains
+>    `LogicMods` and `TFWWorkbench`, which are legitimate mod output and were not touched.
+>
+> **~85 GB reclaimed in total.** Expect Root Builder to rebuild a fresh cache and ~47 GB backup on
+> the next MO2 launch, snapshotting the *correct* install. That is the fix working, not a relapse.
+>
+> ### 🟩 The repaired install is verified — 119/119 paks + 9/9 binaries by SHA256
+>
+> Not by size, and not by "the game launched". Every pak and every Win64 binary hash-matches
+> `post-24536482`; the shipping exe is back to `5D9F12E6…`. **Functionally proven too:** the
+> decoder mounts **76,310** files (76,589 would mean still reverted), `DA_WPN_PLAYER_HRF01`
+> decodes a full 57 properties against the regenerated usmap, and `AIDEF_Sensor_Damage_Default`
+> round-trips byte-identical to its committed dump.
+>
+> **One baseline hash was corrected in the process** — `pakchunk20_s8-Windows.ucas`, same byte
+> length, different content. Steam's post-verify copy is authoritative (it matches the depot
+> manifest; our baseline was an unvalidated filesystem snapshot), so the CSV now carries the
+> validated hash and the original is preserved in
+> [`CORRECTION-pakchunk20_s8.md`](baselines/post-24536482/CORRECTION-pakchunk20_s8.md). Cause not
+> determined — a torn read during a capture started ~30 s after the patch completed, or a patch
+> write that differed from the manifest. **Process fix: run a Steam verify *before* capturing a
+> post-patch baseline**, which makes the baseline manifest-validated rather than merely observed.
 >
 > **⚠ SylDesk needs steps 2 and 3** — its cache and backup live under an `H:`-keyed directory,
 > almost certainly also ~47 GB, and its displaced exe is still armed. **It has not been done.**
