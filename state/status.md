@@ -19,9 +19,19 @@ Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 
 >
 > - `buildid 24501089` → `TargetBuildID 24536482`, `StateFlags 6`, **413,369,888 B to download,
 >   0 downloaded**. Nothing has been fetched yet.
-> - ⚠ **`AutoUpdateBehavior` is `0`** ("always keep updated") and `ScheduledAutoUpdate` is
->   **2026-08-04 03:08:17 EDT**. Unless that is changed to `1` in the Steam UI, **the patch lands
->   unattended tonight.** Steam is running. Only Sylvia can change this — we do not edit the acf.
+> - ⚠ **On SylG5 `AutoUpdateBehavior` is `0`** ("always keep updated") with `ScheduledAutoUpdate`
+>   at **2026-08-04 03:08:17 EDT**, so the patch lands **unattended tonight** unless changed in
+>   the Steam UI. Steam is running. **SylDesk is not exposed** — it is `1` there (confirmed by the
+>   2026-08-03 desktop session), so the two machines will diverge again by morning if nothing is
+>   done. Only Sylvia changes this; we do not edit the acf.
+> - **The hold is now optional rather than load-bearing, because the baseline is already
+>   captured.** The reason to hold last cycle was to protect the capture window; that is banked.
+>   What a hold buys now is only control over *when* the patch lands.
+> - **There is a known-good way to apply a patch without launching the game** — the Steam client's
+>   **Downloads page**, per-app start button (established on SylDesk 2026-08-03).
+>   **`steam://install/<appid>` does not work** — Steam silently drops it, with or without a
+>   client window open. This matters because rule 3 ("never launch to check something while an
+>   update is pending") assumes launching is the only way to trigger a patch. It is not.
 > - **The `24536482` rollback key does not exist yet.** It is created by the install. Read it from
 >   the acf the moment the patch completes, before anything overwrites it. The current key
 >   (`6443337773729671953` → `24501089`) is recorded and unaffected.
@@ -40,7 +50,53 @@ Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 
 
 ---
 
-> ## 🔺 BUILD 24501089 — hotfix, measured 2026-08-01 (still the installed build)
+> ## 🖥 SylDesk caught up to 24501089 — 2026-08-03 11:36:51 EDT
+>
+> The desktop had been sitting on `24479102` with the hotfix pending since 2026-08-01
+> (`AutoUpdateBehavior` is **`1`** here, not the `0` read on SylG5). Pushed through on request,
+> **without launching the game** — via the Steam client's Downloads page, not `steam://install`,
+> which Steam silently ignores. Verified: `StateFlags 4`, size on disk and shipping-exe SHA256
+> both **exact matches** for the figures recorded from the laptop, rollback key
+> `6443337773729671953` identical. Full sequence in [`build-history.md`](build-history.md).
+>
+> **Consequence for the board: the "never launch while an update is pending" hazard is gone on
+> this machine.** A launch is now an ordinary launch. That unblocks, in one sitting, everything
+> the board has been holding: the HRF damage number (780 vs 300), Gates 3/3b re-clear against the
+> new exe, Gate 5a, and the two Class B functional tests.
+>
+> ### ⚠ BLOCKER BEFORE ANY IN-GAME MEASUREMENT — the executable reverts itself
+>
+> Measured before the update, the game-dir exe was the **`24097213`** binary (169,513,984 B,
+> mtime 2026-07-07, matching `baselines/pre-24479102/binaries-win64.csv`) — while Steam's
+> manifest had read `24479102` for four days. The real `24479102` exe is **hash-proven to be
+> sitting in MO2's overwrite** at
+> `overwrite\Root\Windows\ForeverWinter\Binaries\Win64\ForeverWinter-Win64-Shipping.exe`
+> (`58EE4F8D…`, mtime 2026-07-30 17:22:43). Root Builder displaced the patched exe into overwrite
+> and restored its stale pre-patch backup over it, on exit from the Gate 3/3b session.
+>
+> **`overwrite\` deploys at the highest priority, so the next session copies that `24479102` exe
+> over the `24501089` one Steam just wrote.** Any measurement taken then is against the wrong
+> binary and is worthless — silently, with nothing in any log naming it. **Clear it first**, and
+> clear the `GameData.json` cache with it: removing the backup alone leaves the cache
+> authoritative. Not done here — MO2 was running.
+>
+> This also scopes the Gate 3/3b greens: they were taken *during* that session, so they did test
+> the correct `24479102` binary. They are still unknown against `24501089`.
+>
+> ### ✅ Checked on SylG5 2026-08-03 — the laptop does NOT have this problem
+>
+> **No `ForeverWinter-Win64-Shipping.exe` exists anywhere under
+> `D:\MO2_InstanceData\TheForeverWinter`.** A full recursive search of the instance returns
+> nothing; `overwrite\Root\Windows\ForeverWinter\Binaries\Win64\` holds only `bitfix.txt` and
+> `UE4SS.log`, which are ordinary session logs. There is also **no `GameData.json`** under the
+> instance, under `%LOCALAPPDATA%\ModOrganizer` or under `%APPDATA%\ModOrganizer`, so neither
+> half of the SylDesk remediation applies. The laptop's game-dir exe is the correct `24501089`
+> binary — hash-proven `E4E76D0E…` by the `pre-24536482` capture, not merely size-matched.
+> **Nothing needs clearing here before an in-game measurement.** The blocker is SylDesk-only.
+
+---
+
+> ## 🔺 BUILD 24501089 — hotfix, measured 2026-08-01 (installed on BOTH machines as of 2026-08-03)
 >
 > Released Friday 2026-07-31; auto-applied on SylG5 2026-08-01 06:42. Full analysis in
 > [`hotfix-24501089-findings.md`](hotfix-24501089-findings.md).
@@ -147,10 +203,16 @@ Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 
 
 ---
 
-Last updated: 2026-08-03 — **a new build `24536482` is pending and the `pre-24536482` baseline is
-captured with 0 warnings** (see the top banner). The patch has not landed; nothing below is
-re-checked against it. The one thing outstanding is a Steam UI change to stop it auto-applying at
-03:08 EDT. Also fixed `tools/steam_state.ps1`, which could not run on this machine at all.
+Last updated: 2026-08-03 — **two sessions on two machines, merged.** Evening, SylG5: **a new build
+`24536482` is pending and the `pre-24536482` baseline is captured with 0 warnings** before the
+patch downloaded a single byte (see the top banner). The patch has **not** landed, so nothing
+below is re-checked against it and every 🟩 still means `24501089`. Outstanding on the laptop is a
+Steam UI change, or a deliberate apply, before the 03:08 EDT auto-slot. Also fixed
+`tools/steam_state.ps1`, which could not run on SylG5 at all, and **checked the desktop's
+stale-executable blocker against this instance — the laptop is clean.** Morning, SylDesk:
+**applied `24501089`** (11:36:51 EDT) without launching, verified against the laptop's figures,
+and found the stale-executable blocker in the process. **No mod status changed today on either
+machine** — nothing was rebuilt, deployed or launched.
 Earlier 2026-08-01 — **`HeavyRifleRebalanceFix` v2.0 is live on Nexus #123 as `2.0.0`**
 (Sylvia reported; upload time not captured, not yet verified by re-download). That
 closes the release gap for every mod we own — nothing we ship is still broken on `24501089`.
