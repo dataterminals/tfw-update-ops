@@ -19,7 +19,7 @@ App `2828860` · Depot `2828861` · Install: `H:\SteamLibrary\...` on **SylDesk*
 | `24097213` | `7600230730618885177` | 2026-07-07 16:55 EDT | 50,779,543,727 B | Previous baseline. Almanac data stamped to this build. usmap `ForeverWinter-5.4.2.usmap` corresponds to it. Datamine tagged `baseline-24097213`. |
 | `24479102` | `6430523508700280691` | 2026-07-30 17:34 EDT | 50,815,237,941 B | Applied 2026-07-30 17:34 EDT. 819,642,192 B download; install grew 35,694,214 B. Weapons-systems overhaul — see [`patch-notes-24479102.md`](patch-notes-24479102.md). All Session-1/2 triage work is stamped to this build. |
 | `24501089` | `6443337773729671953` | 2026-08-01 06:42 (file mtime; no `LastUpdated` key in the acf) | 50,812,092,213 B | **Installed on BOTH machines** — SylG5 auto-applied 2026-08-01 06:42, SylDesk deliberately 2026-08-03 11:36:51. 686,534,560 B download; install **shrank** 3,145,728 B (exactly 3 MiB). Patch notes not yet reviewed. |
-| `24536482` | *(not installed — no manifest yet)* | — | — | **PENDING on SylG5, not applied.** 413,369,888 B to download, **0 downloaded**. `StateFlags 6` (UpdateRequired + FullyInstalled). Baseline `pre-24536482` captured 2026-08-03 20:10 EDT **while `24501089` was still on disk**. SylDesk state on this build not read. |
+| `24536482` | `7134816348397298387` | 2026-08-03 20:21:32 EDT | 50,813,198,796 B | **Current on SylG5.** Applied deliberately 20:21:32 EDT via the Steam Downloads page, **without launching**. 414,173,424 B download; install grew **1,106,583 B**. Baseline `pre-24536482` captured before it downloaded a byte. **SylDesk is still on `24501089`** — the two machines are diverged. |
 
 ## 24097213 → 24479102 — landed 2026-07-30 17:34 EDT
 
@@ -161,23 +161,36 @@ overwritten it, so that can no longer be upgraded to proof. The *displaced* copy
 overwrite is hash-proven. **Add the shipping exe's SHA256 to the pre-launch checklist** — the
 baselines capture it, but nothing compares it before a session.
 
-## 24501089 → 24536482 — PENDING on SylG5 as of 2026-08-03 20:10 EDT, not yet applied
+## 24501089 → 24536482 on SylG5 — applied 2026-08-03 20:21:32 EDT, deliberately
 
-**The pre-patch window was caught this time, deliberately rather than by luck.** Steam is holding
-`24536482` as a pending update and the `24501089` files are untouched on disk, so `pre-24536482`
-is a true pre-patch baseline. Contrast the previous cycle, which installed unattended and survived
-only because `post-24479102` happened to serve as the "before" side.
+**The pre-patch window was caught, deliberately rather than by luck.** Steam held `24536482` as a
+pending update long enough for `pre-24536482` to be captured with the `24501089` files untouched
+on disk, so this cycle has a true pre-patch baseline. Contrast the previous cycle, which installed
+unattended and survived only because `post-24479102` happened to serve as the "before" side.
 
-State read from the SylG5 acf at capture time:
+**Rollback key for `24536482`: `7134816348397298387`** — captured immediately on completion. The
+previous key (`6443337773729671953` → `24501089`) is in the table above and remains usable; it is
+the one that matters most right now, because SylDesk is still on that build.
 
-- `buildid 24501089` · `TargetBuildID 24536482` · `StateFlags 6` (UpdateRequired + FullyInstalled).
-- `BytesToDownload 413,369,888` · **`BytesDownloaded 0`** — the download had not started.
-- **`AutoUpdateBehavior 0`** ("always keep this game updated") with
-  `ScheduledAutoUpdate` = **2026-08-04 03:08:17 EDT**. Note this is the laptop's setting;
-  **SylDesk is `1`**, so the desktop will not take this build unattended and the two machines
-  diverge again unless one is changed.
-- Depot manifest still `6443337773729671953` — the `24501089` rollback key, unchanged by the
-  pending update.
+Sequence of record:
+
+- **Before** — `buildid 24501089` · `TargetBuildID 24536482` · `StateFlags 6` ·
+  `BytesToDownload 413,369,888` · **`BytesDownloaded 0`**. Nothing had been fetched.
+  `AutoUpdateBehavior 0` with `ScheduledAutoUpdate` = 2026-08-04 03:08:17 EDT, i.e. it would have
+  landed unattended overnight. **SylDesk is `1`** — this setting is per-machine.
+- **Applied without launching the game**, via the Steam client's Downloads page, following the
+  route established on SylDesk earlier the same day. Confirms that finding on a second machine.
+- Transition observed in the acf: `StateFlags 6` → **`1030`** (Uninstalled|UpdateRequired|
+  UpdateRunning) while downloading → **`4`** (FullyInstalled) on completion, `UpdateResult 0`.
+  Start to finish **under three minutes** on a ~394 MiB download.
+- **Download 414,173,424 B — the acf predicted 413,369,888.** The prediction ran ~803 KB light.
+  SylDesk saw the same direction of error on the previous patch and much larger (predicted
+  686,538,384, actual 757,311,296), so **`BytesToDownload` is an estimate, not a contract** —
+  do not use it to verify a patch completed. `BytesDownloaded == BytesToDownload` plus
+  `StateFlags 4` is the real completion test.
+- Install grew 50,812,092,213 → **50,813,198,796 B (+1,106,583 B)**. A ~1 MiB net delta on a
+  394 MiB patch is consistent with rewriting existing assets rather than adding content — the
+  same signature `24479102` and `24501089` both showed.
 
 **Baseline `pre-24536482` — 0 warnings.** 119 pak files / 48,572,725,793 B SHA256-hashed,
 `filelist.txt` at **76,309 entries**, catalog copied, MO2 deployment recorded, datamine at
@@ -192,12 +205,33 @@ State read from the SylG5 acf at capture time:
   already says about `24501089` (0 added / 0 removed / 0 renamed). The baseline agrees with the
   record.
 
-**Rollback key for `24536482` is not captured yet** — it does not exist until the patch installs.
-Read it out of the acf once the update completes.
+**Patch notes not reviewed.** This build has no blast-radius characterization from the developers'
+side. `24479102` was a restructure and `24501089` a pure value tune; measured, this one is
+**structurally near-inert but schema-breaking** — see below.
 
-**Patch notes not reviewed.** This build has no blast-radius characterization, so no mod has a
-prior on it. `24479102` was a restructure and `24501089` a pure value tune; this one is
-unclassified, and the gate order restarts from Stage 1 when it lands.
+### Gate results measured the same evening
+
+- **Gate 1a — AES key survives.** The decoder mounted **76,310** files with the key at
+  `decoder/Program.cs:28` unchanged. The IoStore index is AES-encrypted, so the mount is the test.
+- **Gate 1b — FAILS. The usmap must be regenerated.** Full detail on the board. The short version:
+  the active usmap is the **`24479102`** regeneration and no longer matches `FWWeaponDefinition`.
+  `DA_WPN_PLAYER_HRF01` decodes 30 of 57 properties and stops; `HRF02` decodes 56 **under partly
+  wrong names**. The diagnostic tell is `MaxImpactFX` landing at index 29 where `NumberOfBuckshots`
+  belongs — and `MaxImpactFX` is *not* new (it is in the `24097213` archive map too), so this is a
+  misaligned fragment walk, not a missing mapping. Everything before the shift point reads
+  correctly, which is what makes it survivable-looking.
+- **The control matters as much as the failure.** `AIDEF_Sensor_Damage_Default`, `_TTKDummy` and
+  `_ESP_Default` round-trip **byte-identical** against their committed dumps. That is the same
+  evidence that wrongly cleared 1b on `24479102`. **A usmap is per-struct.** Any future "1b is
+  fine" claim has to name which struct family it tested.
+- **Filelist diff is structurally clean:** 76,309 → 76,310, with 108 of 109 additions being
+  case-only directory renames in map/level geometry, **zero real removals**, one real addition
+  (`WBP_PopUp_Gift_July2026Drone.uasset`), zero hits across all 69 dependency patterns in
+  `asset-dependencies.md`, and `ForeverWinter/Content/CMSF/` still at 0.
+
+**The pairing is the finding.** A completely clean path diff and a broken struct schema occurred in
+the same patch. Neither check substitutes for the other, and a future cycle that runs only the
+filelist diff will conclude "nothing to do" on a build that silently corrupts every weapon decode.
 
 ### The stale-executable blocker does not reach SylG5 — checked, not assumed
 
@@ -206,9 +240,15 @@ pre-patch backup restored over it. **The same check on SylG5 comes back clean.**
 search of `D:\MO2_InstanceData\TheForeverWinter` finds **no `ForeverWinter-Win64-Shipping.exe` at
 all**; `overwrite\Root\Windows\ForeverWinter\Binaries\Win64\` holds only `bitfix.txt` and
 `UE4SS.log`. There is **no `GameData.json`** under the instance, `%LOCALAPPDATA%\ModOrganizer` or
-`%APPDATA%\ModOrganizer`, so neither half of the SylDesk remediation applies here. Combined with
-the hash check above, the laptop's game directory holds the correct `24501089` binary and nothing
-is staged that could displace it. **In-game measurement on SylG5 is not blocked by this.**
+`%APPDATA%\ModOrganizer`, so neither half of the SylDesk remediation applies here.
+
+Checked immediately before the patch, so the finding is about the *staging*, not about one build:
+nothing exists in this MO2 instance that could displace a shipping executable, which is the
+property that persists across patches. At that moment the game directory held the correct
+`24501089` binary, hash-proven `E4E76D0E…`. **In-game measurement on SylG5 is not blocked by
+this.** The `post-24536482` capture re-hashes the exe, so the same claim is re-established for the
+new build rather than carried over on faith — and that hash becomes the pre-launch check the
+desktop session asked for.
 
 ### Toolchain fix made to enable this capture
 

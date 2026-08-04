@@ -6,47 +6,96 @@ Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 
 
 ---
 
-> ## ⏸ NEW BUILD 24536482 — PENDING, NOT APPLIED — as of 2026-08-03 20:10 EDT
+> ## 🔺 NEW BUILD 24536482 — APPLIED on SylG5 2026-08-03 20:21:32 EDT
 >
-> **Nothing below this banner has been re-checked against it, because it is not installed.**
-> Every 🟩 on the board is stamped to `24501089` and stays valid until the patch actually lands.
+> **Nothing below this banner has been re-checked against this build.** Every 🟩 on the board is
+> stamped to `24501089`. **Treat the whole board as provisional until the gates are re-run** —
+> that is not a formality: `24479102` looked survivable until `FWWeaponDefinition` turned out to
+> decode to shifted garbage, and `24501089` looked inert until it silently reverted URF.
 >
-> **The pre-patch window was caught.** Baseline **`pre-24536482` is captured, 0 warnings** —
-> 119 paks / 48,572,725,793 B SHA256-hashed, `filelist.txt` **76,309 entries**, catalog, MO2
-> deployment, datamine `6f76f425`. Verified it snapshots the right build: the captured exe hashes
-> to `E4E76D0E…`, matching the recorded `24501089` hash. **Gate 0 is green for this cycle before
-> the patch has even downloaded** — the opposite of last cycle, which installed unattended.
+> **Rollback key: `7134816348397298387`** ([`build-history.md`](build-history.md)). The previous
+> key (`6443337773729671953` → `24501089`) still matters — **SylDesk is still on `24501089`**, so
+> the two machines are diverged as of tonight.
 >
-> - `buildid 24501089` → `TargetBuildID 24536482`, `StateFlags 6`, **413,369,888 B to download,
->   0 downloaded**. Nothing has been fetched yet.
-> - ⚠ **On SylG5 `AutoUpdateBehavior` is `0`** ("always keep updated") with `ScheduledAutoUpdate`
->   at **2026-08-04 03:08:17 EDT**, so the patch lands **unattended tonight** unless changed in
->   the Steam UI. Steam is running. **SylDesk is not exposed** — it is `1` there (confirmed by the
->   2026-08-03 desktop session), so the two machines will diverge again by morning if nothing is
->   done. Only Sylvia changes this; we do not edit the acf.
-> - **The hold is now optional rather than load-bearing, because the baseline is already
->   captured.** The reason to hold last cycle was to protect the capture window; that is banked.
->   What a hold buys now is only control over *when* the patch lands.
-> - **There is a known-good way to apply a patch without launching the game** — the Steam client's
->   **Downloads page**, per-app start button (established on SylDesk 2026-08-03).
->   **`steam://install/<appid>` does not work** — Steam silently drops it, with or without a
->   client window open. This matters because rule 3 ("never launch to check something while an
->   update is pending") assumes launching is the only way to trigger a patch. It is not.
-> - **The `24536482` rollback key does not exist yet.** It is created by the install. Read it from
->   the acf the moment the patch completes, before anything overwrites it. The current key
->   (`6443337773729671953` → `24501089`) is recorded and unaffected.
-> - Patch notes **not yet reviewed** — no characterization of blast radius yet, so no mod has a
->   prior on it. `24479102` was a restructure and `24501089` was a pure value tune; this one is
->   unclassified.
+> **Both sides of the diff exist for the first time in two cycles.** `pre-24536482` was captured
+> **before the patch downloaded a single byte** (0 warnings, 119 paks / 48,572,725,793 B hashed,
+> 76,309-entry filelist, exe hash-proven `E4E76D0E…` = `24501089`), and `post-24536482` follows
+> immediately. **Gate 0 is green on evidence, not on luck** — contrast `24501089`, which installed
+> unattended and had no pre-side of its own.
 >
-> **`tools/steam_state.ps1` was fixed to make the capture possible** — it threw `DriveNotFound`
-> on the absent `H:` before reaching the `D:` root, and `capture_baseline.ps1` calls it as step 1
-> under `-ErrorActionPreference Stop`. Now drive-safe; SylDesk unaffected. `capture_baseline.ps1`
-> still needs the same treatment (its `H:` defaults were overridden on the command line here).
+> - Applied **deliberately, without launching the game**, via the Steam client's **Downloads
+>   page** — the route established on SylDesk earlier the same day, now confirmed on a second
+>   machine. **`steam://install/<appid>` does not work.** This is a genuine amendment to rule 3:
+>   launching is *not* the only way to trigger a pending patch, so a pending update no longer
+>   forces a choice between patching and testing.
+> - `StateFlags` went `6` → `1030` (UpdateRunning) → **`4`**, `UpdateResult 0`. Under three
+>   minutes end to end.
+> - **Download 414,173,424 B against a predicted 413,369,888.** SylDesk saw the same
+>   under-prediction, much larger, on the previous patch. **`BytesToDownload` is an estimate, not
+>   a contract** — completion is `BytesDownloaded == BytesToDownload` *and* `StateFlags 4`.
+> - Install grew **+1,106,583 B** (~1 MiB on a 394 MiB patch) — the rewrite-in-place signature
+>   both prior patches showed. **This says nothing about whether values changed.**
+> - **Patch notes still unreviewed**, so this build has no blast-radius characterization and no
+>   mod has a prior on it. `24479102` was a restructure, `24501089` a pure value tune; this one is
+>   unclassified. The Discord announcement is the missing input.
 >
-> **When it lands, the gate order restarts from Stage 1** — AES key, then usmap, then re-decode,
-> then UE4SS/Signature Bypass. Note that gates 3 and 3b are *already* unknown on `24501089` (the
-> exe changed and was never re-tested), so they are owed regardless of what this patch does.
+> **The stale-executable blocker is SylDesk-only** — see the checked-not-assumed subsection in the
+> banner below. Nothing needs clearing on the laptop before an in-game session.
+>
+> **`tools/steam_state.ps1` was fixed to make any of this possible** — it threw `DriveNotFound` on
+> the absent `H:` before reaching the `D:` root, and `capture_baseline.ps1` calls it as step 1
+> under `-ErrorActionPreference Stop`, so that one throw would have taken down the whole capture.
+> Now drive-safe; SylDesk unaffected. `capture_baseline.ps1` still needs the same treatment (its
+> `H:` defaults were overridden on the command line here).
+>
+> ### Gate order from here — Stage 1 restarts
+>
+> AES → usmap → re-decode/diff → UE4SS → Signature Bypass → Class B → Class A.
+> Two standing warnings apply to this cycle specifically:
+>
+> - **Gate 1b is the one that bites.** On `24479102` the usmap was declared clear because AI
+>   sensors decoded byte-identically, and `FWWeaponDefinition` was simultaneously decoding to
+>   correct values bound to neighbouring property names — no error, entirely plausible. **A usmap
+>   is per-struct.** Check a weapon struct explicitly; do not generalise from one struct family.
+> - **Gates 3 and 3b were already unknown before this patch** (the exe changed on 08-01 and was
+>   never re-tested), so they are owed regardless of what `24536482` did.
+>
+> ### What the patch did structurally — clean, and that is not the whole story
+>
+> Diff in [`state/diffs/pre-24536482__vs__post-24536482/`](diffs/pre-24536482__vs__post-24536482/REPORT.md).
+> Filelist **76,309 → 76,310**: 109 added / 108 removed, of which **108 are case-only directory
+> renames** in map and level-design geometry (`FW/Maps` 58, `LevelDesign/City` 26, `HUB_World` 14,
+> `HUB_Intro` 7, `Shanti` 3). Lowercased, they are unchanged — and per
+> [`asset-dependencies.md`](asset-dependencies.md) a casing change is not a break, because UE
+> lowercases the package name before hashing `FPackageId`.
+>
+> - **Zero real removals.** Nothing any mod overlays has vanished. That is the failure mode that
+>   killed AWU and HRF on `24479102`, and it did not happen here.
+> - **One real addition:** `FW/UI/MainMenu/UMG/Panels/WBP_PopUp_Gift_July2026Drone.uasset`.
+> - **Zero hits against the routing table** — all 69 Group 1–5 dependency patterns checked against
+>   the full 217-path changed set. No Class A or Class B mod is structurally implicated.
+> - **Frozen contract intact:** `ForeverWinter/Content/CMSF/` count is **0**, the required state.
+> - **33 pak files changed, most with identical byte counts** — content rewritten in place. Plus
+>   `pakchunk0_s1-Windows.ucas` +1,048,576 B and `global.ucas` +368 B.
+>
+> **Do not read the clean structural diff as "this patch is harmless."** The diff compares schema
+> and row counts; a tuning pass that rewrites values in place is invisible to it, and the changed
+> `.ucas` files with unchanged sizes are exactly where that hides. **More to the point, Gate 1b
+> failed** — the weapon type layout moved without a single path moving. A clean filelist diff and a
+> broken struct schema are entirely compatible, and this build is the proof.
+>
+> ### ⚠ Consequence to check before anything else ships: `HeavyRifleRebalanceFix` v2.0
+>
+> **Not established — flagged, and it needs a measurement, not an argument.** HRF v2.0 was built by
+> extracting every package from the **`24501089` live cook** and value-patching it, and `retoc`
+> never re-serializes property blobs. If `FWWeaponDefinition`'s layout moved in `24536482` — which
+> Gate 1b says it did — then the mod's shipped `DA_WPN_*` blobs carry the **old** layout and the
+> game reads them against the **new** class. That is the precise "worse than inert" failure the
+> board already documents for a rebase, and **v2.0 is live on Nexus #123 as `2.0.0`**. It is also
+> the second time the same field has bitten this mod. **Check it before assuming either way**; the
+> answer changes whether a page correction is owed. Note the mod is **not deployed on SylG5** (the
+> laptop still holds pre-v2.0 paks per the 08-01 audit), so deploying v2.0 here is a prerequisite
+> for testing it at all.
 
 ---
 
@@ -284,9 +333,9 @@ These block whole classes. Nothing below them means anything until they're resol
 | # | Gate | Status | Notes |
 |---|---|---|---|
 | 0 | Baseline captured | 🟩 | **Green for the pending `24536482` cycle too — captured 2026-08-03 before the patch downloaded.** `pre-24536482`: 0 warnings, 119 paks / 48,572,725,793 B hashed, 76,309 entries, datamine `6f76f425`, exe hash confirms it snapshots `24501089`. Prior cycle: `pre-24479102` (76,589) + `post-24479102` (76,309), datamine tagged `baseline-24097213` @ `36b068b8`, rollback key `6430523508700280691`. |
-| 1a | AES key still valid | 🟩 | **Cleared.** Decoder mounted 76,309 files from the new paks with the key hardcoded at `decoder/Program.cs:28`. The IoStore index is AES-encrypted, so the mount *is* the test. No AESDumpster run needed. |
-| 1b | usmap valid (or regenerated) | 🟩 | **Resolved by regeneration 18:15.** Was found stale for `FWWeaponDefinition` (shifted values under wrong names). Dumped a fresh map via UE4SS `Ctrl+Numpad6` → `ForeverWinter-5.4.2-24479102.usmap`; re-decode is clean and round-trips against the old dump. Old map archived to `mappings/archive/`. |
-| 2 | Re-decode + filelist diff | 🟩 | **Complete.** Filelist diff + force re-decode + catalog rebuild from fresh dumps (stamp `24479102`, data to match). Real deltas found that the stale-vs-stale diff had missed: `WeaponsDetailsData` 56→53, `DT_TagToRowHandle` 1176→1173 (rows `RFL01_Red/Blue/Green` cut). Nine non-taxonomy dump subdirs not re-decoded — verified 0 stale, flagged as cleanup. |
+| 1a | AES key still valid | 🟩 | **Cleared on `24536482` 2026-08-03.** Decoder mounted **76,310** files from the new paks with the key hardcoded at `decoder/Program.cs:28`, unchanged. The IoStore index is AES-encrypted, so the mount *is* the test. No AESDumpster run needed. (Previously cleared the same way on `24479102` at 76,309.) |
+| 1b | usmap valid (or regenerated) | 🟥 | **FAILS ON `24536482` — regeneration required, and it blocks Stage 2 entirely.** The active `ForeverWinter-5.4.2.usmap` is the **`24479102`** regeneration (`4cc3016`/`76eda79`, 2026-07-30) — it was never regenerated for `24501089`, where it happened to still work. On `24536482` it no longer matches `FWWeaponDefinition`. **Measured, three ways:** `DA_WPN_PLAYER_HRF01` decodes **30 of 57** properties and stops; `RFL29` **31**; `HRF02` yields **56 but under partly wrong names** — it gains `bAutomatic`, `WeaponOffset`, `BeamTraceEffect`, `Fire1PADSAnimationMontage` (all names from the *previous* stale-usmap failure) and loses `FireAnimationMontage`, `ReloadAnimationMontage`, `EquipAnimationMontage`, `UnequipAnimationMontage`, `CharacterWeaponAnimationSets`. **The tell is `MaxImpactFX` appearing at index 29 where `NumberOfBuckshots` belongs.** That is *not* a new property — it is present in both usmaps including the `24097213` archive — so this is a **misaligned fragment walk landing on the wrong entry**, not a missing mapping. **What makes it dangerous:** everything before the shift point decodes *correctly* (`WeaponDamage 300.0` matches the documented vanilla figure exactly), so a spot-check of the first few values passes. **This is the identical trap that mis-cleared 1b on `24479102`** — and the control proves it: `AIDEF_Sensor_Damage_Default`, `_TTKDummy` and `_ESP_Default` all round-trip **byte-identical SHA256** against their committed dumps. **A usmap is per-struct; sensors decoding perfectly is not evidence about weapons.** Evidence preserved as `baselines/post-24536482/DA_WPN_PLAYER_*-STALE-USMAP.json`. **Fix: regenerate via UE4SS `Ctrl+Numpad6` — which needs Gate 3 to pass first.** |
+| 2 | Re-decode + filelist diff | 🟦 | **BLOCKED on Gate 1b for `24536482`.** The filelist half is done — `pre-`/`post-24536482` captured and diffed (see the top banner: 0 real removals, 1 real addition, zero dependency hits). The **re-decode half must not run** until the usmap is regenerated, or it writes misaligned weapon values into `dumps/` and stamps the catalog with them. Prior cycle's result below. **Complete on `24479102`:** Filelist diff + force re-decode + catalog rebuild from fresh dumps (stamp `24479102`, data to match). Real deltas found that the stale-vs-stale diff had missed: `WeaponsDetailsData` 56→53, `DT_TagToRowHandle` 1176→1173 (rows `RFL01_Red/Blue/Green` cut). Nine non-taxonomy dump subdirs not re-decoded — verified 0 stale, flagged as cleanup. |
 | 3 | RE-UE4SS attaches to new exe | 🟩 | **Cleared 2026-07-30 17:50.** Clean attach against the new exe (`169584128 B` confirmed in-log). PS scan finished 627 ms, `EngineVersion 5.4`, all symbols resolved, `PS scan successful`, `Event loop start`. The lone `FUObjectHashTables::Get()` miss is **pre-existing** — byte-for-byte the same line appears in the 2026-07-27 old-build log. **Class B is unblocked.** |
 | 3b | Signature Bypass matches new exe | 🟩 | **Cleared 2026-07-30 17:50:55.** bitfix AOB scan hit on the new exe (`scan results: [[7FF6E9560600, 7FF6E9560950]]`) and applied the patch (`writing C3`). Same shape as the 07-27 run at shifted addresses. |
 | 5a | TFWWorkbench reads new paks | ⬜ | Gates all of Class A rebuilds. |

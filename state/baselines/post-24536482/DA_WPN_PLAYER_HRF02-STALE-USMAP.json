@@ -1,0 +1,114 @@
+[
+  {
+    "Type": "FWWeaponDefinition",
+    "Name": "DA_WPN_PLAYER_HRF02",
+    "Flags": "RF_Public | RF_Standalone | RF_Transactional | RF_WasLoaded | RF_LoadCompleted",
+    "Class": "UScriptClass'FWWeaponDefinition'",
+    "Package": "/Game/FW/Weapons/Weapon_V2/HRF_HeavyRifles/HRF02/DA_WPN_PLAYER_HRF02",
+    "Properties": {
+      "WeaponTypeTag": {
+        "TagName": "Weapon.Type.Rifle"
+      },
+      "CharacterRightHand": "RightHand",
+      "SocketNameRightHand": "RightHandSocket_Rifle",
+      "SocketNameLeftHand": "IK_Hand_L",
+      "SocketNameVehicle": "ATT_OpticSocket",
+      "SocketOptic": "S_Aim",
+      "WeaponCameraWeaponSocket": "Camera",
+      "WeaponFireGameplayCue": {
+        "TagName": "GameplayCue.Weapon.HRF02.Fire"
+      },
+      "WeaponPassiveEffects": [
+        {
+          "ObjectName": "BlueprintGeneratedClass'GE_WPN_Passive_HRF_C'",
+          "ObjectPath": "/Game/FW/Weapons/Weapon_V2/HRF_HeavyRifles/GE_WPN_Passive_HRF.0"
+        }
+      ],
+      "AmmoTypeCaliber": {
+        "TagName": "Item.Ammo.20mm"
+      },
+      "MetaData": [
+        "Weapon.Threat.High"
+      ],
+      "TraceLength": 100000.0,
+      "CrosshairGunFireFactorEndSpeed": 5.0,
+      "FireRate": 1.333333,
+      "WeaponDamage": 1800.0,
+      "DistanceToSphere": 1000.0,
+      "SphereRadius": 0.05,
+      "CrosshairSpreadScalar": 1.333333,
+      "MaxDispersionRate": 3.0,
+      "DispersionCoolDownStart": 0.333333,
+      "DispersionCoolDownRate": 0.175,
+      "FovHipFire": 90.0,
+      "FovADS": 60.0,
+      "FovOTS": 70.0,
+      "FovSprint": 110.0,
+      "FovSpeed": 8.0,
+      "FovSprintSpeed": 3.0,
+      "ScaleADSCameraBlendSpeed": 0.9,
+      "MaxImpactFX": 1,
+      "ADSMovementSpeed": 1.378609E-39,
+      "OTAMovementSpeed": 0.0,
+      "MaxAimLagYaw": {
+        "X": 0.0,
+        "Y": -2.0
+      },
+      "MaxAimLagYawADS": {
+        "X": -2.0,
+        "Y": 0.0
+      },
+      "MaxAimLagPitch": {
+        "X": 0.0,
+        "Y": -2.0
+      },
+      "MaxAimLagPitchADS": {
+        "X": -2.0,
+        "Y": "-Infinity"
+      },
+      "ScaleAimLagRotationInADS": 2.2348E-41,
+      "AimLagSpringStiffness": -1.5951086E-23,
+      "AimLagSpringDamping": 2.2725E-41,
+      "AimLagSpringMass": 2.3957E-41,
+      "AimLagTurnSpeedContributionScalar": 2.26E-41,
+      "AimLagIdleScale": -1.5200319E+14,
+      "RecoilWristPitch": 2.1752E-41,
+      "RecoilWristRecoveryBlend": 0.0,
+      "RecoilArmAngle": -3.1307942E-13,
+      "ScaleRecoilADS": 2.2659E-41,
+      "StabilizeFireTime": -107614780.0,
+      "StabilizeFireScaleAimLag": 6.222841E-33,
+      "bAutomatic": false,
+      "MaxAmmo": 0,
+      "WeaponOffset": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": "NaN"
+      },
+      "WeaponFireAnimation": {
+        "ObjectName": "AnimMontage'AM_femi_combat_rifle_FPS_Fire'",
+        "ObjectPath": "/Game/Animations/GenericHumanoid/ScavengerFemale/Rifle/GunPlay/RFLGEN/AM_femi_combat_rifle_FPS_Fire.0"
+      },
+      "Fire1PADSAnimationMontage": {
+        "ObjectName": "AnimMontage'AM_femi_combat_rifle_crouch_FPS_Fire'",
+        "ObjectPath": "/Game/Animations/GenericHumanoid/ScavengerFemale/Rifle/GunPlay/RFLGEN/AM_femi_combat_rifle_crouch_FPS_Fire.0"
+      },
+      "WeaponEquipAnimation": {
+        "ObjectName": "AnimMontage'AM_femi_combat_rifle_ADS_Fire'",
+        "ObjectPath": "/Game/Animations/GenericHumanoid/ScavengerFemale/Rifle/GunPlay/RFLGEN/AM_femi_combat_rifle_ADS_Fire.0"
+      },
+      "WeaponUnequipAnimation": {
+        "ObjectName": "AnimMontage'AM_femi_combat_rifle_crouch_ADS_Fire'",
+        "ObjectPath": "/Game/Animations/GenericHumanoid/ScavengerFemale/Rifle/GunPlay/RFLGEN/AM_femi_combat_rifle_crouch_ADS_Fire.0"
+      },
+      "WeaponAnimationLayer": {
+        "ObjectName": "AnimMontage'AM_femi_combat_rifle_quickTurn_R180'",
+        "ObjectPath": "/Game/Animations/GenericHumanoid/ScavengerFemale/Rifle/Locomotion/Turns/AM_femi_combat_rifle_quickTurn_R180.0"
+      },
+      "BeamTraceEffect": {
+        "ObjectName": "AnimSequence'AS_masc_weapon_HRF02_Reload'",
+        "ObjectPath": "/Game/Animations/GenericHumanoid/OldMan/Rifle/GunPlay/Guns/HRF02/AS_masc_weapon_HRF02_Reload.0"
+      }
+    }
+  }
+]
