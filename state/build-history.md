@@ -14,7 +14,8 @@ App `2828860` · Depot `2828861` · Install `D:\SteamLibrary\steamapps\common\Th
 |---|---|---|---|---|
 | `24097213` | `7600230730618885177` | 2026-07-07 16:55 EDT | 50,779,543,727 B | Previous baseline. Almanac data stamped to this build. usmap `ForeverWinter-5.4.2.usmap` corresponds to it. Datamine tagged `baseline-24097213`. |
 | `24479102` | `6430523508700280691` | 2026-07-30 17:34 EDT | 50,815,237,941 B | Applied 2026-07-30 17:34 EDT. 819,642,192 B download; install grew 35,694,214 B. Weapons-systems overhaul — see [`patch-notes-24479102.md`](patch-notes-24479102.md). All Session-1/2 triage work is stamped to this build. |
-| `24501089` | `6443337773729671953` | 2026-08-01 06:42 (file mtime; no `LastUpdated` key in the acf) | 50,812,092,213 B | **Current.** Auto-applied 2026-08-01 06:42. 686,534,560 B download; install **shrank** 3,145,728 B (exactly 3 MiB). Patch notes not yet reviewed. |
+| `24501089` | `6443337773729671953` | 2026-08-01 06:45 EDT | 50,812,092,213 B | **Currently installed.** Auto-applied 2026-08-01. 686,534,560 B download; install **shrank** 3,145,728 B (exactly 3 MiB). Patch notes not yet reviewed. |
+| `24536482` | *(not installed — no manifest yet)* | — | — | **PENDING, not applied.** 413,369,888 B to download, **0 downloaded**. `StateFlags 6` (UpdateRequired + FullyInstalled). Baseline `pre-24536482` captured 2026-08-03 20:10 EDT **while the old build was still on disk**. |
 
 ## 24097213 → 24479102 — landed 2026-07-30 17:34 EDT
 
@@ -98,6 +99,63 @@ Failure modes observed on SylG5:
 **Consequence for the ledger:** builds recorded before 2026-08-01 were measured on SylDesk.
 `24501089` was read on SylG5. The two installs are independent Steam copies and **can sit at
 different builds** — do not assume a build row describes both machines.
+
+## 24501089 → 24536482 — PENDING as of 2026-08-03 20:10 EDT, not yet applied
+
+**The window was caught this time.** Steam is holding `24536482` as a pending update and the
+`24501089` files are still on disk, so `pre-24536482` is a true pre-patch baseline rather than a
+reconstructed one. Contrast the previous cycle, which installed unattended and survived only
+because `post-24479102` happened to serve as the "before" side.
+
+State read from the acf at capture time:
+
+- `buildid 24501089` · `TargetBuildID 24536482` · `StateFlags 6` (UpdateRequired + FullyInstalled).
+- `BytesToDownload 413,369,888` · **`BytesDownloaded 0`** — the download had not started.
+- **`AutoUpdateBehavior 0`** ("always keep this game updated") with
+  `ScheduledAutoUpdate` = **2026-08-04 03:08:17 EDT**. This is the same setting that was `1`
+  through the `24479102` cycle, which is what held that patch open. It is currently **off**, so
+  the patch lands unattended unless changed in the Steam UI.
+- Depot manifest still `6443337773729671953` — the `24501089` rollback key, already recorded
+  above and unchanged by the pending update.
+
+**Baseline `pre-24536482` — 0 warnings.** 119 pak files / 48,572,725,793 B SHA256-hashed,
+`filelist.txt` at **76,309 entries**, catalog copied, MO2 deployment recorded, datamine at
+`6f76f425`. Two internal consistency checks passed:
+
+- The captured `ForeverWinter-Win64-Shipping.exe` hashes to
+  `E4E76D0E37782EA8E846CF21369BDDEB230BA219999B67A4C03CEBDF55A41C1E`, which **matches the
+  `24501089` hash recorded above** — the snapshot is of the intended build, not a partially
+  patched tree.
+- The 76,309-entry filelist is **identical in count to `post-24479102`**, which is what the
+  ledger already says about `24501089` (0 added / 0 removed / 0 renamed). The baseline agrees
+  with the record.
+
+**Rollback key for `24536482` is not captured yet** — it does not exist until the patch installs.
+Read it out of the acf immediately after the update lands, before anything can overwrite it.
+
+### Toolchain fix made to enable this capture
+
+`tools/steam_state.ps1` could not run on SylG5 at all: `Join-Path` resolves the drive qualifier
+and throws `DriveNotFound` on the absent `H:`, killing the candidate-root loop before it reached
+the `D:` root that does exist. Since `capture_baseline.ps1` calls `steam_state.ps1` as its first
+step under `$ErrorActionPreference = 'Stop'`, that one throw would have taken down the whole
+capture. Fixed by building the candidate path as a plain string — `Test-Path` is drive-safe,
+`Join-Path` is not. The candidate list itself was always correct and is unchanged, so this is
+per-machine resolution rather than a find-and-replace, and SylDesk is unaffected.
+
+`capture_baseline.ps1` still defaults to `H:` on all four path parameters. They are overridable
+on the command line, which is how this capture was taken:
+
+```
+powershell -File tools/capture_baseline.ps1 -Label pre-24536482 `
+  -GamePath 'D:\SteamLibrary\steamapps\common\The Forever Winter' `
+  -AcfPath 'D:\SteamLibrary\steamapps\appmanifest_2828860.acf' `
+  -Mo2Base 'D:\MO2_InstanceData\TheForeverWinter' `
+  -DatamineRepo 'D:\Github Repositories\forever-winter-datamine' `
+  -RunDecoderList
+```
+
+Giving it the same per-machine resolution as `steam_state.ps1` is still owed.
 
 ## Post-patch close-outs
 

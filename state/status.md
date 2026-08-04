@@ -6,7 +6,41 @@ Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 
 
 ---
 
-> ## 🔺 NEW BUILD 24501089 — hotfix, measured 2026-08-01
+> ## ⏸ NEW BUILD 24536482 — PENDING, NOT APPLIED — as of 2026-08-03 20:10 EDT
+>
+> **Nothing below this banner has been re-checked against it, because it is not installed.**
+> Every 🟩 on the board is stamped to `24501089` and stays valid until the patch actually lands.
+>
+> **The pre-patch window was caught.** Baseline **`pre-24536482` is captured, 0 warnings** —
+> 119 paks / 48,572,725,793 B SHA256-hashed, `filelist.txt` **76,309 entries**, catalog, MO2
+> deployment, datamine `6f76f425`. Verified it snapshots the right build: the captured exe hashes
+> to `E4E76D0E…`, matching the recorded `24501089` hash. **Gate 0 is green for this cycle before
+> the patch has even downloaded** — the opposite of last cycle, which installed unattended.
+>
+> - `buildid 24501089` → `TargetBuildID 24536482`, `StateFlags 6`, **413,369,888 B to download,
+>   0 downloaded**. Nothing has been fetched yet.
+> - ⚠ **`AutoUpdateBehavior` is `0`** ("always keep updated") and `ScheduledAutoUpdate` is
+>   **2026-08-04 03:08:17 EDT**. Unless that is changed to `1` in the Steam UI, **the patch lands
+>   unattended tonight.** Steam is running. Only Sylvia can change this — we do not edit the acf.
+> - **The `24536482` rollback key does not exist yet.** It is created by the install. Read it from
+>   the acf the moment the patch completes, before anything overwrites it. The current key
+>   (`6443337773729671953` → `24501089`) is recorded and unaffected.
+> - Patch notes **not yet reviewed** — no characterization of blast radius yet, so no mod has a
+>   prior on it. `24479102` was a restructure and `24501089` was a pure value tune; this one is
+>   unclassified.
+>
+> **`tools/steam_state.ps1` was fixed to make the capture possible** — it threw `DriveNotFound`
+> on the absent `H:` before reaching the `D:` root, and `capture_baseline.ps1` calls it as step 1
+> under `-ErrorActionPreference Stop`. Now drive-safe; SylDesk unaffected. `capture_baseline.ps1`
+> still needs the same treatment (its `H:` defaults were overridden on the command line here).
+>
+> **When it lands, the gate order restarts from Stage 1** — AES key, then usmap, then re-decode,
+> then UE4SS/Signature Bypass. Note that gates 3 and 3b are *already* unknown on `24501089` (the
+> exe changed and was never re-tested), so they are owed regardless of what this patch does.
+
+---
+
+> ## 🔺 BUILD 24501089 — hotfix, measured 2026-08-01 (still the installed build)
 >
 > Released Friday 2026-07-31; auto-applied on SylG5 2026-08-01 06:42. Full analysis in
 > [`hotfix-24501089-findings.md`](hotfix-24501089-findings.md).
@@ -113,7 +147,11 @@ Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 
 
 ---
 
-Last updated: 2026-08-01 — **`HeavyRifleRebalanceFix` v2.0 is live on Nexus #123 as `2.0.0`**
+Last updated: 2026-08-03 — **a new build `24536482` is pending and the `pre-24536482` baseline is
+captured with 0 warnings** (see the top banner). The patch has not landed; nothing below is
+re-checked against it. The one thing outstanding is a Steam UI change to stop it auto-applying at
+03:08 EDT. Also fixed `tools/steam_state.ps1`, which could not run on this machine at all.
+Earlier 2026-08-01 — **`HeavyRifleRebalanceFix` v2.0 is live on Nexus #123 as `2.0.0`**
 (Sylvia reported; upload time not captured, not yet verified by re-download). That
 closes the release gap for every mod we own — nothing we ship is still broken on `24501089`.
 **It went out ahead of its one in-game measurement**, which is a deliberate trade, not an
@@ -183,7 +221,7 @@ These block whole classes. Nothing below them means anything until they're resol
 
 | # | Gate | Status | Notes |
 |---|---|---|---|
-| 0 | Baseline captured | 🟩 | Both sides captured, 0 warnings. `pre-24479102` (76,589 entries) + `post-24479102` (76,309). Datamine tagged `baseline-24097213` @ `36b068b8`. New rollback key `6430523508700280691`. |
+| 0 | Baseline captured | 🟩 | **Green for the pending `24536482` cycle too — captured 2026-08-03 before the patch downloaded.** `pre-24536482`: 0 warnings, 119 paks / 48,572,725,793 B hashed, 76,309 entries, datamine `6f76f425`, exe hash confirms it snapshots `24501089`. Prior cycle: `pre-24479102` (76,589) + `post-24479102` (76,309), datamine tagged `baseline-24097213` @ `36b068b8`, rollback key `6430523508700280691`. |
 | 1a | AES key still valid | 🟩 | **Cleared.** Decoder mounted 76,309 files from the new paks with the key hardcoded at `decoder/Program.cs:28`. The IoStore index is AES-encrypted, so the mount *is* the test. No AESDumpster run needed. |
 | 1b | usmap valid (or regenerated) | 🟩 | **Resolved by regeneration 18:15.** Was found stale for `FWWeaponDefinition` (shifted values under wrong names). Dumped a fresh map via UE4SS `Ctrl+Numpad6` → `ForeverWinter-5.4.2-24479102.usmap`; re-decode is clean and round-trips against the old dump. Old map archived to `mappings/archive/`. |
 | 2 | Re-decode + filelist diff | 🟩 | **Complete.** Filelist diff + force re-decode + catalog rebuild from fresh dumps (stamp `24479102`, data to match). Real deltas found that the stale-vs-stale diff had missed: `WeaponsDetailsData` 56→53, `DT_TagToRowHandle` 1176→1173 (rows `RFL01_Red/Blue/Green` cut). Nine non-taxonomy dump subdirs not re-decoded — verified 0 stale, flagged as cleanup. |

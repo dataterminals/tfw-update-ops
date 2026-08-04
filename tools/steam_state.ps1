@@ -34,7 +34,10 @@ function Format-Epoch {
 
 $manifestPath = $null
 foreach ($root in $LibraryRoots) {
-    $candidate = Join-Path $root "appmanifest_$AppId.acf"
+    # Build the candidate as a plain string. Join-Path resolves the drive qualifier and throws
+    # DriveNotFound on an absent drive, which killed the whole loop on the machine that lacks H:
+    # before it could reach the roots that do exist. Test-Path is drive-safe; Join-Path is not.
+    $candidate = $root.TrimEnd('\') + '\' + "appmanifest_$AppId.acf"
     if (Test-Path $candidate) { $manifestPath = $candidate; break }
 }
 if (-not $manifestPath) {
