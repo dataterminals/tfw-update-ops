@@ -6,6 +6,67 @@ Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 
 
 ---
 
+> ## 🟥 DO NOT LAUNCH MO2 ON SylG5 — the 2026-08-03 23:05 session REVERTED the game install
+>
+> **Root Builder restored stale pre-patch backups over the patched game on exit.** Same mechanism
+> SylDesk found with its executable on 2026-08-03, at far greater scale. Measured immediately
+> after the session, with the game closed and the directory stable:
+>
+> - **The shipping exe is the `24097213` binary** — 169,513,984 B, SHA `CAEFF67E…`. It should be
+>   169,641,472 / `5D9F12E6…`. That is a **three-patch** revert.
+> - **20 of 118 pak files reverted** to `24097213`-era versions (mtimes 2026-07-04 / 07-07),
+>   including `global.ucas`, `pakchunk0_s1-Windows.ucas` and `pakchunk20_s16/s17`.
+> - **`FWPakManifest.json` deleted** from the game's `Paks\`.
+> - Proof it is a genuine revert and not a mis-measure: the decoder now mounts **76,589** files —
+>   exactly the `pre-24479102` count — and matches **zero** `DA_WPN_PLAYER_*`, a naming that only
+>   exists from `24479102` onward.
+>
+> **Nothing is lost.** Every correct `24536482` file is sitting in
+> `overwrite\Root\Windows\…` with mtime `2026-08-03 20:19:32` (Steam's patch write), sizes
+> matching `post-24536482` exactly — including the correct exe at 169,641,472 B.
+>
+> ### Root cause: Root Builder's cache is keyed on the ENGINE version, which never changes
+>
+> `C:\Modding\MO2\plugins\data\RootBuilder\DSteamLibrarysteamappscommonThe_Forever_Winter\`
+> **`5_4_2_0`**`\GameData.json` (68,263 B, rewritten 23:05:47 at session start). The key is
+> `5_4_2_0` — the UE version — and it has been identical across `24097213` → `24479102` →
+> `24501089` → `24536482`. So Root Builder believes its file inventory from a July build still
+> describes the current game and "restores" it. **This will recur on every launch after every
+> patch until the cache is cleared**, and it explains the SylDesk executable finding as the same
+> bug rather than a one-off.
+>
+> ### Remedy, in this order
+>
+> 1. **Steam → TFW → Properties → Installed Files → Verify integrity of game files.** Restores the
+>    exe, the 20 paks and `FWPakManifest.json` authoritatively. Do this *before* deleting anything,
+>    so there is never a moment when the only good copy is the one being deleted.
+> 2. **Delete the Root Builder cache** at the `5_4_2_0\GameData.json` path above, so it rebuilds
+>    from current state instead of a July snapshot.
+> 3. **Clear the displaced game files** out of `overwrite\Root\Windows\` — they are duplicates of
+>    what Steam just restored. The regenerated usmap is already committed to the datamine repo, so
+>    nothing in there is needed any more.
+>
+> **SylDesk needs steps 2 and 3 too** — its cache lives under an `H:`-keyed directory and its
+> displaced exe is still armed.
+>
+> ### What this does and does not invalidate
+>
+> - **Gates 3 and 3b stand.** Both were measured at 23:05:50 from the live session log, while the
+>   correct `24536482` exe was still in place; the revert happened at cleanup ~23:12.
+> - **The usmap regeneration stands.** It was dumped at 23:12:13 from the running correct build,
+>   and both validation runs mounted **76,310** files. Had they hit the reverted set, the AI-sensor
+>   controls would have differed rather than matching byte-identically.
+> - **Any in-game measurement taken on this machine before tonight is suspect**, because nothing
+>   ever compared the exe hash before a session. Add that check to the pre-launch routine — the
+>   baselines already capture the hash, nothing was reading it.
+> - **The earlier "SylG5 is clean" check in this session was correct but too narrow.** It looked
+>   for a displaced *executable* under the MO2 instance and for `GameData.json` under the instance
+>   and `%LOCALAPPDATA%`/`%APPDATA%`. The cache actually lives under the **MO2 install directory**
+>   (`C:\Modding\MO2\plugins\data\`), which was never searched, and the check never considered
+>   *pak* files at all.
+
+---
+
 > ## 🔺 NEW BUILD 24536482 — APPLIED on SylG5 2026-08-03 20:21:32 EDT
 >
 > **Nothing below this banner has been re-checked against this build.** Every 🟩 on the board is
