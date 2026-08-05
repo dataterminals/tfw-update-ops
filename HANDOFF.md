@@ -1,7 +1,26 @@
-# HANDOFF — start here
+# HANDOFF — ⚠ THIS DOCUMENT IS FOR THE `24479102` CYCLE. IT IS TWO BUILDS OLD.
+
+> ## Read [`state/status.md`](state/status.md) instead. Start there, not here.
+>
+> **The live build is `24536482`** (applied 2026-08-03, all seven gates 🟩 against it as of
+> 2026-08-05). Everything below describes `24479102` and is kept as the record of that cycle.
+>
+> It is dangerous precisely because it is *internally consistent*: its gate list happens to be
+> nearly right for `24536482` too, so nothing in the text signals that it is describing a
+> different patch. Two specific claims below are now false — "**6 of 7 gates green, only 5a
+> open**" (5a is green; it was cleared 2026-08-03 23:06 and simply never scored) and
+> "**`HeavyRifleRebalanceFix` is dead and needs a *redesign***" (it was redesigned and shipped as
+> v2.0 on 2026-08-01, then broken again by `24536482`'s weapon-schema change; v2.1 is built and
+> awaiting upload).
+>
+> **A stale "start here" is worse than none.** If you are writing the next cycle's handoff,
+> replace this file rather than appending to it.
+
+---
 
 **Written:** 2026-07-31, end of the session that applied the patch and did the first triage pass.
-**State:** patch **applied**. 6 of 7 gates green. One mod fixed, deployed and **released**.
+**State (as of that date, for build `24479102`):** patch **applied**. 6 of 7 gates green. One mod
+fixed, deployed and **released**.
 
 > **Update 2026-08-01:** AWU **shipped**. Sylvia uploaded both variants the night of 2026-07-31 —
 > regular **1.2.1**, Trees **1.1.1**. Everything below that reads "not on Nexus" / "the one

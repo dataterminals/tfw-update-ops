@@ -43,8 +43,13 @@ tools/        the small scripts the procedure calls
 
 ## Current situation
 
-See [`state/build-history.md`](state/build-history.md) — as of 2026-07-30 the game is on build
-`24097213` with build `24479102` (~820 MB) queued and **held pending go-ahead**. Baseline capture
-has not been run.
+**Don't read a build number out of this file** — it is static and goes stale every patch.
+[`state/status.md`](state/status.md) carries the live cycle and
+[`state/build-history.md`](state/build-history.md) the lineage; four baselines and two diff sets
+are captured to date.
 
-Start any new session from [`HANDOFF.md`](HANDOFF.md).
+As of 2026-08-05: SylG5 is on **`24536482`** with **all seven gates 🟩** against it. SylDesk is a
+build behind on `24501089` and needs its Root Builder remediation before it is launched.
+
+Start any new session from [`state/status.md`](state/status.md). [`HANDOFF.md`](HANDOFF.md) is
+written per-cycle and is only current if its date matches the cycle on the board.

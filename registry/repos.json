@@ -1,8 +1,29 @@
 {
   "schema": 1,
-  "generated": "2026-07-30",
+  "generated": "2026-08-05",
   "org": "dataterminals",
   "local_root": "H:\\Github Repositories",
+  "roots": {
+    "_note": "Per-machine. `local_root`/`deployment` above are SylDesk's and are kept for compatibility; resolve by hostname instead. H:\\ does not exist on SylG5, and a script that joins it throws DriveNotFound rather than reporting nothing found.",
+    "SylG5": {
+      "repos": "D:\\Github Repositories",
+      "mod_store": "D:\\MO2_InstanceData\\TheForeverWinter\\mods",
+      "modlist": "D:\\MO2_InstanceData\\TheForeverWinter\\profiles\\Default\\modlist.txt",
+      "game_path": "D:\\SteamLibrary\\steamapps\\common\\The Forever Winter",
+      "paks_path": "D:\\SteamLibrary\\steamapps\\common\\The Forever Winter\\Windows\\ForeverWinter\\Content\\Paks",
+      "build": 24536482,
+      "note": "18 mods in the store as of 2026-08-05. Verified on this machine."
+    },
+    "SylDesk": {
+      "repos": "H:\\Github Repositories",
+      "mod_store": "H:\\MO2Instance_ModData\\ForeverWinter\\mods",
+      "modlist": "H:\\MO2Instance_ModData\\ForeverWinter\\profiles\\Default\\modlist.txt",
+      "game_path": "H:\\SteamLibrary\\steamapps\\common\\The Forever Winter",
+      "paks_path": "H:\\SteamLibrary\\steamapps\\common\\The Forever Winter\\Windows\\ForeverWinter\\Content\\Paks",
+      "build": 24501089,
+      "note": "NOT measurable from SylG5. Still on 24501089, Root Builder cache+backup unremediated, displaced exe still armed. Last written to git 2026-08-03 11:40."
+    }
+  },
   "classes": {
     "A": "Pak / asset mods — baked against specific assets at specific paths; fail silently",
     "B": "UE4SS / Lua runtime mods — resolve BP paths and widgets at runtime; fail loudly",
@@ -11,75 +32,256 @@
     "E": "Research — reference only, no ship surface"
   },
   "repos": [
-    { "name": "TFWCharModelSelFramework", "class": "A", "tag": "v0.2.3", "risk": "critical",
+    {
+      "name": "TFWCharModelSelFramework",
+      "class": "A",
+      "tag": "v0.2.3",
+      "risk": "critical",
       "note": "Skin-append framework. Author owns name/portrait/mesh at frozen slot paths; those paths are the contract.",
-      "deployed_as": ["CMSF v0.2 Framework"] },
-    { "name": "AllWeaponsUnlockableFix", "class": "A", "tag": null, "risk": "high",
+      "deployed_as": [
+        "CMSF v0.2 Framework"
+      ]
+    },
+    {
+      "name": "AllWeaponsUnlockableFix",
+      "class": "A",
+      "tag": null,
+      "risk": "high",
       "note": "Weapon unlock data mod; Trees variant is the deployed one.",
-      "deployed_as": ["AllWeaponsUnlockableTrees", "AllWeaponsUnlockableFix"] },
-    { "name": "UnkillablesRebalanceFix", "class": "A", "tag": null, "risk": "critical",
+      "deployed_as": [
+        "AllWeaponsUnlockableTrees",
+        "AllWeaponsUnlockableFix"
+      ]
+    },
+    {
+      "name": "UnkillablesRebalanceFix",
+      "class": "A",
+      "tag": null,
+      "risk": "critical",
       "note": "6 boss BPs rebuilt via Option B. BP rebuilds are our most patch-fragile technique.",
-      "deployed_as": ["UnkillablesRebalanceFix"] },
-    { "name": "HeavyRifleRebalanceFix", "class": "A", "tag": null, "risk": "high",
+      "deployed_as": [
+        "UnkillablesRebalanceFix"
+      ]
+    },
+    {
+      "name": "HeavyRifleRebalanceFix",
+      "class": "A",
+      "tag": null,
+      "risk": "high",
       "note": "Built via TFWWorkbench; upstream/ + work/ staging dirs.",
-      "deployed_as": ["HeavyRifleRebalanceFix"] },
-    { "name": "ScavgirlCarryPerks", "class": "A", "tag": null, "risk": "high",
+      "deployed_as": [
+        "HeavyRifleRebalanceFix"
+      ]
+    },
+    {
+      "name": "ScavgirlCarryPerks",
+      "class": "A",
+      "tag": null,
+      "risk": "high",
       "note": "4 pak variants + a UE4SS variant.",
-      "deployed_as": ["ScavgirlCarryPerks-Balanced", "ScavgirlCarryPerks-Unbalanced", "ScavgirlCarryPerks-Combined-Balanced", "ScavgirlCarryPerks-Combined-Unbalanced", "ScavgirlCarryPerks-UE4SS"] },
-    { "name": "TFWQuestGiverPortraitPatch", "class": "A", "tag": null, "risk": "high",
+      "deployed_as": [
+        "ScavgirlCarryPerks-Balanced",
+        "ScavgirlCarryPerks-Unbalanced",
+        "ScavgirlCarryPerks-Combined-Balanced",
+        "ScavgirlCarryPerks-Combined-Unbalanced",
+        "ScavgirlCarryPerks-UE4SS"
+      ]
+    },
+    {
+      "name": "TFWQuestGiverPortraitPatch",
+      "class": "A",
+      "tag": null,
+      "risk": "high",
       "note": "Rebaked BC1 button textures + mip splice. Assumes a fixed 2:1 button brush.",
-      "deployed_as": ["QuestGiver Portrait Patch"] },
-    { "name": "forever-winter-skin-mods", "class": "A", "tag": null, "risk": "medium",
-      "note": "Skin pak collection.",
-      "deployed_as": ["Recruiter Slade", "Naughty Luca", "Bunco-chan Texture Swap", "Augmented Kane"] },
-
-    { "name": "TFWStaggerControl", "class": "B", "tag": null, "risk": "high",
+      "deployed_as": [
+        "QuestGiver Portrait Patch"
+      ]
+    },
+    {
+      "name": "forever-winter-skin-mods",
+      "class": "A",
+      "tag": null,
+      "risk": "medium",
+      "note": "Skin pak collection. **NOT deployed** — builds SCVGIRL_UMP9_* / SHM_UMP45_*, none of which is in the MO2 store. The 4 skins that ARE enabled (Recruiter Slade, Naughty Luca, Bunco-chan Texture Swap, Augmented Kane) are third-party, not ours. repos.md was corrected 2026-08-01; this file was not, so agents reading it attributed 4 third-party paks to us.",
+      "deployed_as": []
+    },
+    {
+      "name": "TFWStaggerControl",
+      "class": "B",
+      "tag": null,
+      "risk": "high",
       "note": "Pivots on the ungranted Ability.HitReactionBlocked tag. Public, NOT yet game-verified — verify against the new build.",
-      "deployed_as": ["TFWStaggerControl"] },
-    { "name": "TFWLootAll", "class": "B", "tag": null, "risk": "high",
+      "deployed_as": [
+        "TFWStaggerControl"
+      ]
+    },
+    {
+      "name": "TFWLootAll",
+      "class": "B",
+      "tag": null,
+      "risk": "high",
       "note": "Wired to decoded W_LootUI_C. Open item: the per-item transfer call.",
-      "deployed_as": ["TFWLootAll"] },
-    { "name": "TFWQuestHUDToggle", "class": "B", "tag": "v0.1.1", "risk": "medium",
+      "deployed_as": [
+        "TFWLootAll"
+      ]
+    },
+    {
+      "name": "TFWQuestHUDToggle",
+      "class": "B",
+      "tag": "v0.1.1",
+      "risk": "medium",
       "note": "Shipped.",
-      "deployed_as": ["TFWQuestHUDToggle"] },
-    { "name": "TFWQuestItemTag", "class": "B", "tag": null, "risk": "medium",
+      "deployed_as": [
+        "TFWQuestHUDToggle"
+      ]
+    },
+    {
+      "name": "TFWQuestItemTag",
+      "class": "B",
+      "tag": null,
+      "risk": "medium",
       "note": "Manifest generated from fwdata.query.quest_items() — regenerate after re-decode.",
-      "deployed_as": [] },
-
-    { "name": "forever-winter-datamine", "class": "C", "tag": null, "risk": "critical",
-      "note": "THE SOURCE. usmap + CUE4Parse decoder + dumps + parse_*.py + fwdata. Everything downstream waits on this.",
-      "upstream_of": ["forever-winter-almanac", "forever-winter-maps", "fwact", "TFWQuestItemTag", "TFWLootAll"] },
-    { "name": "forever-winter-almanac", "class": "C", "tag": null, "risk": "high",
-      "note": "Offline PWA. Data currently stamped to build 24097213." },
-    { "name": "forever-winter-maps", "class": "C", "tag": null, "risk": "medium",
-      "note": "Offline maps PWA on GitHub Pages; updated via tools/fetch_maps.py." },
-    { "name": "NewStefanMap", "class": "C", "tag": null, "risk": "medium", "note": "Map work." },
-    { "name": "fwact", "class": "C", "tag": "v0.1.0", "risk": "low",
-      "note": "Rust. CANNOT be built or tested on this desktop — toolchain can't link (no as.exe, no MSVC)." },
-
-    { "name": "ForeverWinterMO2Support", "class": "D", "tag": "v0.2.1", "risk": "medium" },
-    { "name": "TFWWorkbenchMO2Patcher", "class": "D", "tag": "v1.0.0", "risk": "medium" },
-    { "name": "TFWWorkbenchMO2Fix", "class": "D", "tag": null, "risk": "medium" },
-    { "name": "TFWModdingAssistant", "class": "D", "tag": "v0.2.0", "risk": "low",
-      "note": "Diagnosis works; repair pass deliberately unwritten." },
-    { "name": "ForeverWinterModSetup", "class": "D", "tag": null, "risk": "low" },
-
-    { "name": "tfw-weapon-modding-research", "class": "E", "tag": null, "risk": "none" },
-    { "name": "tfw-imgui-research", "class": "E", "tag": null, "risk": "none",
-      "note": "Concluded: ImGui in TFW is C++-only, separate-window D3D12; no d3d12 UE4SS backend." },
-    { "name": "tfworkbench-compat-research", "class": "E", "tag": null, "risk": "none" },
-    { "name": "FWBehaviorLab", "class": "E", "tag": null, "risk": "none" },
-
-    { "name": "TFW_CyborgNerfFix", "class": "stub", "tag": null, "risk": "none",
-      "note": "EMPTY — .git only, zero commits. Build it or archive it." }
+      "deployed_as": []
+    },
+    {
+      "name": "forever-winter-datamine",
+      "class": "C",
+      "tag": null,
+      "risk": "critical",
+      "note": "THE SOURCE. usmap + CUE4Parse decoder + dumps + parse_*.py + fwdata. Everything downstream waits on this. Re-decoded and current at 24536482.",
+      "upstream_of": [
+        "forever-winter-almanac",
+        "forever-winter-maps",
+        "fwact",
+        "TFWQuestItemTag",
+        "TFWLootAll"
+      ]
+    },
+    {
+      "name": "forever-winter-almanac",
+      "class": "C",
+      "tag": null,
+      "risk": "high",
+      "note": "Offline PWA on GitHub Pages (serves `main` root). Data stamped 24536482 as of 2026-08-05."
+    },
+    {
+      "name": "forever-winter-maps",
+      "class": "C",
+      "tag": null,
+      "risk": "medium",
+      "note": "Offline maps PWA on GitHub Pages; updated via tools/fetch_maps.py."
+    },
+    {
+      "name": "NewStefanMap",
+      "class": "C",
+      "tag": null,
+      "risk": "medium",
+      "note": "Map work."
+    },
+    {
+      "name": "fwact",
+      "class": "C",
+      "tag": "v0.1.0",
+      "risk": "low",
+      "note": "Rust. CANNOT be built or tested on this desktop — toolchain can't link (no as.exe, no MSVC)."
+    },
+    {
+      "name": "ForeverWinterMO2Support",
+      "class": "D",
+      "tag": "v0.2.1",
+      "risk": "medium"
+    },
+    {
+      "name": "TFWWorkbenchMO2Patcher",
+      "class": "D",
+      "tag": "v1.0.0",
+      "risk": "medium"
+    },
+    {
+      "name": "TFWWorkbenchMO2Fix",
+      "class": "D",
+      "tag": null,
+      "risk": "medium"
+    },
+    {
+      "name": "TFWModdingAssistant",
+      "class": "D",
+      "tag": "v0.2.0",
+      "risk": "low",
+      "note": "Diagnosis works; repair pass deliberately unwritten."
+    },
+    {
+      "name": "ForeverWinterModSetup",
+      "class": "D",
+      "tag": null,
+      "risk": "low"
+    },
+    {
+      "name": "tfw-weapon-modding-research",
+      "class": "E",
+      "tag": null,
+      "risk": "none"
+    },
+    {
+      "name": "tfw-imgui-research",
+      "class": "E",
+      "tag": null,
+      "risk": "none",
+      "note": "Concluded: ImGui in TFW is C++-only, separate-window D3D12; no d3d12 UE4SS backend."
+    },
+    {
+      "name": "tfworkbench-compat-research",
+      "class": "E",
+      "tag": null,
+      "risk": "none"
+    },
+    {
+      "name": "FWBehaviorLab",
+      "class": "E",
+      "tag": null,
+      "risk": "none"
+    },
+    {
+      "name": "TFW_CyborgNerfFix",
+      "class": "stub",
+      "tag": null,
+      "risk": "none",
+      "note": "EMPTY — .git only, zero commits. Build it or archive it."
+    },
+    {
+      "name": "forever-winter-attachments",
+      "class": "C",
+      "tag": null,
+      "risk": "medium",
+      "note": "Second TFW almanac PWA — same root commit and tab set as forever-winter-almanac, its own GitHub remote, HEAD 8d1580c (2026-07-20) with data stamped 24097213 (three builds stale). Appears to be the retired predecessor. OPEN: confirm whether its Pages deployment is still live; if so it serves stale economy/drop numbers under the same branding. Archive or redirect."
+    },
+    {
+      "name": "TombstoneAlways",
+      "class": "B",
+      "tag": null,
+      "risk": "low",
+      "note": "Pre-implementation research (FWTombStoneSave / FWPersistenceSubsystem). Open item is a runtime instrumentation session, so it is a candidate to piggyback on the next launch window."
+    }
   ],
   "excluded": [
-    { "name": "CleanUIRecipeTooltipFix", "why": "Project Zomboid B42 mod (42/media/lua/client/), not TFW. Name misleads." }
+    {
+      "name": "CleanUIRecipeTooltipFix",
+      "why": "Project Zomboid B42 mod (42/media/lua/client/), not TFW. Name misleads."
+    }
   ],
   "third_party_blockers": [
-    { "name": "RE-UE4SS", "why": "Every class B mod is dead without it. Stable v3.0.1 FAILS on this exe; we run the experimental build (fixed 5.4 AOB signatures)." },
-    { "name": "Signature Bypass", "why": "Must match the new shipping exe." },
-    { "name": "TFWWorkbench", "why": "Build tool for class A paks. If it can't read the new paks, class A cannot be rebuilt." }
+    {
+      "name": "RE-UE4SS",
+      "why": "Every class B mod is dead without it. Stable v3.0.1 FAILS on this exe; we run the experimental build (fixed 5.4 AOB signatures)."
+    },
+    {
+      "name": "Signature Bypass",
+      "why": "Must match the new shipping exe."
+    },
+    {
+      "name": "TFWWorkbench",
+      "why": "Build tool for class A paks. If it can't read the new paks, class A cannot be rebuilt."
+    }
   ],
   "deployment": {
     "model": "MO2 — the game directory is clean by design; never read the game folder to see what's installed",
@@ -89,9 +291,17 @@
     "game_path": "H:\\SteamLibrary\\steamapps\\common\\The Forever Winter",
     "paks_path": "H:\\SteamLibrary\\steamapps\\common\\The Forever Winter\\Windows\\ForeverWinter\\Content\\Paks",
     "enabled_2026_07_30": [
-      "CMSF v0.2 Framework", "QuestGiver Portrait Patch", "Recruiter Slade", "Naughty Luca",
-      "Bunco-chan Texture Swap", "Augmented Kane", "HeavyRifleRebalanceFix",
-      "UnkillablesRebalanceFix", "AllWeaponsUnlockableTrees", "TFWWorkbench", "RE-UE4SS",
+      "CMSF v0.2 Framework",
+      "QuestGiver Portrait Patch",
+      "Recruiter Slade",
+      "Naughty Luca",
+      "Bunco-chan Texture Swap",
+      "Augmented Kane",
+      "HeavyRifleRebalanceFix",
+      "UnkillablesRebalanceFix",
+      "AllWeaponsUnlockableTrees",
+      "TFWWorkbench",
+      "RE-UE4SS",
       "Signature Bypass"
     ]
   }

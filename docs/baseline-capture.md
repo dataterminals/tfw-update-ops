@@ -10,6 +10,21 @@ copy of the game. Everything below is small, takes minutes, and makes the *diff*
 (unanswerable for Class A, which fails silently). With one you can ask "what actually changed?"
 and route the answer at the exact mods that care.
 
+## Run a Steam **verify** before capturing a POST-patch baseline
+
+A baseline is only as good as the bytes it hashes, and a filesystem snapshot taken moments after a
+patch completes is *observed*, not *validated*. On `post-24536482` exactly one pak —
+`pakchunk20_s8-Windows.ucas` — hashed differently at the same byte length, and Steam's post-verify
+copy (which matches the depot manifest) is the authoritative one. Cause undetermined: either a
+torn read during a capture that started ~30 s after the patch landed, or a patch write that
+differed from the manifest. Either way the fix is the same and costs minutes.
+
+**Verify first, then capture.** That makes the baseline manifest-validated rather than merely
+observed — and a baseline is the thing every later "what changed?" answer is measured against, so
+a single wrong hash there propagates into every diff that follows. The correction is recorded in
+`state/baselines/post-24536482/CORRECTION-pakchunk20_s8.md`; a *pre*-patch baseline cannot be
+verified this way (verify would pull the new build), so this applies to post-patch captures only.
+
 ## What to capture, and why each item earns its place
 
 | Artifact | Why |

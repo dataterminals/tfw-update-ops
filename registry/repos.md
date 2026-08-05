@@ -1,8 +1,19 @@
 # Registry — everything TFW we own
 
-25 tracked repos + 1 empty stub. All remotes are `github.com/dataterminals/<name>`.
-Local root: `H:\Github Repositories\`. Classes are defined in
-[`../docs/exposure-model.md`](../docs/exposure-model.md).
+27 tracked repos + 1 empty stub. All remotes are `github.com/dataterminals/<name>`.
+Classes are defined in [`../docs/exposure-model.md`](../docs/exposure-model.md).
+
+**Local root is per-machine** — resolve from `repos.json` → `roots.<hostname>`, never a hardcoded
+drive. SylG5: `D:\Github Repositories\`. SylDesk: `H:\Github Repositories\` (`H:\` does not exist
+on SylG5, and joining it throws `DriveNotFound` rather than reporting nothing found).
+
+Added 2026-08-05, previously absent from both halves of the registry:
+- **`forever-winter-attachments`** (Class C) — a second full TFW almanac PWA sharing the almanac's
+  root commit, its own remote, data stamped `24097213`. Almost certainly the retired predecessor.
+  **Open:** confirm whether its GitHub Pages deployment is still live; if it is, it serves
+  three-build-old economy and drop numbers under the same branding as the live almanac.
+- **`TombstoneAlways`** (Class B) — pre-implementation research whose open item is a runtime
+  instrumentation session, so it should be routed into the next launch window.
 
 Deliberately **excluded**: `CleanUIRecipeTooltipFix` (Project Zomboid B42 mod — `42/media/lua/client/`,
 not TFW; the name misleads).
@@ -99,9 +110,18 @@ helps if these don't come back up on the new build.
 The game directory is **clean by design** — mods live in the MO2 instance, never the game folder.
 
 - MO2 instance ini: `C:\Users\sylvi\AppData\Local\ModOrganizer\The Forever Winter\ModOrganizer.ini`
+**SylG5** (the machine on `24536482`, doing the work):
+- Mod store: `D:\MO2_InstanceData\TheForeverWinter\mods\` (**18** folders)
+- Load order: `D:\MO2_InstanceData\TheForeverWinter\profiles\Default\modlist.txt`
+- Game: `D:\SteamLibrary\steamapps\common\The Forever Winter`
+
+**SylDesk** (still on `24501089`, not measurable from SylG5):
 - Mod store: `H:\MO2Instance_ModData\ForeverWinter\mods\` (39 folders)
 - Load order: `H:\MO2Instance_ModData\ForeverWinter\profiles\Default\modlist.txt`
 - Game: `H:\SteamLibrary\steamapps\common\The Forever Winter`
+
+⚠ The counts differ because these are **different loadouts**, not a stale reading — the three
+Class B mods the board wants functionally tested are in SylDesk's store, not SylG5's.
 
 **Enabled as of 2026-07-30** — 12 of 39, but **only 5 of them are ours.** Corrected after reading
 the actual pak filenames in the mod store; the earlier version of this section misattributed the

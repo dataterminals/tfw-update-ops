@@ -7,6 +7,31 @@ Update `state/status.md` as you go. That file, not this one, is the source of tr
 
 ---
 
+## Stage 0a — Before ANY session that launches the game: check the exe hash
+
+**Compare the shipping exe's SHA256 against the current baseline's `binaries-win64.csv`.** If it
+does not match, stop — the install is not the build you think it is, and every measurement taken
+in that session is void.
+
+```powershell
+(Get-FileHash "<game_path>\Windows\ForeverWinter\Binaries\Win64\ForeverWinter-Win64-Shipping.exe" -Algorithm SHA256).Hash
+```
+
+**Why this is a standing rule, not a precaution.** MO2's **Root Builder caches the game's file
+inventory keyed on the *engine* version** (`5_4_2_0`), which has been identical across
+`24097213` → `24479102` → `24501089` → `24536482`. A content patch never invalidates it, so on
+exit Root Builder "restores" a months-old backup over the freshly patched game. On 2026-08-03
+this reverted SylG5 by **three builds** — the exe plus 20 of 118 paks — and deleted
+`FWPakManifest.json`. It was found only because the decoder suddenly mounted the pre-`24479102`
+file count.
+
+The baselines have **always** captured this hash. Nothing ever read it. That single comparison
+would have caught the same bug on SylDesk four days earlier.
+
+**Remediation when it fires:** Steam **verify**, then delete Root Builder's `GameData.json` **and**
+its sibling `Backup\` **together** — removing only the cache leaves ~47 GB of stale files ready to
+restore; removing only the backup leaves the cache asserting the game looks like July.
+
 ## Stage 0 — Record the landing
 
 Run `tools/steam_state.ps1`. Append the new row to `state/build-history.md`: new build ID, new

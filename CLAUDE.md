@@ -5,8 +5,9 @@
 The command post for handling a Forever Winter game update across all 25 TFW repos. It holds
 **no mod code**. Fixes land in each mod's own repo; this repo tracks that they happened.
 
-Start every session by reading [`HANDOFF.md`](HANDOFF.md), then
-[`state/status.md`](state/status.md).
+Start every session by reading [`state/status.md`](state/status.md) — its top banners and the
+Gates table are the live state. [`HANDOFF.md`](HANDOFF.md) is a **per-cycle** document and goes
+stale between patches; check its date before trusting it.
 
 ## Rules
 
@@ -16,12 +17,21 @@ Start every session by reading [`HANDOFF.md`](HANDOFF.md), then
 2. **Respect the gate order** in [`docs/triage-pipeline.md`](docs/triage-pipeline.md). AES → usmap
    → re-decode → UE4SS → Class B → Class A → Class C → Class D. Fixing a mod against stale dumps
    means fixing it twice.
-3. **Never launch the game to "check something" while an update is pending.** Steam is set to
-   "only update when I launch it" — launching *is* the update. Check
-   `tools/steam_state.ps1` if unsure.
+3. **Read the update behaviour; do not assume it.** `AutoUpdateBehavior` is **per-machine** —
+   SylG5 is `0` ("always keep updated", so a patch lands on its own schedule whether or not you
+   launch), SylDesk is `1`. Run `tools/steam_state.ps1` rather than relying on the old blanket
+   rule that "launching *is* the update", which is false on SylG5. **A pending patch no longer
+   forces a choice between patching and testing:** apply it deliberately from the Steam client's
+   **Downloads page** (`steam://install/<appid>` is silently ignored) — established on both
+   machines 2026-08-03. Completion is `BytesDownloaded == BytesToDownload` **and** `StateFlags 4`;
+   `BytesToDownload` is an estimate, not a contract.
 4. **Read the MO2 mod store to see what's deployed**, never the game folder. The game directory
-   is clean by design: `H:\MO2Instance_ModData\ForeverWinter\mods\`, load order in
-   `profiles\Default\modlist.txt`.
+   is clean by design. **The store is per-machine — resolve it from `registry/repos.json` →
+   `roots.<hostname>`, never from a hardcoded drive:** SylG5 is
+   `D:\MO2_InstanceData\TheForeverWinter\mods\`, SylDesk is
+   `H:\MO2Instance_ModData\ForeverWinter\mods\`. Load order in `profiles\Default\modlist.txt`.
+   `H:\` does not exist on SylG5, and joining it throws `DriveNotFound` rather than reporting
+   nothing deployed — that class of failure already took down `tools/steam_state.ps1` once.
 5. **Don't edit Steam's `.acf`.** Read it. Steam owns it and overwrites hand edits. Update
    behavior is changed in the Steam UI by Sylvia.
 6. **This repo is private and stays private.** Baselines contain decoded catalog JSON derived from
