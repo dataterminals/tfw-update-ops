@@ -20,6 +20,7 @@ App `2828860` · Depot `2828861` · Install: `H:\SteamLibrary\...` on **SylDesk*
 | `24479102` | `6430523508700280691` | 2026-07-30 17:34 EDT | 50,815,237,941 B | Applied 2026-07-30 17:34 EDT. 819,642,192 B download; install grew 35,694,214 B. Weapons-systems overhaul — see [`patch-notes-24479102.md`](patch-notes-24479102.md). All Session-1/2 triage work is stamped to this build. |
 | `24501089` | `6443337773729671953` | 2026-08-01 06:42 (file mtime; no `LastUpdated` key in the acf) | 50,812,092,213 B | **Installed on BOTH machines** — SylG5 auto-applied 2026-08-01 06:42, SylDesk deliberately 2026-08-03 11:36:51. 686,534,560 B download; install **shrank** 3,145,728 B (exactly 3 MiB). Patch notes not yet reviewed. |
 | `24536482` | `7134816348397298387` | 2026-08-03 20:21:32 EDT | 50,813,198,796 B | **Current on SylG5.** Applied deliberately 20:21:32 EDT via the Steam Downloads page, **without launching**. 414,173,424 B download; install grew **1,106,583 B**. Baseline `pre-24536482` captured before it downloaded a byte. **SylDesk is still on `24501089`** — the two machines are diverged. |
+| `25071553` | `4492887131597018203` | (no `LastUpdated` key; pak mtimes 2026-09-03 11:57) | 50,814,351,716 B | **Current on SylG5.** Auto-applied — `AutoUpdateBehavior` is `0` on this machine, so it landed unattended. 646,420,448 B download; install grew **1,152,920 B**. **No `pre-25071553` capture exists** — see the section below. Accumulates game versions `0.9.5.0` (08-28) through `0.9.5.3` (09-02); the intermediate depot manifests are unrecoverable. **SylDesk state unknown as of this entry.** |
 
 ## 24097213 → 24479102 — landed 2026-07-30 17:34 EDT
 
@@ -273,6 +274,102 @@ powershell -File tools/capture_baseline.ps1 -Label pre-24536482 `
 ```
 
 Giving it the same per-machine resolution as `steam_state.ps1` is still owed.
+
+## 24536482 -> 25071553 — landed unattended, recorded 2026-09-09
+
+**The pre-patch window was missed, and this time not recoverable by luck alone.** SylG5 runs
+`AutoUpdateBehavior` `0` ("always keep this game updated"), so the patch applied itself with
+nobody watching. Worse than the `24501089` case: the installed build has accumulated **four
+announced game versions** — `0.9.5.0` (2026-08-28), the `0.9.5.1` same-day hotfix, `0.9.5.2`
+(08-31) and `0.9.5.3` (09-02) — and the pak mtimes are all 2026-09-03 11:57. Only the final
+build ID and its manifest survive; **the three intermediate depot manifests are gone**, so the
+rollback granularity for this cycle is one step, not four.
+
+The `post-24536482` baseline serves as the "before" side of the diff, exactly as
+`post-24479102` did for `24501089`. Nothing needed for triage is lost.
+
+**Rollback key for `25071553`: `4492887131597018203`.**
+
+### Stage 0a — the install is genuinely the new build, not a Root Builder revert
+
+The shipping exe is **169,740,288 B / `D87AE674…`**, mtime 2026-09-03 11:57:09 — Steam's own
+patch write. It differs from `post-24536482`'s `169,641,472` / `5D9F12E6…` because the build
+genuinely moved, which is the expected reading. The standing pre-launch check is satisfied:
+this is not the 2026-08-03 revert mechanism firing again. Note that the game has **not been
+launched under MO2 since 2026-08-04** — `overwrite\Root` is absent and there is no `UE4SS.log`
+anywhere under the instance — so Root Builder has had no opportunity to rebuild its cache
+against this build. **Expect the revert mechanism to be armed on the next launch** and clear
+`GameData.json` + `Backup\` together first.
+
+### Stage 1a — AES key survived 🟩
+
+The decoder mounted **76,321 files** with the key still hardcoded at `decoder/Program.cs:36`,
+unchanged. The IoStore index is AES-encrypted, so the mount is the test. (`24536482`: 76,310.)
+
+### Stage 1b — usmap is STALE and must be regenerated 🟥
+
+**This is the blocker for the cycle.** Measured on the `FWWeaponDefinition` export of
+`DA_WPN_PLAYER_HRF01`, decoded three ways with an identical extraction:
+
+| decode | properties |
+|---|---|
+| build `24536482`, its own correct usmap (committed dump) | **57** |
+| the `post-24536482` baseline's kept `-STALE-USMAP` sample | 30 |
+| **build `25071553`, the current live usmap** | **30** |
+
+57 is the exact figure `mappings/provenance.json` records as verification for the current map,
+and gate 1b's own note in `status.md` says it "was stopping at 30" before regeneration. It is
+stopping at 30 again, and the values it does produce look plausible — no garbage numbers, no
+error, exit 0. That is the documented silent-failure mode verbatim.
+
+`bConvergeADSAimToCamera` reads at index 28 of 30 rather than provenance's index 46 of 57.
+That is not evidence of health; it is the "reads real bytes under neighbouring property names"
+symptom, and it is consistent with `0.9.5.x` having moved the weapon struct again — the patch
+notes describe a recoil/stability **display** rework, height-over-bore work and per-weapon
+reload scaling, all of which touch that definition.
+
+**Consequence:** every value-level decode for this build is void until the map is regenerated,
+and no Class A pak may be rebuilt against it. Structural findings that do **not** read the type
+map are still sound and are the only things this cycle may act on so far:
+
+- the filelist (76,321 entries) and everything derived from path existence,
+- raw byte comparisons taken through `retoc to-legacy`, which is passed no usmap at all.
+
+**To clear it** (doctrine Stage 1, needs a game launch, so it is Sylvia's): experimental UE4SS
+into `Binaries\Win64`, a Lua mod calling `DumpUSMAP()`, then remove UE4SS again. Archive the
+outgoing `24536482` map under `mappings/archive/` with its build in the filename and update
+`provenance.json` in the same commit.
+
+### Stage 3 — UE4SS attach: UNKNOWN ⬜
+
+Not merely unscored — **unattempted**. There is no `UE4SS.log` anywhere under
+`D:\MO2_InstanceData\TheForeverWinter`, so nothing has run against this exe. All of Class B is
+unknown for `25071553`, including `CMSFUnlock`, and the `-894` experimental pin has never been
+tested against a September binary.
+
+### Filelist diff `post-24536482` -> `25071553`: 153 added / 142 removed, and most of it is noise
+
+The bulk is **directory-case churn** and should not be read as movement: `Posed/` -> `posed/`,
+`DataLayers/` -> `Datalayers/`, `images/` -> `Images/`, `TOOTHY/` -> `Toothy/`,
+`Bagman/` -> `BagMan/`. Per `asset-dependencies.md`, case-only changes are benign because UE
+lowercases the package name before hashing `FPackageId`.
+
+The genuinely new or moved content:
+
+- **Europa soldier behaviour trees `Trees_v2` -> `Trees_v3`**, plus new EQS queries
+  (`EQS_FindSearchLocation`, `EQS_FleeTarget_V3`, `EQS_DangerCloseFireLine_V3`) and
+  `BTDecorator_DangerCloseFoe`. This is the announced AI state-machine rework landing as assets.
+- **`BTTask_AI_FindRandomSpotNearKey` removed** — worth a look from anything touching AI tasks.
+- **Shaman MAY skin materials renamed**: `MI_EUP_INF_head_V4` -> `MI_SCV_SHM_Head`,
+  `MI_EUP_INF_torso_2` -> `MI_EUP_INF_torso`, `VMI_EUP_INF_eyes_2` -> `MI_EUP_INF_eyes`.
+  Matches the "Shaman: improved materials" note. **Direct exposure for
+  `forever-winter-skin-mods`**, whose ranked failure modes put `M_FW_Char`-class material
+  renames at "drops all materials to default".
+- **`SM_WPN_SHG05_RCV` split** into `_IronSight` / `_NoIronSight` variants.
+- New `Toothy` AI definition set at the recased path.
+
+Nothing in the diff touches any asset `TFWCharModelSelFramework` owns or reads — see the CMSF
+section of the mod-side findings.
 
 ## Post-patch close-outs
 

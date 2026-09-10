@@ -1,0 +1,109 @@
+{
+ "_source": "WBP_*/BPFL_* tooltip widgets (decoded with CUE4Parse)",
+ "_note": "UI widget family: parent class, TextBlock bindings, functions.",
+ "build": 24536482,
+ "count": 9,
+ "widgets": {
+  "BPFL_Tooltips": {
+   "class": null,
+   "parent": null,
+   "text_blocks": {},
+   "functions": [
+    "CreateTooltips",
+    "GetDetailsFromTag"
+   ],
+   "child_widgets": {}
+  },
+  "WBP_BaseTooltip": {
+   "class": "WBP_BaseTooltip_C",
+   "parent": "UserWidget",
+   "text_blocks": {
+    "ItemDescription": "lorem ipsum",
+    "ItemName": "lorem ipsum"
+   },
+   "functions": [],
+   "child_widgets": {
+    "CanvasPanel_0": "CanvasPanel",
+    "CanvasPanelSlot_11": "CanvasPanelSlot",
+    "CanvasPanelSlot_12": "CanvasPanelSlot",
+    "Border": "Image",
+    "Overlay_0": "Overlay",
+    "OverlaySlot_2": "OverlaySlot",
+    "OverlaySlot_3": "OverlaySlot",
+    "VerticalBox_0": "VerticalBox",
+    "VerticalBoxSlot_0": "VerticalBoxSlot",
+    "VerticalBoxSlot_1": "VerticalBoxSlot"
+   }
+  },
+  "WBP_BuddyTooltips": {
+   "class": "WBP_BuddyTooltips_C",
+   "parent": "WBP_BaseTooltip_C",
+   "text_blocks": {},
+   "functions": [
+    "ExecuteUbergraph_WBP_BuddyTooltips",
+    "PreConstruct"
+   ],
+   "child_widgets": {}
+  },
+  "WBP_ContainerTooltips": {
+   "class": "WBP_ContainerTooltips_C",
+   "parent": "WBP_BaseTooltip_C",
+   "text_blocks": {},
+   "functions": [
+    "ExecuteUbergraph_WBP_ContainerTooltips",
+    "PreConstruct"
+   ],
+   "child_widgets": {}
+  },
+  "WBP_DanglyTooltips": {
+   "class": "WBP_DanglyTooltips_C",
+   "parent": "WBP_BaseTooltip_C",
+   "text_blocks": {},
+   "functions": [
+    "ExecuteUbergraph_WBP_DanglyTooltips",
+    "PreConstruct"
+   ],
+   "child_widgets": {}
+  },
+  "WBP_FrameTooltips": {
+   "class": "WBP_FrameTooltips_C",
+   "parent": "WBP_BaseTooltip_C",
+   "text_blocks": {},
+   "functions": [
+    "ExecuteUbergraph_WBP_FrameTooltips",
+    "PreConstruct"
+   ],
+   "child_widgets": {}
+  },
+  "WBP_GenericToolTip": {
+   "class": "WBP_GenericToolTip_C",
+   "parent": "WBP_BaseTooltip_C",
+   "text_blocks": {},
+   "functions": [
+    "ExecuteUbergraph_WBP_GenericToolTip",
+    "PreConstruct"
+   ],
+   "child_widgets": {}
+  },
+  "WBP_ItemTooltips": {
+   "class": "WBP_ItemTooltips_C",
+   "parent": "WBP_BaseTooltip_C",
+   "text_blocks": {},
+   "functions": [
+    "ExecuteUbergraph_WBP_ItemTooltips",
+    "PreConstruct"
+   ],
+   "child_widgets": {}
+  },
+  "WBP_RigTooltips": {
+   "class": "WBP_RigTooltips_C",
+   "parent": "WBP_BaseTooltip_C",
+   "text_blocks": {},
+   "functions": [
+    "ExecuteUbergraph_WBP_RigTooltips",
+    "PreConstruct"
+   ],
+   "child_widgets": {}
+  }
+ }
+}
