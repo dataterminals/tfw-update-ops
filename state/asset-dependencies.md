@@ -523,6 +523,51 @@ grep -c "^ForeverWinter/Content/CMSF/" filelist.txt   # must be 0
 **5. Route at the named mods**, then update `state/status.md` in the same turn. Zero hits for a repo
 means *likely-clean*, which is a smoke-test result, not a verified one.
 
+---
+
+## The filelist is not the only staleness surface
+
+A path-level diff sees packages appearing, moving and vanishing. It is blind to three other ways a
+shipped pak goes stale, and two of them were only characterised in the `25071553` cycle. Full
+working in [`scriptobjects-25071553.md`](scriptobjects-25071553.md).
+
+**1. Content staleness** — the pak's bytes no longer match the live cook's. This is the only one
+every harness in the collection already tests (reversion checks, provenance gates, value
+comparison).
+
+**2. Container staleness — ScriptImports.** A Zen container serialises its imports of native
+classes, functions and properties into the global script-object store. **The predicate is removals,
+not growth:**
+
+> A pak is exposed **iff its ScriptImport set intersects the set of script-object paths REMOVED or
+> RENAMED since it was packed.** Store *growth* is causally inert.
+
+Resolution is by explicit 64-bit `GlobalIndex`, not array position — measured: across
+`24097213 → 25071553`, **zero of 46,497 shared paths changed id while 99.7% changed position**. For
+this cycle the removed set is exactly
+`{FWReplicatedAimRecord, FWHardpointContainerComponent.OnRep_AimReplication}` and **measured
+exposure across every audited pak is zero.** Checked by `tools/scriptobjects_diff.py` (canonical
+copy in the `TFWCharModelSelFramework` repo pending vendoring here) — usmap-free, launch-free,
+`exit 2` = could-not-run so it is never a silent pass.
+
+**3. Container staleness — `PackageImport` public-export hashes. ⬜ UNTESTED, and it generalises
+further than the other two.** Distinct from ScriptImports: these resolve by
+`(ImportedPackageIndex, ImportedPublicExportHashIndex)` against the **target base package's** public
+export hashes, which live in the live cook rather than the script store. **A renamed or removed
+public export in a reworked base package is a missing import, and fatal in shipping builds.** Any
+mod that overrides or references a base package inside a reworked subsystem is exposed regardless
+of what it imports from `/Script/`. `0.9.5.0` rebuilt the AI subsystem from the ground up, so this
+cycle is exactly when it would bite — `UnkillablesRebalanceFix` whole-asset-overrides eleven base
+packages in that subsystem.
+
+> ### 🚨 And no local launch tests any of this against the integrity subsystem
+>
+> The MO2 profile runs **`Signature Bypass` (`dsound.dll`) enabled**. `FWModIntegritySubsystem`
+> exists in the live cook (mod detection with party-wide replication, plus a weapon-damage override
+> gated on `IsStockWeapon`). **A clean local launch proves the bypass works — not that a user
+> without it sees the same thing.** State which of `Signature Bypass` / `RE-UE4SS` were loaded
+> before writing down any "mods are fine" conclusion.
+
 **6. Then do the work a filelist diff cannot do.** This is the part that gets skipped and should
 not be. The intersection above finds moved paths. It finds none of the following, all of which are
 live risks in this patch:

@@ -54,7 +54,7 @@ Write-Output "Capturing baseline '$Label' -> $outDir"
 Write-Output ''
 
 # ---------------------------------------------------------------- 1. Steam state
-Write-Output '[1/6] Steam state'
+Write-Output '[1/7] Steam state'
 if (Test-Path $AcfPath) {
     Copy-Item $AcfPath (Join-Path $outDir 'appmanifest.acf') -Force
     & (Join-Path $PSScriptRoot 'steam_state.ps1') |
@@ -65,7 +65,7 @@ if (Test-Path $AcfPath) {
 }
 
 # ------------------------------------------------------- 2. Pak inventory + hashes
-Write-Output '[2/6] Pak inventory'
+Write-Output '[2/7] Pak inventory'
 $paksPath = Join-Path $GamePath 'Windows\ForeverWinter\Content\Paks'
 if (Test-Path $paksPath) {
     $paks = Get-ChildItem $paksPath -Recurse -File
@@ -89,8 +89,47 @@ if (Test-Path $paksPath) {
     Add-Warn "Paks folder not found at $paksPath"
 }
 
-# ------------------------------------------------------------ 3. Shipping exe hash
-Write-Output '[3/6] Shipping binaries'
+# ---------------------------------------------------- 3. Global containers (script objects)
+# WHY: global.ucas carries the ScriptObjects chunk -- the hash->entry map every cooked pak
+# resolves its native class / function / struct imports through. A pak is exposed to a patch if
+# and only if it imports a script object whose path was REMOVED or RENAMED, so the removal set
+# between two builds is the durable exposure predicate for every Class A mod. Growth is a
+# non-event: resolution is by a hash of the object path, not by array position.
+#
+# Without this archived per build the set cannot be recovered afterwards. On the 25071553 cycle
+# the store had moved 5,258 bytes across four builds and the intermediate cooks were already
+# gone, so the change could only be BOUNDED by byte arithmetic rather than read off directly.
+#
+# Copied rather than extracted, deliberately. retoc can pull scriptobjects.bin out, but that
+# needs retoc, the game's AES key and the .NET decoder -- three dependencies this script does
+# not have and should not acquire. global.ucas is only 15 bytes larger than the
+# scriptobjects.bin inside it, so copying the container preserves the same information for
+# ~3 MB and no tooling. Parse it later with tools/scriptobjects_diff.py.
+Write-Output '[3/7] Global containers'
+if (Test-Path $paksPath) {
+    $globDir = Join-Path $outDir 'global'
+    New-Item -ItemType Directory -Force $globDir | Out-Null
+    $got = 0
+    foreach ($g in @('global.utoc', 'global.ucas')) {
+        $src = Join-Path $paksPath $g
+        if (Test-Path $src) {
+            Copy-Item $src (Join-Path $globDir $g) -Force
+            $len = (Get-Item $src).Length
+            Write-Output "      $g ($len bytes)"
+            $got = $got + 1
+        } else {
+            Add-Warn "$g not found in $paksPath -- the script-object store was NOT archived."
+        }
+    }
+    if ($got -eq 2) {
+        Write-Output '      -> global/ ; diff two baselines with scriptobjects_diff.py'
+    }
+} else {
+    Add-Warn 'Paks folder missing -- global containers not captured.'
+}
+
+# ------------------------------------------------------------ 4. Shipping exe hash
+Write-Output '[4/7] Shipping binaries'
 $binDir = Join-Path $GamePath 'Windows\ForeverWinter\Binaries\Win64'
 if (Test-Path $binDir) {
     Get-ChildItem $binDir -File |
@@ -108,8 +147,8 @@ if (Test-Path $binDir) {
     Add-Warn "Win64 binaries folder not found at $binDir"
 }
 
-# ------------------------------------------------------------- 4. MO2 deployment
-Write-Output '[4/6] MO2 deployment'
+# ------------------------------------------------------------- 5. MO2 deployment
+Write-Output '[5/7] MO2 deployment'
 $modsDir  = Join-Path $Mo2Base 'mods'
 $modlist  = Join-Path $Mo2Base "profiles\$Mo2Profile\modlist.txt"
 if (Test-Path $modsDir) {
@@ -127,8 +166,8 @@ if (Test-Path $modlist) {
     Add-Warn "MO2 modlist not found at $modlist"
 }
 
-# ---------------------------------------------------------- 5. fwdata catalog copy
-Write-Output '[5/6] fwdata catalog'
+# ---------------------------------------------------------- 6. fwdata catalog copy
+Write-Output '[6/7] fwdata catalog'
 $catalogDir = Join-Path $DatamineRepo 'datamine\catalog'
 if (Test-Path $catalogDir) {
     $dest = Join-Path $outDir 'catalog'
@@ -154,8 +193,8 @@ if (Test-Path (Join-Path $DatamineRepo '.git')) {
     Write-Output "      datamine-git-state.txt (HEAD $($sha.Substring(0,8)))"
 }
 
-# ------------------------------------------------------------ 6. decoder filelist
-Write-Output '[6/6] Decoder filelist'
+# ------------------------------------------------------------ 7. decoder filelist
+Write-Output '[7/7] Decoder filelist'
 $decoderDir = Join-Path $DatamineRepo 'datamine\decoder'
 if ($RunDecoderList) {
     if (Test-Path $decoderDir) {

@@ -43,46 +43,70 @@ first parse that assumed they were produced wrong answers. Format validated two 
 
 ```
 FWReplicatedAimRecord
-OnRep_AimReplication
+FWHardpointContainerComponent.OnRep_AimReplication
 ```
 
-**Added: 78.** So the live store is **not** a strict superset of July's.
+**Added: 78** — `/Script/FWAICore` 28, `/Script/FWWeapon` 19, `/Script/AgentAI` 12, remainder
+scattered. So the live store is **not** a strict superset of July's.
 
-### The predicate is removal, not growth
+### ✅ RESOLVED — container staleness is refuted. Resolution is by id, not by position.
 
-A script import is an `FPackageObjectIndex` of type ScriptImport whose value is a **hash of the
-object's path name**, and the ScriptObjects chunk is a hash→entry map. Resolution is by hash, not
-by array position. **Appending symbols therefore cannot break an existing pak.** A pak is exposed
-iff it imports a symbol that was *removed or renamed*:
+This was proposed as the cause of CMSF's launch crash, tested three independent ways, and **is
+not**. The route is closed; do not reopen it without new evidence.
 
-> **Exposure = `imports ∩ {FWReplicatedAimRecord, OnRep_AimReplication}`**
+**1 — The format itself.** `FScriptObjectEntry` stores an **explicit 64-bit `GlobalIndex`** per
+entry (top two bits `01`, spread across the 62-bit space). *An array-position encoding would never
+need to store the position.*
 
-That is a two-symbol set covering aim replication. **Almost nothing will intersect it.** Both
-symbols are the client-aim-replication rework described in the `0.9.5.0` notes; their replacements
-are in the added set (`ServerFireWithTarget`, `WeaponFiredMulticastRPC`,
-`FireCosmeticsMulticastRPC`, `GetLastFiredShotId`, `OnWeaponFired__DelegateSignature`).
+**2 — The measurement.** Across the two cooks, of 46,497 shared paths: **zero changed their
+`GlobalIndex`**, while **46,374 — 99.7% — sit at a different array position.** Position moved for
+almost everything. Not one id did.
 
-**Consequence: do not tell six repos to rebuild on this basis.** The correct instruction is
-*investigate*, and for almost every repo the investigation will come back clean.
+**3 — The artifact test, which settles it.** The *actually shipped, actually crashing* July
+`CMSF_Core_9_P` was unpacked and the `ImportMap` of all 199 zen package headers parsed:
+**220 distinct ScriptImports, all 220 resolve against the live store to identical paths, zero
+dangling**, and neither removed object is referenced. The Octogirl skin pak: 19 imports, 0
+dangling.
 
-### This does not explain the CMSF crash — the mechanism is still open
+**So the exposure predicate is removal, and the removal set is two symbols wide:**
 
-Neither removed symbol is referenced by any of the seven CMSF-overridden assets. The negative was
-sanity-checked (script-object names *are* greppable in `retoc to-legacy` output —
-`FWSkinChangeComponent` appears 4× in `BP_Player_Girl.uasset`), so 0 hits is meaningful rather
-than an artifact.
+> **Exposure = `imports ∩ {FWReplicatedAimRecord, FWHardpointContainerComponent.OnRep_AimReplication}`**
 
-**Honest limit on that negative:** `FWReplicatedAimRecord` is a *struct type* and
-`OnRep_AimReplication` a *RepNotify function*. Neither would necessarily appear as an **import**
-in a child Blueprint even if the native parent pawn declares them. "Not imported" ≠ "not exposed"
-— it rules out a dead ScriptImport, not schema misalignment.
+Both are the client-aim-replication rework from the `0.9.5.0` notes; their replacements are in the
+added set (`ServerFireWithTarget`, `WeaponFiredMulticastRPC`, `FireCosmeticsMulticastRPC`,
+`GetLastFiredShotId`, `OnWeaponFired__DelegateSignature`). **Measured exposure across every audited
+pak is zero.**
 
-**Leading remaining candidate:** native parent property-layout change. If `FWReplicatedAimRecord`
-was a `UPROPERTY` on the native pawn and was removed, July-cooked `BP_Player_*` unversioned
-property data misaligns against the September schema — which would crash at pawn construction,
-i.e. at launch. **Evidence against it:** the game's own recooked pawn `.uexp` files are the same
-length as July's with only 2–23 scalar bytes changed, which argues the serialized property set did
-not change. Genuinely unresolved.
+**Growth is a non-event.** The +5,258 bytes that started this investigation are causally inert.
+
+**Consequence — the CMSF rebuild is a null intervention.** 193 of its 199 packages are
+byte-identical to the July pak with identical import lists throughout. It fixes a real staleness
+that was **never the cause**, and must not be presented as a fix.
+
+**Do not tell any repo to rebuild on this basis.** Not "rebuild", not even "investigate container
+staleness" — that route is closed.
+
+### CMSF's crash is still unexplained
+
+Two candidates survive.
+
+**Native parent property-layout change.** If `FWReplicatedAimRecord` was a `UPROPERTY` on the
+native pawn and was removed, July-cooked `BP_Player_*` unversioned property data misaligns against
+the September schema, crashing at pawn construction — i.e. at launch. **Evidence against:** the
+game's own recooked pawn `.uexp` files are the same length as July's with only 2–23 scalar bytes
+changed, arguing the serialized property set did not change.
+
+**`PackageImport` public-export-hash staleness — untested by anything so far, and the better-formed
+hypothesis.** Distinct from ScriptImports: CMSF's 199 packages carry **1,094 `PackageImport`s**
+resolving by `(ImportedPackageIndex, ImportedPublicExportHashIndex)` against the *target base
+package's* public export hashes — which live in the **live cook**, not the script store. A removed
+or renamed public export in a reworked base package is a missing import, and **fatal in shipping
+builds**. `0.9.5.0` rebuilt the AI subsystem from the ground up, so reworked base packages are
+exactly what exists this cycle.
+
+**This generalises further than ScriptImports do**, because a mod that overrides or references a
+base package in a reworked subsystem is exposed regardless of what it imports from `/Script/`. See
+§5.
 
 ## 3. Dating it — the store moved in three steps, not one
 
@@ -205,13 +229,38 @@ or flag the player's whole party.
 
 ## 5. What to do about it
 
+### 🚨 Doctrine — this rig cannot test any integrity path, and never could
+
+**The MO2 instance runs `Signature Bypass` (`dsound.dll`) `+`enabled.** Whatever
+`FWModIntegritySubsystem` does about container or manifest validation, **no measurement taken on
+SylG5 is a valid control for it.** A clean local launch proves the bypass works, not that the mods
+are undetected.
+
+This has been true for every measurement this project has ever taken and was never stated. It
+belongs in the pre-launch routine beside the exe-hash check: **before concluding "mods are fine"
+from a local session, say which of `Signature Bypass` / `RE-UE4SS` were loaded.** Any real test of
+the integrity path requires disabling the bypass, which is a separate deliberate experiment.
+
+### The durable predicate, for `asset-dependencies.md`
+
+Not *"packed before date X"* — that rubric is dead. It is:
+
+> **A pak is exposed iff its ScriptImport set intersects the set of script-object paths REMOVED or
+> RENAMED since it was packed.** Growth is a non-event.
+
+For this cycle that set is exactly
+`{FWReplicatedAimRecord, FWHardpointContainerComponent.OnRep_AimReplication}`.
+
 ### Checks worth having
 
-1. **Compare script-object *name sets*, report removals only.** Growth is a non-event; the
-   invariant that matters is that nothing a pak imports has disappeared. The CMSF session is
-   folding this into its `verify_build.sh` check [5] and will hand over the parser. It is
-   usmap-free and launch-free, so **it is not blocked by gate 1b** — one of the few things this
-   cycle can act on today.
+1. **Compare script-object *name sets*, report removals only.** Implemented as
+   `tools/scriptobjects_diff.py` in the `TFWCharModelSelFramework` repo — name-set diff, removals
+   only, `--refs` for the exposure test, **exit 2 = could-not-run so it is never a silent pass**,
+   with a negative control proving it fires. **Vendor it into this repo's `tools/`**: every Class A
+   repo needs the same check and one copy should be canonical. It is usmap-free and launch-free,
+   so **it is not blocked by gate 1b** — one of the few things this cycle can act on today.
+   *Caveat now known: it will return clean nearly everywhere. That is a true negative, not
+   coverage.*
 2. **Capture `scriptobjects.bin` in every baseline.** `capture_baseline.ps1` does not. Had it,
    this cycle's dating would have been exact instead of bounded, and the intermediate `0.9.5.x`
    cooks would not have been lost. **Three lines, and it retires this whole class of archaeology.**
@@ -234,10 +283,57 @@ or flag the player's whole party.
 
 ### What NOT to conclude
 
-- **Not** that every pre-`0.9.5.0` pak must be rebuilt. The removal set is two aim-replication
-  symbols; almost nothing intersects it.
-- **Not** that container staleness explains the CMSF launch crash. It was proposed, tested, and
-  **does not**. The rebuilt CMSF pak fixes a real staleness that was probably never the cause, and
-  is **not** a demonstrated fix.
-- **Not** that a clean name-set diff means a pak is healthy. It rules out dead ScriptImports. It
-  says nothing about native parent property-layout drift, which is the leading open candidate.
+- **Not** that any pak must be rebuilt for container staleness. Measured exposure is **zero
+  everywhere**. The route is closed.
+- **Not** that container staleness explains the CMSF launch crash. Proposed, tested three ways,
+  **refuted**. The rebuilt CMSF pak is a **null intervention** — 193 of 199 packages byte-identical
+  to the July pak — and must not be presented as a fix.
+- **Not** that a clean name-set diff means a pak is healthy. It rules out dead ScriptImports and
+  nothing else. `PackageImport` public-export-hash staleness is untested, better-formed, and
+  generalises further.
+- **Not** that a clean local launch means mods are undetected. **`Signature Bypass` is enabled on
+  this rig.**
+
+---
+
+## 6. Class A exposure — audited, and what it actually means
+
+Seven repos audited read-only by the CMSF session. **Ratings were assigned under the
+now-refuted rubric ("ships Blueprints + packed pre-`0.9.5.0`"), so read the column as *overlap with
+the reworked subsystems*, not as script-import exposure — which is zero everywhere.**
+
+| Repo | Zen pak | pre-`0.9.5.0` | overrides base | BPs | MO2 | rated |
+|---|---|---|---|---|---|---|
+| **`UnkillablesRebalanceFix`** | yes | yes | yes | **7 of 11** | **`+`ENABLED** | **critical** |
+| `HeavyRifleRebalanceFix` | yes | yes | yes | no | disabled | medium |
+| `forever-winter-skin-mods` | yes | yes | yes | no | absent | medium |
+| `ScavgirlCarryPerks` | yes | yes | yes | no | disabled | low |
+| `TFWQuestGiverPortraitPatch` | yes | yes | yes | no | absent | low |
+| `TFWQuestItemTag` | no | n/a | no | no | absent | none |
+| `TFW_CyborgNerfFix` | no | n/a | no | no | absent | none |
+
+⚠ **`AllWeaponsUnlockableFix` and the whole-tree sweep are still owed** — the audit hit a session
+limit. Flagged so a gap does not read as coverage. AWU is `+`enabled.
+
+### 🔴 `UnkillablesRebalanceFix` is the one that matters — for content reversion, not containers
+
+It **whole-asset-overrides eleven base packages**, including `BP_AI_Euruska_MeatMan`,
+`BP_Mech_Toothy` and `BPC_IncomingDamageMod` — *precisely the AI subsystem `0.9.5.0` rebuilt from
+the ground up.* Packed 2026-08-01/08-24, last commit 2026-08-23 (**before `0.9.5.0` shipped**), and
+**enabled in the profile right now**. A whole-asset override of a reworked base package silently
+reverts the developers' work for every user — the Group 1 staleness inversion
+[`asset-dependencies.md`](asset-dependencies.md) exists to catch.
+
+**⚠ Correction to the obvious next move.** Re-running its `tools/verify_build.sh` is **not** the
+cheap first test — it is **void under gate 1b**, and worse than useless: line 97 hard-fails without
+a `USMAP`, line 159 passes `FW_USMAP` to the decoder for *both* the base and shipped dumps, so it
+will run to completion and **exit 0 with plausible property-shape numbers read against a stale
+map**. That is the documented silent-failure mode, aimed at the one repo we most need a true
+answer from.
+
+**The usmap-free test that does work today:** `build_fix.sh` step `[2]` is
+`retoc -a $AES to-legacy` of all 11 packages from the current base game (line 186) — no decoder, no
+usmap, deliberately written in bytes "so it holds even when the decoder or the usmap is
+unavailable". **Extract the 11 live packages and byte-compare them against the shipped pak's
+extracts.** That detects content reversion directly, needs no type map and no launch, and is
+therefore actionable *this cycle*. Its owner-session's call to run it.
