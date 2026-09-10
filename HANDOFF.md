@@ -15,9 +15,21 @@
 - It folds in **four announced versions**, `0.9.5.0` (08-28) through the `0.9.5.3` hotfix (09-02).
   The three intermediate depot manifests are gone, so **rollback granularity this cycle is one
   step, not four.**
-- **Gate 1b is RED** — the usmap is stale, `FWWeaponDefinition` decodes 30 properties where
-  provenance records 57. **Every value-level decode is void.**
-- **Gate 3 is UNATTEMPTED** — no `UE4SS.log` exists. All of Class B is unknown.
+- ~~**Gate 1b is RED**~~ — **CLEARED 2026-09-10 on SylDesk.** Map re-dumped from the live build;
+  `DA_WPN_PLAYER_HRF01` decodes **57** properties where the stale map gave 30. Installed as
+  `forever-winter-datamine` `f2526c8`; `fwdata paths` reports `usmap_stale: false`. **Value-level
+  decodes are sound again — the whole collection is un-voided.** Note the new provenance
+  deliberately drops the old `bConvergeADSAimToCamera` check: that property no longer serializes on
+  this build, so reusing it would false-red a good map.
+- ~~**Gate 3 is UNATTEMPTED**~~ — **CLEARED 2026-09-10 on SylDesk.** UE4SS
+  `v3.0.1 Beta #0 Git SHA #2172883` attaches to the September binary; `CMSFUnlock v0.2.4` and
+  `CMSFTime` load and their claim-signal chain resolves. **Class B is also no longer unknown here:**
+  SylDesk's store holds `TFWLootAll`, `TFWQuestHUDToggle` and `TFWStaggerControl` and all three ran.
+- **CMSF's P0 is verified fixed in-game** — a pak rebuilt on the live cook launches and populates
+  (`39 skin(s) listed` = 7 + 32) with no crash. Caveat recorded in that repo: the crash was never
+  reproduced here, so the rebuild is not *isolated* as the cause. **CMSF's P1 mechanism is also
+  now measured** — the skin-menu button is gated on `|owned ∩ LockedSkinChoices| ≥ 1`, which is
+  why `SkinChoices`-based fixes never worked. See `TFWCharModelSelFramework` `32d11d9`, `55e5e0c`.
 - **Root Builder is ARMED.** No MO2 launch since 2026-08-04, so its cache has had no chance to
   rebuild against this build.
 - **A previously-unknown mod-detection subsystem is in the live cook** and in no patch note. See
