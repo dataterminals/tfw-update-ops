@@ -152,3 +152,10 @@ Nexus-facing prose is Sylvia's** — flagged, not drafted.
 Class A exposure audit, and CMSF itself. **One repo, one owner** — this repo does not touch another
 repo's build. Nothing has been pushed to Nexus or Discord, and `modlist.txt` is untouched by both
 sessions.
+
+⚠ **"One repo, one owner" protects authorship, not the filesystem.** Sessions share one working
+tree per repo, and on 2026-09-10 a `git add -A` here committed another session's uncommitted edit
+under the wrong authorship — with a near-miss that would have destroyed it silently instead.
+**Never `git add -A` in a shared repo; stage explicit paths, and claim a shared file before editing
+it.** Full protocol and the structural fix in
+[`docs/multi-session-protocol.md`](docs/multi-session-protocol.md).

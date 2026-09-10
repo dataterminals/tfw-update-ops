@@ -148,6 +148,12 @@ The 13 `FWModIntegritySubsystem` symbols are 13 *distinct new names*, costing at
 at `25071553` — the four-build window narrows to two candidate builds, from data already on disk,
 with no download.
 
+> **✅ Superseded, and the bound held.** The build is now known exactly — **`24479102`** — from the
+> datamine's archived per-build usmaps ([Appendix A](#a-fwmodintegritysubsystem-is-dated-exactly--build-24479102-and-no-depot-download-needed)).
+> That is one of the two candidates this arithmetic left standing, so the bound was correct and is
+> kept as a worked method: **when only container sizes survive, the byte budget still constrains
+> what a step can contain.** It is the fallback for any future symbol a usmap does not record.
+
 ## 4. 🔴 `FWModIntegritySubsystem` — mod detection with party-wide replication
 
 Thirteen symbols absent in July, present live, forming one coherent surface:
@@ -176,12 +182,28 @@ session.
 **Settled:** the symbols exist in the live cook and not in the July one. The names are read
 verbatim from the parsed name table, not inferred.
 
+**Settled — the build. ✅ `24479102`, 2026-07-30.** Closed by direct measurement, not by the byte
+bound: the datamine repo archives a usmap per build, and a usmap is a full type dump.
+`FWModIntegritySubsystem` is **absent** from the `24097213` map and **present** in the `24479102`
+map. Controls behave (`FWWeaponDefinition`, `FWPartySubsystem` hit all three;
+`FWAIGoal_Investigate_Phased`, `BTTask_SuppressiveFire` are `25071553`-only and miss all three).
+Full working in [Appendix A](#a-fwmodintegritysubsystem-is-dated-exactly--build-24479102-and-no-depot-download-needed).
+
+**Two unrelated artifacts land on the same patch** — the usmap type ladder and this repo's
+`FWPakManifest.json` baseline evidence (§4 below). That is convergence, not one finding counted
+twice.
+
+**⇒ This retires the subsystem as a crash candidate.** Six weeks live, symptomless, across three
+builds our mods ran on. It remains a **real concern for the weapon mods in multiplayer** — that is
+untouched — but it is not what broke anything this cycle.
+
 **Not settled:**
 
-- **Behaviour.** Everything above is read off *names*. The names are unusually unambiguous — the
-  subsystem is literally called `FWModIntegritySubsystem` — but a name is not an implementation,
-  and nothing here has been observed running.
-- **Which build.** Narrowed to `24479102` or `25071553` (§3). Not closed.
+- **Behaviour.** Everything above is read off *names* and *types*. The names are unusually
+  unambiguous — the subsystem is literally called `FWModIntegritySubsystem` — but a name is not an
+  implementation, and nothing here has been observed running. **A usmap dates the type, not the
+  moment behaviour behind it was switched on**; a type can ship dormant and be enabled later by a
+  server flag with no cook change at all.
 - **The `FWPakManifest.json` link.** The manifest in `Content\Paks\` is a `Paks` list of
   name/size/`TailHash` plus a top-level `Signature`, and it is the obvious thing an integrity
   subsystem would consume. But **there is no `FWPakManifest` script symbol in either cook**, so if
@@ -205,10 +227,17 @@ entry count, same name lengths, values rewritten per cook. That is a manifest of
 regenerated each patch.
 
 So the tamper-detection *surface* is **six weeks old, not new this cycle**, and the collection has
-been running against some of it all along without symptoms. That materially lowers the urgency
-from "a new subsystem landed under us" — but it does not close the question, because the
-manifest's arrival at `24479102` correlates with the ~28-object step, and the 13 script symbols
-could equally sit in the ~44-object `25071553` step.
+been running against it all along without symptoms.
+
+**✅ And the correlation is now a match.** The usmap type ladder independently places
+`FWModIntegritySubsystem` at **the same build, `24479102`** ([Appendix A](#a-fwmodintegritysubsystem-is-dated-exactly--build-24479102-and-no-depot-download-needed)) —
+so the manifest (a *data* artifact, dated from this repo's pak inventories) and the subsystem (a
+*type*, dated from the datamine's archived maps) shipped together, established from two unrelated
+artifacts by two methods that share no inputs. The whole feature landed on 2026-07-30.
+
+**That retires it as a crash candidate for this cycle** and it is why the row-count lesson matters:
+the 118→119 delta *was* the feature arriving, and it sat unread in a baseline for six weeks. **A
+changed row count is a question, not a datum — read what the new row is.**
 
 ### Blast radius: the weapon mods, not the cosmetics
 
@@ -274,12 +303,14 @@ For this cycle that set is exactly
   HRF's headline feature may not do what its page says in multiplayer — independently of the
   schema problem already on the board. **Nexus-facing prose is Sylvia's**; this is flagged, not
   drafted.
-- **Is an exact date worth a depot download?** We hold rollback keys for `24479102`
-  (`6430523508700280691`), `24501089` (`6443337773729671953`) and `24536482`
-  (`7134816348397298387`). Pulling `24536482`'s `global.ucas` and diffing its name set would
-  settle §3 outright. Steam's `download_depot` fetches the whole depot (~50 GB); a
-  file-filtered fetch would be ~3 MB. **Sylvia's call on disk and bandwidth**, and on whether
-  knowing the exact build is worth it now that the manifest is dated to `24479102`.
+- ~~**Is an exact date worth a depot download?**~~ **Answered — no, and Sylvia never needed to be
+  asked.** The date was recoverable from an artifact already in the repo set: the datamine's
+  archived per-build usmaps are full type dumps, and the type ladder places
+  `FWModIntegritySubsystem` at `24479102` outright ([Appendix A](#a-fwmodintegritysubsystem-is-dated-exactly--build-24479102-and-no-depot-download-needed)).
+  **The generalisable lesson is the one worth keeping: before proposing a ~50 GB depot pull to date
+  a symbol, check whether an artifact already on disk encodes the same fact.** The rollback keys
+  (`24479102` `6430523508700280691`, `24501089` `6443337773729671953`, `24536482`
+  `7134816348397298387`) remain the route of last resort for anything a usmap does *not* record.
 
 ### What NOT to conclude
 

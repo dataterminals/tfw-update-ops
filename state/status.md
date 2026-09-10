@@ -83,11 +83,16 @@ Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 
 >   `OnRep_PotentiallyModded`) plus a weapon-damage override path gated on `IsStockWeapon`
 >   (`GetBaseWeaponDamage` / `SetBaseWeaponDamage` / `ClearWeaponDamageOverride`). **In no patch
 >   note.** Blast radius is the weapon mods, not the cosmetics.
-> - **Dating, from the baselines this repo owns:** `FWPakManifest.json` — the anti-tamper manifest —
->   **first appears at `24479102`** (absent in `pre-24479102`, present in `post-24479102`, and it is
->   the 118→119 pak-row delta). So the integrity surface is **six weeks old, not new this cycle**,
->   and our mods have been running against some of it all along. Whether the 13 script symbols
->   landed with the manifest or later is **not settled** — see the doc for the bound.
+> - **✅ Dated exactly: it shipped at `24479102`, 2026-07-30 — six weeks ago, and symptomless
+>   since.** Two unrelated artifacts converge. This repo's baselines put `FWPakManifest.json` (the
+>   anti-tamper manifest) at that build — absent in `pre-24479102`, present in `post-`, and it is
+>   precisely the 118→119 pak-row delta we recorded as a *count* without ever reading what the new
+>   row was. The datamine's archived per-build usmaps independently put the
+>   `FWModIntegritySubsystem` *type* at the same build. **So it is not a crash candidate for this
+>   cycle** — but it stays a real concern for the weapon mods in multiplayer. A usmap dates the
+>   type, not the moment behaviour behind it was switched on.
+> - **Lesson worth keeping:** a changed row count is a question, not a datum. **Read what the new
+>   row is.** This one sat unread in a baseline for six weeks.
 >
 > ### Restamp status — what this cycle actually knows
 >
