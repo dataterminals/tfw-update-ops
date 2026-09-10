@@ -59,6 +59,30 @@ Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 
 > `CMSF v0.2.1 dev` (Jul 25 pak, will crash) → launch → `DumpUSMAP()` → exit. Gate 3, gate 3b and
 > every Class B row fall out of the same launch for free.
 >
+> ### ⚠ "1b is red so everything is void" is too coarse — and the cycle is not frozen
+>
+> Full rule in [`docs/gate-1b-partial-validity.md`](../docs/gate-1b-partial-validity.md). The
+> distinction is whether a conclusion came from the **type map** or from the package's own **name
+> table**:
+>
+> - **Sound today:** raw `retoc to-legacy` byte comparison (passed no usmap at all — *the gold
+>   standard while 1b is red*), filelist and path existence, `FPackageId` binding, DataTable **row
+>   keys**, soft-path **strings**, script-object name-set diffs, container structure, and all
+>   deployment / load-order / ship-state auditing.
+> - **Void:** property counts, property names, every scalar value, "0 properties dropped", and any
+>   catalog rebuilt from a decode.
+> - **The trap — relative comparison is only half safe.** A detected **difference** is sound. A
+>   detected **identity is not**: a stale map *truncates* the read (30 of 57 right now), so anything
+>   past the truncation point is never compared and reports as clean. **"Identical" means "identical
+>   in the part the map could still reach."** The same mechanism makes a softref check report *0
+>   dangling* because it never reached the properties — a false green of exactly the vacuous-check
+>   family this project keeps rediscovering.
+>
+> **Three repos' verifiers were found this cycle to run to completion and exit 0 against the stale
+> map** — `UnkillablesRebalanceFix` (`verify_build.sh:97,159`), `HeavyRifleRebalanceFix` (both
+> scripts), and `TFWCharModelSelFramework` (checks `[3]`/`[4]`, self-reported). **Nothing may be
+> called "fully green" while 1b is red.** Report which checks ran soundly and which are void.
+>
 > ### 🔍 The script-object store, and an undisclosed mod-detection subsystem
 >
 > Full working in [`scriptobjects-25071553.md`](scriptobjects-25071553.md). The short version:

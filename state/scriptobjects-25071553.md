@@ -290,9 +290,19 @@ For this cycle that set is exactly
    so **it is not blocked by gate 1b** — one of the few things this cycle can act on today.
    *Caveat now known: it will return clean nearly everywhere. That is a true negative, not
    coverage.*
-2. **Capture `scriptobjects.bin` in every baseline.** `capture_baseline.ps1` does not. Had it,
-   this cycle's dating would have been exact instead of bounded, and the intermediate `0.9.5.x`
-   cooks would not have been lost. **Three lines, and it retires this whole class of archaeology.**
+2. ✅ **DONE — capture the global containers in every baseline.** `capture_baseline.ps1` now has
+   step **`[3/7]` Global containers**, which **copies** `global.utoc` + `global.ucas` rather than
+   extracting — retoc, the AES key and .NET are three dependencies that script must not acquire, and
+   `global.ucas` is only 15 bytes larger than the `scriptobjects.bin` inside it (§3). Verified here:
+   steps renumbered 1..7, **zero non-ASCII bytes** (PowerShell 5.1 reads UTF-8-without-BOM as ANSI,
+   so an em-dash is a parse error), and `post-25071553/global/` backfilled at `global.ucas`
+   3,017,568 B / `global.utoc` 1,615 B — matching the figures §3 derived independently.
+   `tools/scriptobjects_diff.py` reads a stored `global.ucas` directly (chunk at offset 0, 15-byte
+   container footer), so an archived baseline is diffable with no extraction step.
+   **Authored by the `TFWCharModelSelFramework` session**; it landed in commit `ceed333` under this
+   repo's authorship because of the shared-working-tree defect described in
+   [`docs/multi-session-protocol.md`](../docs/multi-session-protocol.md). Recorded here because the
+   commit log gets it wrong.
 3. **Warn when the copied catalog's build stamp does not match the baseline's label.**
    `capture_baseline.ps1` copies whatever catalog sits in the datamine repo without comparing.
    `post-25071553/catalog/` is stamped `24536482` for exactly this reason.
