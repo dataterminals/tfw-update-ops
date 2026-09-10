@@ -195,8 +195,17 @@ even if nothing skin-related is in the diff. (2) Runtime claim signal fails *ope
 `SkinRow`, `SkinOptions` or the brush chain is renamed, `deriveVerdict` returns nil and roughly 192
 placeholder tiles appear rather than a crash. (3) `Init()` renamed = menu silently stops
 repopulating. All pcall-wrapped; none logs a rename as an error. Fastest field check is the
-`cmsfunlock` console line "selector lists N skin(s)" - vanilla unfiltered Scav Girl is 7,
-framework-loaded is 39.
+`cmsfunlock` console line "selector lists N skin(s)" — but **read it as a delta, not against a
+constant.** The unfiltered count is `len(SkinChoices) + |owned ∩ LockedSkinChoices|`, so vanilla
+Scav Girl is **5–8** (7 on the dev account, which owns 2 of her 3 locked skins) and framework-loaded
+is that **+32**, i.e. 37–40 (39 on the dev account). The figures previously recorded here as
+constants, 7 and 39, are that account's values and are correct for it.
+
+⚠ **0 does not mean "the read failed".** On an account with no entitlement for the character, 0 is
+what a *correctly working* default-filtered panel reports — that is CMSF's P1 mechanism, not a
+fault. What discriminates is the jump of exactly **+32** across `CMSFUnlock` clearing the filter.
+Record what the test account owns alongside any absolute figure. Worked through in
+`TFWCharModelSelFramework/docs/10-patch-25071553.md`, commit `57d7c7f`.
 
 ### UnkillablesRebalanceFix (Class A)
 

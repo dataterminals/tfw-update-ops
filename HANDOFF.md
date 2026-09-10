@@ -51,19 +51,75 @@ there is nothing for it to load. Deploy them first — they are loose Lua.
 
 ## 🖥 Picking this up on SylDesk
 
-**SylDesk is two cycles behind and has never been remediated.** Everything below is unverified from
-SylG5 — `H:` does not exist here, and joining it throws `DriveNotFound` rather than reporting
-nothing, which has already taken down `steam_state.ps1` once. **Measure, do not assume.**
+> **✅ Remediated on SylDesk, 2026-09-10, measured on the machine itself.** The table below is kept
+> because its *method* still applies to the next cycle, but its SylDesk column is now history. What
+> was actually found is in the rows marked **was / now**. The patch was applied in the same sitting.
 
-| | SylG5 | SylDesk |
-|---|---|---|
-| Build | `25071553` | **`24501089`** — two cycles back |
-| `AutoUpdateBehavior` | `0` (self-applies) | **`1`** (waits) |
-| Root Builder cache + backup | ✅ cleared 2026-08-04, but **re-armed** since | ❌ **never done** — ~47 GB, still armed |
-| Displaced exe in `overwrite\Root` | ✅ deleted | ❌ **still armed** |
-| Last written to git | current | 2026-08-03 11:40 |
+| | SylG5 | SylDesk — was | SylDesk — now |
+|---|---|---|---|
+| Build | `25071553` | `24501089`, two cycles back | patched to `25071553` |
+| `AutoUpdateBehavior` | `0` (self-applies) | `1` (waits) | `1`, unchanged |
+| Root Builder cache + backup | ✅ cleared 2026-08-04, but **re-armed** since | ❌ never done, armed | ✅ **cleared, both together** |
+| Displaced exe in `overwrite\Root` | ✅ deleted | ❌ still armed | ✅ **moved out** |
+| Last written to git | current | 2026-08-03 11:40 | current |
+
+**Two board figures were wrong and are corrected by measurement:**
+
+- **Root Builder's `Backup\` was 2,240,296,629 bytes — 2.1 GB, not "~47 GB".** 154 files, all stock
+  (the `.pak`s in it are Chromium/CEF locale paks, not UE content). Nothing in it was unique.
+- **The displaced exe was not a copy of the live one.** Same 169,584,128 bytes, but SHA256
+  `58EE4F8D…` against the live `E4E76D0E…` — it is the **bitfix-patched** exe (`bitfix.txt` records
+  `writing C3 to 7FF7D6770290`). `CrashReportClient.exe` differed too, and the exe *inside*
+  `Backup\` was **169,513,984** bytes, older still than 24501089. The hazard was real: an MO2 launch
+  would have laid a patched two-builds-old binary over whatever Steam had just written.
+
+The standing pre-session exe check **passed before any of this**: SylDesk's live exe hashed
+`E4E76D0E…`, exactly the `pre-24536482` baseline, so the machine was genuinely on 24501089 and not
+silently running a foreign build. All 7 game binaries matched that baseline; the two "missing"
+rows against it are `dsound.dll` and `bitfix.txt`, which are MO2-deployed rather than game files.
+
+Preserved at `H:\MO2Instance_ModData\_preserved-syldesk-2026-09-10\` with a `HASHES.txt` recording
+everything before removal: both displaced exes, and SylDesk's own `bitfix.txt` and `UE4SS.log`,
+which are genuinely unique — they differ from the `post-24536482` copies. The overwrite usmap was
+**not** preserved: it is byte-identical to `mappings/archive/ForeverWinter-5.4.2-build24479102.usmap`.
+
+**No pre-patch baseline was captured, deliberately.** `pre-24536482` *is* a 24501089 baseline and
+its exe hash matches this machine's to the byte, and the rollback key `6443337773729671953` was
+already in `build-history.md`. There was nothing left to capture.
+
+### Two corrections to what the board believes about SylDesk
+
+1. **Class B is not absent here.** SylDesk's store holds `TFWLootAll`, `TFWQuestHUDToggle` and
+   `TFWStaggerControl`, and the preserved 2026-07-30 log shows all three loading from `enabled.txt`
+   and running. "There is no Class B loadout" is true of SylG5 and was never measured here.
+2. **The usmap dump does not need a Lua mod.** Step 3 of "One sitting clears most of it" says to
+   write one that calls `DumpUSMAP()`. SylDesk already did this on 2026-07-30 using UE4SS's
+   built-in **Mappings Generator by OutTheShade** from the GUI console (`GuiConsoleEnabled = 1` in
+   `UE4SS-settings.ini`); the log records `Mappings Generation Completed Successfully!` and
+   `Output file: ForeverWinter-5.4.2-0+UE5-2172883.usmap`. UE4SS here is
+   `v3.0.1 Beta #0 - Git SHA #2172883`, which is the experimental build `CMSFUnlock` targets.
+
+Also note SylDesk's profile needs no mod disabling before a smoke test: **every CMSF and rebalance
+mod is already `-` in `modlist.txt`**, with only `RE-UE4SS` and `Signature Bypass` enabled.
 
 ### Do these in order on SylDesk
+
+> **All of 1–5 were done on 2026-09-10** and their findings are recorded above. **6 was skipped
+> deliberately** — `pre-24536482` already *is* a 24501089 baseline whose exe hash matches this
+> machine to the byte, and the rollback key was already recorded, so there was nothing left to
+> capture and the pre-patch window cost nothing to spend. The steps stay here as the method for
+> next cycle.
+>
+> ⚠ **Step 5's completion criterion is misleading and should be read as `StateFlags 4` alone.**
+> Watched live through this patch, `BytesDownloaded == BytesToDownload` went true *early*, with the
+> apply phase still to come; `BytesStaged == BytesToStage` then also went true (38,256,399,262 B)
+> while `StateFlags` was still `1030` `[UpdateRequired | FullyInstalled | UpdateRunning]`. Both byte
+> equalities are reached before the update is finished. **Only the `StateFlags` transition to `4`
+> means done.**
+>
+> Also worth knowing for next time: Steam's cached `TargetBuildID` was a month stale and read
+> `24536482` until the client refreshed, at which point it re-targeted to `25071553` and the
+> download grew from 413 MB to 1,495,072,128 B. Do not size the job off the pre-refresh figure.
 
 1. **`powershell -File tools/steam_state.ps1`** — read the actual state. Do not trust the table
    above; it is a month old and was never measurable from here.
