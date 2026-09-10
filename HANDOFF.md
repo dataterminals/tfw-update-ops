@@ -1,223 +1,154 @@
-# HANDOFF — ⚠ THIS DOCUMENT IS FOR THE `24479102` CYCLE. IT IS TWO BUILDS OLD.
+# HANDOFF — the `25071553` cycle
 
-> ## Read [`state/status.md`](state/status.md) instead. Start there, not here.
->
-> **The live build is `24536482`** (applied 2026-08-03, all seven gates 🟩 against it as of
-> 2026-08-05). Everything below describes `24479102` and is kept as the record of that cycle.
->
-> It is dangerous precisely because it is *internally consistent*: its gate list happens to be
-> nearly right for `24536482` too, so nothing in the text signals that it is describing a
-> different patch. Two specific claims below are now false — "**6 of 7 gates green, only 5a
-> open**" (5a is green; it was cleared 2026-08-03 23:06 and simply never scored) and
-> "**`HeavyRifleRebalanceFix` is dead and needs a *redesign***" (it was redesigned and shipped as
-> v2.0 on 2026-08-01, then broken again by `24536482`'s weapon-schema change; v2.1 is built and
-> awaiting upload).
->
-> **A stale "start here" is worse than none.** If you are writing the next cycle's handoff,
-> replace this file rather than appending to it.
+> **Written 2026-09-10.** Per-cycle document — check that date before trusting a word of it.
+> [`state/status.md`](state/status.md) is the source of truth for progress; this file is the
+> orientation. If you are writing the next cycle's handoff, **replace this file rather than
+> appending to it** — a stale "start here" is worse than none.
 
 ---
 
-**Written:** 2026-07-31, end of the session that applied the patch and did the first triage pass.
-**State (as of that date, for build `24479102`):** patch **applied**. 6 of 7 gates green. One mod
-fixed, deployed and **released**.
+## The situation in six lines
 
-> **Update 2026-08-01:** AWU **shipped**. Sylvia uploaded both variants the night of 2026-07-31 —
-> regular **1.2.1**, Trees **1.1.1**. Everything below that reads "not on Nexus" / "the one
-> user-facing gap is the upload" is superseded. **Nexus publication state is never recorded by
-> these repos** — uploads happen in a browser and the checkboxes go stale. Ask, don't infer.
+- **Build `25071553` landed 2026-09-03, unattended.** `AutoUpdateBehavior` is `0` on SylG5, so it
+  applied itself. **No `pre-25071553` capture exists and none can**; `post-24536482` is the
+  "before" side. Rollback key **`4492887131597018203`**.
+- It folds in **four announced versions**, `0.9.5.0` (08-28) through the `0.9.5.3` hotfix (09-02).
+  The three intermediate depot manifests are gone, so **rollback granularity this cycle is one
+  step, not four.**
+- **Gate 1b is RED** — the usmap is stale, `FWWeaponDefinition` decodes 30 properties where
+  provenance records 57. **Every value-level decode is void.**
+- **Gate 3 is UNATTEMPTED** — no `UE4SS.log` exists. All of Class B is unknown.
+- **Root Builder is ARMED.** No MO2 launch since 2026-08-04, so its cache has had no chance to
+  rebuild against this build.
+- **A previously-unknown mod-detection subsystem is in the live cook** and in no patch note. See
+  [`state/scriptobjects-25071553.md`](state/scriptobjects-25071553.md).
 
----
+## One sitting clears most of it
 
-## The situation in five lines
+In this order. Steps 1 and 2 are preconditions — doing 3 without them produces numbers off a
+part-July install with a mod that crashes.
 
-- Build `24479102` landed 2026-07-30 17:34 EDT. Both baselines captured; the window was not missed.
-- **Gates 0, 1a, 1b, 2, 3, 3b are all green.** Only **5a** (TFWWorkbench reads the new paks) is open.
-- **`AllWeaponsUnlockableFix` is fixed** (both variants), verified, deployed to MO2, and **on Nexus
-  since 2026-07-31** (regular 1.2.1 / Trees 1.1.1).
-- **`HeavyRifleRebalanceFix` is dead** and needs a *redesign*, not a rebase.
-- Everything else structurally survived. Class B is fully intact.
+1. **Delete Root Builder's `GameData.json` AND its sibling `Backup\` — together.** Removing only
+   the cache leaves ~47 GB of July files ready to restore; removing only the backup leaves the
+   cache asserting the game looks like July. On SylG5 they live under
+   `C:\Modding\MO2\plugins\data\RootBuilder\DSteamLibrarysteamappscommonThe_Forever_Winter\5_4_2_0\`.
+   The key is the **engine** version, which has not changed since July — that is why it never
+   self-corrects.
+2. **Disable `CMSF v0.2.1 dev` in the profile.** It holds a Jul 25 pak and will crash at launch.
+   Consider also disabling `+UnkillablesRebalanceFix` — it is enabled and carrying a two-build-stale
+   v1.2 pak, which makes it a smoke-test contaminant.
+3. **Launch → `DumpUSMAP()` → exit.** Experimental UE4SS into `Binaries\Win64`, a Lua mod calling
+   `DumpUSMAP()`, then remove UE4SS again. Archive the outgoing `24536482` map under
+   `mappings/archive/` with its build in the filename and update `provenance.json` **in the same
+   commit**.
 
-## Do this first
+Gate 3, gate 3b and gate 5a all fall out of the same launch for free. **Gate 1b clearing is what
+un-voids the collection** — no Class A pak may be rebuilt against a stale map.
 
-**Everything blocked on Sylvia fits in one 10-minute browser sitting —
-[`state/nexus-sitting.md`](state/nexus-sitting.md) is the crib sheet** (permission block, report
-comments, page numbers, carry warning). Reply substance for both pages is pre-written there.
+⚠ **Gate 3 clearing does not clear Class B.** All four Class B mods are *absent* from SylG5's mod
+store, not merely disabled. The runtime host (`RE-UE4SS`, `Signature Bypass`) is enabled and ready;
+there is nothing for it to load. Deploy them first — they are loose Lua.
 
-**~~Nothing is blocked on analysis. The one user-facing gap is the Nexus upload.~~ Uploaded
-2026-07-31 17:25Z — and VERIFIED 2026-08-01.** Both files were re-downloaded from the live page
-and compared entry-by-entry against the repo's tracked zips. **All three container entries in each
-are byte-identical**, inner `.ucas` = 75,174 and 79,239 as required — the stale-*pak* failure class
-did not occur. **Page 133 hosts BOTH variants** — that open question is answered.
+## 🖥 Picking this up on SylDesk
 
-⚠ **One real miss: the Trees `readme.txt` shipped stale** (the 07-20 copy — `build_trees.sh` was
-never re-run after `3808a4d`/`591a233`). It tells users to remove `AllWeaponsUnlockable_P.*`, a
-name the regular variant no longer uses, and it omits LassyMorphee. Fixed in `dist/` on 2026-08-01
-with the pak entries copied through untouched; **re-uploading Trees is owed** (Regular is fine).
-Root fix: nothing asserts a build artifact is newer than its inputs — re-run both builds before
-any upload. Sources of truth in `AllWeaponsUnlockableFix/dist/`:
+**SylDesk is two cycles behind and has never been remediated.** Everything below is unverified from
+SylG5 — `H:` does not exist here, and joining it throws `DriveNotFound` rather than reporting
+nothing, which has already taken down `steam_state.ps1` once. **Measure, do not assume.**
 
-| Page | File | Sanity check |
+| | SylG5 | SylDesk |
 |---|---|---|
-| AWU | `dist/AllWeaponsUnlockableFix.zip` | inner `.ucas` = **75,174 B** (clean-room build, 5 assets) |
-| AWUTrees | `dist/AllWeaponsUnlockableTrees.zip` | inner `.ucas` = **79,239 B** |
+| Build | `25071553` | **`24501089`** — two cycles back |
+| `AutoUpdateBehavior` | `0` (self-applies) | **`1`** (waits) |
+| Root Builder cache + backup | ✅ cleared 2026-08-04, but **re-armed** since | ❌ **never done** — ~47 GB, still armed |
+| Displaced exe in `overwrite\Root` | ✅ deleted | ❌ **still armed** |
+| Last written to git | current | 2026-08-03 11:40 |
 
-Ship **only** `75,174` / `79,239`. Every other size in the lineage is superseded or broken:
-`110,000` (07-31, correct but ships LassyMorphee's roots — not cleared), `110,008` (07-31 am,
-**carry-graft regression**), `112,133` / `81,372` (pre-patch, dead DataAsset pointers).
+### Do these in order on SylDesk
 
-**Permission gate — CLOSED 2026-07-31.** The #110 author is **LassyMorphee**; their page grants
-no permissions; Sylvia chose **rebuild from vanilla**, and it is **done** (`5ed467c`): the regular
-Fix is now clean-room like Trees — 4 vanilla roots + own grafts via `skillpatch add`, AllowTags
-derived by rule, 5 shipped assets, **zero upstream bytes**. A/B-verified functionally identical
-(every root's children equal; all 53 table rows equal on every field). Deployed to MO2.
-**Both variants are cleared to upload.** Still owed: the courtesy/bug-relay DM to LassyMorphee
-(their ScavGirl carry slip).
-**Page numbers: AWU = mods/133, SCP = mods/135** (SCP *is* released — its worklog's
-"optional upload" box was stale). Community reports parsed in `state/community-reports.md`;
-live replies owed to `4ce0fspades` (base-game carry bug, confirmed by their wording) and
-`Southperry88` (one diagnostic question) — substance pre-written there.
+1. **`powershell -File tools/steam_state.ps1`** — read the actual state. Do not trust the table
+   above; it is a month old and was never measurable from here.
+2. **Compare the shipping exe's SHA256 against the baseline before anything else.** This is the
+   standing pre-session rule and it exists *because of SylDesk* — it was running the previous
+   build's executable for four days with nothing in any log naming it. The baselines have always
+   captured the hash; nothing was ever reading it.
+3. **Clear `GameData.json` and `Backup\` together**, under SylDesk's `H:`-keyed plugin directory.
+   Until this is done, any measurement taken on that machine is suspect.
+4. **Delete the displaced exe from `overwrite\Root`.** `overwrite\` deploys at the highest
+   priority, so the next session copies a stale exe over whatever Steam wrote. Preserve anything
+   unique first (`UE4SS.log`, `bitfix.txt`, a usmap) — hash-compare before removing, do not assume.
+5. **Only then** apply the pending patch, **from the Steam client's Downloads page**.
+   `steam://install/<appid>` is silently ignored. Completion is
+   `BytesDownloaded == BytesToDownload` **and** `StateFlags 4`; `BytesToDownload` is an estimate,
+   not a contract.
+6. **Capture a baseline before the patch downloads a byte.** With `AutoUpdateBehavior 1` the
+   pre-patch window is genuinely available on this machine — that is the one advantage SylDesk has
+   over SylG5, and it has been wasted every cycle so far. Run a **Steam verify first** so the
+   baseline is manifest-validated rather than merely observed.
 
-**Release facts, already researched — do not re-derive:**
-- Versions: **regular 1.2.1, Trees 1.1.1 — decided 2026-07-31 and uploaded the same night**
-  (from 1.1.0 and 1.0.0; the pages are *not* in step and that is fine).
-- **Dependency is Signature Bypass only.** Neither variant ships Lua or Workbench DataTable JSON,
-  so neither needs RE-UE4SS or TFWWorkbench. Saying otherwise sends users to install a pinned
-  UE4SS build for nothing.
-- Paks install to `...\The Forever Winter\Windows\ForeverWinter\Content\Paks\Mods\` — a folder
-  that **does not exist on a stock install**. Most common "nothing happened" cause.
-- **The pak filename changed** this session (`AllWeaponsUnlockable_P` → `AllWeaponsUnlockableFix_P`),
-  so new files do **not** overwrite old ones. Upgraders must delete the old set or double-install.
-  Covered in the readme; worth a changelog/sticky note too.
-- A Nexus reply to user `disxmfk` is owed — they reported the break and were correct.
+**Resolve every path from `registry/repos.json` → `roots.<hostname>`.** Never hardcode a drive.
+SylDesk's store is `H:\MO2Instance_ModData\ForeverWinter\mods\`; SylG5's is
+`D:\MO2_InstanceData\TheForeverWinter\mods\`.
 
-## What this patch actually did
+⚠ `capture_baseline.ps1` still hardcodes `H:` defaults and has **not** had the drive-safety
+treatment `steam_state.ps1` got. On SylDesk that happens to be correct; it is a trap on SylG5.
 
-Full analysis in [`state/stage2-findings.md`](state/stage2-findings.md); root cause of the
-user-visible break in [`state/rootcause-awu-customization-ui.md`](state/rootcause-awu-customization-ui.md).
+## What is actually known this cycle
 
-- **Weapons were restructured, not just retuned.** `DA_WPN_<code>_v2` split into
-  `DA_WPN_PLAYER_<code>` + `DA_WPN_AI_<code>`, and the entire per-weapon `FC_*` curve tree was
-  **deleted game-wide** (`FC_*_Damage` 44 → 0).
-- **1,013 added / 1,293 removed is mostly noise** — 924 are case-only renames (`BagMan`→`BAGMAN`).
-  Real churn is 369 removals, **358 of them under `FW/Weapons/`**.
-- `WeaponsDetailsData` 56 → 53 rows; `DT_TagToRowHandle` 1176 → 1173. The cut rows are
-  `RFL01_Red/Blue/Green`, unused dev-test entries.
-- The AI vision sensors gained `Pawn.Player.HoldingPistol` (accum 1.2 / decay 0.8) — holding a
-  pistol makes you **~20% slower to detect**. Publishable almanac Detection-tab update.
+**Structural findings are sound** — they read no type map. **Everything value-level is void.**
 
-## Two hard-won lessons this patch taught
+The filelist diff is **153 added / 142 removed and mostly directory-case churn**, which must not be
+read as movement (UE lowercases the package name before hashing `FPackageId`). The genuinely new
+content is small: Europa behaviour trees `Trees_v2`→`Trees_v3` with new EQS queries and a
+danger-close decorator, `BTTask_AI_FindRandomSpotNearKey` removed, Shaman MAY material renames, the
+`SM_WPN_SHG05_RCV` receiver split, and a recased `Toothy` AI set.
 
-**1. A `.usmap` is per-struct.** Gate 1b was marked cleared on the strength of AI sensors decoding
-perfectly (28 dumps byte-identical). That was real evidence and the wrong conclusion —
-`FWWeaponDefinition` decoded to *shifted garbage*: correct values bound to neighbouring property
-names, no error, entirely plausible. Regenerated via UE4SS `Ctrl+Numpad6` (already bound in the
-built-in Keybinds mod — the README's "install experimental UE4SS + write a Lua mod" procedure is
-more work than needed). **Never generalise usmap validity from one struct family.**
+**A read-only board audit ran 2026-09-10 and completed 7 of 13 repos** before a session limit cut
+it off — **the adversarial verification pass never ran on any of them**. Those seven rows are
+single-source. `AllWeaponsUnlockableFix`, `TFWStaggerControl`, `TFWQuestGiverPortraitPatch`,
+`forever-winter-datamine`, `forever-winter-almanac` and `TombstoneAlways` were never audited and
+still carry `24536482`-or-older text. **Re-running that audit is the cheapest next task and it is
+not gate-blocked.**
 
-**2. Verification that doesn't check references isn't verification.** Three layers passed a pak in
-which every weapon pointed at a deleted asset. A user found it. `tools/verify_softrefs.py` now
-gates both AWU builds — it asserts every `AssetPathName`/`ObjectPath` resolves against a filelist
-**regenerated from the live game each run**. Proven: 63 dangling on the broken pak, 0 on both
-rebuilds. **It is mod-agnostic — porting it to the other pak mods is the highest-leverage
-remaining work.**
+### Three things the audit found that were not on the board
 
-## Work remaining, roughly in value order
+1. **`UnkillablesRebalanceFix` is ENABLED carrying a two-build-stale v1.2 pak** while a verified
+   v1.3 sits unshipped in `dist/`. The board said "left disabled as found" — false on both counts.
+2. **`HeavyRifleRebalanceFix` v2.1 was built and verified on `24536482`** a day *after* the board's
+   last write, and was never uploaded. **Nexus #123 has served the broken 2.0.0 for five weeks.**
+   Do not upload v2.1 blind — a `24536482`-targeted pak on a live `25071553` risks a second broken
+   release.
+3. **There is no Class B loadout on SylG5 at all** — all four mods absent from the store, not
+   disabled. Unstated for two cycles.
 
-1. ~~**Nexus upload**~~ — **done 2026-07-31 night** (regular 1.2.1 / Trees 1.1.1). What's left is
-   the post-upload pass: confirm the served files match `75,174` / `79,239`, and the replies owed
-   on both pages (`disxmfk`, `4ce0fspades`, `Southperry88`) plus the courtesy DM to LassyMorphee.
-2. **Port `verify_softrefs.py`** to `UnkillablesRebalanceFix`, `HeavyRifleRebalanceFix`,
-   `TFWQuestGiverPortraitPatch`, CMSF. Just needs calling.
-3. **`HeavyRifleRebalanceFix` redesign.** 11 of its 13 targets are gone. The DataAssets are
-   renamed (rebasable) but all 5 `FC_*_Damage` curves are **deleted**, and per the mod's own
-   `docs/diagnosis.md` the *curve* was the real damage lever while the DA scalar is "cosmetic".
-   A pure rebase would look rebuilt and do nothing. **Hypothesis to test, not assume:**
-   `WeaponDamage` on `DA_WPN_PLAYER_*` (270.0 for HRF01) may now be authoritative. Verify by
-   changing it on one weapon and confirming in-game damage moves.
-4. **Gate 5a** — does TFWWorkbench read the new paks. Gates Class A rebuilds. Needs a launch.
-5. **Content diff for the 🟨 Class A mods.** Their paths all survive, but a surviving path is not
-   a surviving asset — BP graphs and DataTable values change without paths moving.
-   `UnkillablesRebalanceFix` silently reverts upstream BP edits by construction.
-6. **Nine dump subdirs sit outside `fwdata`'s taxonomy** (`ai_sensors`, `bosses`, `enemies`, …)
-   and were not re-decoded. Verified 0 stale, so not suspect — but adding taxonomy entries is the
-   natural cleanup.
-7. **In-game test** of the AWU fixes. Static verification is not play.
+## ⚠ The finding that may outrank the whole cycle
 
-## Things established — don't re-derive
+`FWModIntegritySubsystem` is in the live cook and not in July's: mod detection with **party-wide
+replication**, plus a **weapon-damage override gated on `IsStockWeapon`**. It is in no patch note.
 
-- **Rollback key for `24479102`: manifest `6430523508700280691`** (app `2828860`, depot `2828861`).
-  Recorded in `state/build-history.md`. Previous build's key is there too.
-- **MO2 deploys RE-UE4SS / Signature Bypass via Root Builder**, which physically copies them into
-  `Binaries\Win64` for the session. **During a session the live logs are at the real game path**
-  (`…\Binaries\Win64\ue4ss\UE4SS.log`, `…\bitfix.txt`); they only reach MO2's `overwrite\` after
-  cleanup on exit. Reading the overwrite copy mid-session gets you the *previous* session's log.
-- **`forever-winter-skin-mods` is NOT deployed.** The four enabled skins (`101`–`104`) are
-  third-party. Registry corrected. Only **5** of the 12 enabled mods are ours.
-- **The MAY skin set is not new** — 179 assets before and after this patch, 0 added. It has rows
-  in `DT_SkinUIData` for Girl/Gunhead/Shaman. Note the casing inconsistency: `Skin.Girl.MAY` but
-  `Skin.Gunhead.May` / `Skin.Shaman.May`. Your repo covers ScavGirl and Shaman May but **not
-  Gunhead** — a real gap.
-- **The live usmap keeps a stable filename** (`ForeverWinter-5.4.2.usmap`); archived ones carry
-  the build stamp in `mappings/archive/`. Nine build scripts hardcode the stable name — renaming
-  the active file is a **breaking change**, not bookkeeping.
-- **`fwdata get --force` does not update `datamine/dumps/`.** It writes to a build-namespaced
-  cache while `build all` globs `dumps/`, so running the README's own remedy back-to-back yields
-  a catalog stamped new and populated old. Promote manually. `fwdata` should be fixed.
-- `dumps/lootobjects` is a deliberate **151-of-437 curation** — never blind-copy the cache over it.
+The anti-tamper manifest it plausibly consumes — `FWPakManifest.json` — is dated from this repo's
+own baselines to **`24479102`, 2026-07-30**, so the surface is six weeks old and the collection has
+been running against some of it without symptoms. **That lowers the urgency; it does not close the
+question.** Full working, including what is *not* settled, in
+[`state/scriptobjects-25071553.md`](state/scriptobjects-25071553.md).
 
-## Tooling added this session
+**Blast radius is the weapon mods, not the cosmetics.** If server-side damage normalisation is
+real, `HeavyRifleRebalanceFix`'s launch gate ("HRF01 must deal ~780, not ~300") could fail for
+reasons that have nothing to do with the pak being correct. **That is a Nexus-page question and
+Nexus-facing prose is Sylvia's** — flagged, not drafted.
 
-- `tools/diff_baseline.ps1` — diffs two baselines into `state/diffs/`. Tested against a synthetic
-  patched baseline so every branch fired, not just the no-op path.
-- `AllWeaponsUnlockableFix/tools/verify_softrefs.py` — the dangling-reference check.
-- `assets.py` gained `player_weapons` / `ai_weapons` / `weapon_tables` (weapons were never in the
-  taxonomy; they were ad-hoc decoder pulls).
+## What is NOT true, and must not be re-derived
 
-## Current MO2 state
+- **Container staleness does not explain the CMSF launch crash.** It was proposed, tested against
+  the parsed name sets, and ruled out. The rebuilt CMSF pak is **not a demonstrated fix**.
+- **Store *growth* is a non-event.** Only two script objects were ever removed
+  (`FWReplicatedAimRecord`, `OnRep_AimReplication`). **Do not tell six repos to rebuild.**
+- **A clean filelist diff does not mean a patch is harmless.** It compares schema and row counts; a
+  tuning pass that rewrites values in place is invisible to it.
+- **A passing check is not a check that tested anything.** This project has shipped vacuous ones.
 
-**There are two MO2 instances and they are not the same.** Everything below the SylDesk
-heading was recorded on the desktop; it does not describe the laptop.
+## Division of work, 2026-09-10
 
-| | SylDesk (desktop) | SylG5 (laptop) |
-|---|---|---|
-| Instance | `H:\MO2Instance_ModData\ForeverWinter\` | `D:\MO2_InstanceData\TheForeverWinter\` |
-| Mods installed | 12 enabled incl. 4 third-party skins (`101`–`104`) | **17 installed, 5 enabled** |
-
-### SylG5 (laptop) — audited 2026-08-01
-
-Enabled: `AllWeaponsUnlockableFix`, `CMSF v0.2.1 dev`, `TFWWorkbench`, `RE-UE4SS`,
-`Signature Bypass`. Everything else disabled. No third-party skins here; `AWU Trees` is not
-deployed at all.
-
-**Fixed this session: AWU was serving the broken pak.** The deployment held
-`AllWeaponsUnlockable_P.ucas` at **112,133 B** — the pre-patch build with the dead
-`DataAsset` pointers — under the *old* filename, and it was **enabled**. This is the upgrade
-trap the changelog warns users about, landing on our own machine: the pak was renamed during
-the fix, so the new files were never going to overwrite the old ones, and the corrected
-deployment had only ever been done on SylDesk. The old trio was removed (backup in the session
-scratchpad) and `AllWeaponsUnlockableFix_P.*` copied in from `dist/`, **hash-verified identical
-on all three files**. `meta.ini` was stale in the same direction — version `1.1.0`, build
-`24097213`, a 56-row table — and now records `1.2.1`, modid `133`, and the clean-room
-provenance.
-
-Everything else on this machine is byte-identical to its repo build: `UnkillablesRebalanceFix`,
-`HeavyRifleRebalanceFix` (both paks), all four `ScavGirlCarryPerks` variants, CMSF. Note
-"matches the repo" is not "good" — **URF matches a stale repo build that reverts the
-`24501089` hotfix** (see the board). It is disabled, which is fortunate.
-
-The two CMSF entries are not redundant: `v0.2.1 dev` ships a different `CMSFUnlock/main.lua`
-plus a `CMSFTime` module over the same pak, and `v0.2 Framework` is correctly disabled.
-
-No stray paks: the game's `Content\Paks\Mods\` does not exist (correct — MO2 deploys at
-runtime), and no old-named pak survives anywhere in the mod store. `_attic\AllSkills_P.ucas`
-is the deliberately-retired orphan, not a stray; `_attic` is not a mod dir.
-
-### SylDesk (desktop) — as of 2026-07-31, not re-checked since
-
-Both AWU variants are **disabled** in the Default profile — re-enable before testing. The three
-Class B mods (`TFWLootAll`, `TFWStaggerControl`, `TFWQuestHUDToggle`) were enabled for the Gate 3
-test and may still be. `TFWStaggerControl` runs in `mode=blanket`, which suppresses **all**
-stagger — fine for a controlled test, not something to leave on for normal play.
-
-Previous MO2 paks are backed up under the session scratchpad, but git is the durable copy.
+`TFWCharModelSelFramework` is being handled by a parallel session: the mechanism investigation, the
+Class A exposure audit, and CMSF itself. **One repo, one owner** — this repo does not touch another
+repo's build. Nothing has been pushed to Nexus or Discord, and `modlist.txt` is untouched by both
+sessions.

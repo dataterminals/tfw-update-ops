@@ -1,8 +1,88 @@
-# Status board — 24501089 → 24536482
+# Status board — 24536482 → 25071553
 
 **The source of truth for "is this done yet."** Not memory, not the individual repo's WORKLOG.
 
 Legend: ⬜ not started · 🟨 in progress · 🟦 blocked · 🟩 verified · 🟥 confirmed broken · ⬛ n/a this patch
+
+---
+
+> ## 🔺 CURRENT CYCLE — build 25071553, landed 2026-09-03, recorded 2026-09-10
+>
+> **Read this before anything below it.** Everything in the older banners and in the class tables
+> was written for `24536482` or earlier. Where a row has been restamped this cycle it says so;
+> where it has not, treat it as history, not as state.
+>
+> **The board was a full cycle stale until today.** `81c6db5` (2026-09-09) captured the
+> `post-25071553` baseline and wrote [`build-history.md`](build-history.md), but never touched this
+> file — so it carried "all seven gates green" for a week against a build that has two red gates.
+> That is the Rule 1 failure this file exists to prevent. **The board is the deliverable, not the
+> commit message.**
+>
+> ### Machine state — checked 2026-09-10, not assumed
+>
+> | | |
+> |---|---|
+> | Installed / target build | `25071553`, `StateFlags 4`, **no update pending** |
+> | Rollback key | `4492887131597018203` |
+> | Shipping exe | `169,740,288 B` / `D87AE674…`, mtime 2026-09-03 11:57 — **matches `post-25071553/binaries-win64.csv`** |
+> | Root Builder | ⚠ **ARMED** — no MO2 launch since 2026-08-04, no `UE4SS.log` anywhere under the instance, no `overwrite\Root` |
+> | SylDesk | **Two cycles behind** — still `24501089`, cache + ~47 GB backup unremediated, displaced exe still armed |
+>
+> The standing pre-session exe check **passes**: Steam's own patch write is in place and Root
+> Builder has not reverted anything. That is because nothing has launched, not because the
+> mechanism is fixed. **Clear `GameData.json` AND its sibling `Backup\` together before the next
+> launch.**
+>
+> ### Two gates are red, and one action clears both
+>
+> - **Gate 1b 🟥 — the usmap is stale.** `FWWeaponDefinition` on `DA_WPN_PLAYER_HRF01` decodes
+>   **30 properties where `provenance.json` records 57**. No error, plausible values, exit 0 — the
+>   documented silent-failure mode verbatim. **Every value-level decode against this build is void.**
+>   Structural findings that read no type map (the filelist; raw `retoc to-legacy` byte comparison)
+>   are the only things this cycle may act on.
+> - **Gate 3 ⬜ — unattempted, not merely unscored.** Nothing has run against this exe. All of
+>   Class B is unknown, including the UE4SS `-894` pin against a September binary.
+>
+> **The single unblocking action is one sitting at the machine:** clear Root Builder → disable
+> `CMSF v0.2.1 dev` (Jul 25 pak, will crash) → launch → `DumpUSMAP()` → exit. Gate 3, gate 3b and
+> every Class B row fall out of the same launch for free.
+>
+> ### 🔍 The script-object store, and an undisclosed mod-detection subsystem
+>
+> Full working in [`scriptobjects-25071553.md`](scriptobjects-25071553.md). The short version:
+>
+> - A **new failure mode** was identified this cycle — *container* staleness, distinct from the
+>   *content* staleness every harness we own tests for. **Neither is what broke CMSF**; the
+>   investigation is still open. See the doc before acting on either.
+> - The correct exposure predicate is **name-set removals, not store growth**. Across
+>   `24097213 → 25071553` exactly **two** script objects were removed — `FWReplicatedAimRecord` and
+>   `OnRep_AimReplication` — against **78 added**. Growth is a non-event.
+> - **`FWModIntegritySubsystem`** appears in the live cook and not in July's: mod detection with
+>   party-wide replication (`ServerReportPotentiallyModded`, `IsPartyMemberPotentiallyModded`,
+>   `OnRep_PotentiallyModded`) plus a weapon-damage override path gated on `IsStockWeapon`
+>   (`GetBaseWeaponDamage` / `SetBaseWeaponDamage` / `ClearWeaponDamageOverride`). **In no patch
+>   note.** Blast radius is the weapon mods, not the cosmetics.
+> - **Dating, from the baselines this repo owns:** `FWPakManifest.json` — the anti-tamper manifest —
+>   **first appears at `24479102`** (absent in `pre-24479102`, present in `post-24479102`, and it is
+>   the 118→119 pak-row delta). So the integrity surface is **six weeks old, not new this cycle**,
+>   and our mods have been running against some of it all along. Whether the 13 script symbols
+>   landed with the manifest or later is **not settled** — see the doc for the bound.
+>
+> ### Restamp status — what this cycle actually knows
+>
+> A read-only audit was run across the board's rows on 2026-09-10. **It completed 7 of 13 repos and
+> was cut off by a session limit before the adversarial-verification pass ran on any of them.**
+> The 7 restamped rows below are therefore **single-source and unrefuted** — good evidence, not
+> confirmed evidence. They are marked ⚠ *unverified restamp*. The 6 that never ran are unchanged
+> and still carry their `24536482`-or-older text: **`AllWeaponsUnlockableFix`, `TFWStaggerControl`,
+> `TFWQuestGiverPortraitPatch`, `forever-winter-datamine`, `forever-winter-almanac`,
+> `TombstoneAlways`.** `TFWCharModelSelFramework` is owned by a parallel session this cycle and is
+> deliberately not restamped here.
+>
+> **The one thing the audit found that is not gate-blocked:** `UnkillablesRebalanceFix` is
+> **ENABLED in the MO2 profile** (`+UnkillablesRebalanceFix`) carrying the **v1.2 pak**, two builds
+> stale — while a verified v1.3 sits unshipped in `dist/`. The old board row said "left disabled as
+> found". That is now false on both counts, and it makes the profile a smoke-test contaminant.
 
 ---
 
@@ -500,6 +580,20 @@ the deployed binaries are byte-identical to the MO2 mod's, so this tests the rig
 
 These block whole classes. Nothing below them means anything until they're resolved.
 
+### Current cycle — `25071553`
+
+| # | Gate | Status | Notes |
+|---|---|---|---|
+| 0 | Baseline captured | 🟨 | **One-sided.** `post-25071553` exists (76,321-entry filelist, 119 paks, exe hash-proven `D87AE674…`); **there is no `pre-25071553`** and there cannot be — `AutoUpdateBehavior` is `0` on SylG5, so the patch applied itself unattended on 2026-09-03. `post-24536482` serves as the "before" side. Two provenance caveats recorded on the capture: `filelist.txt` was added by hand after the fact, and **`catalog/` is carried over from `24536482`** — stamped `build: 24536482`, files dated 08-05. `capture_baseline.ps1` copies the datamine catalog without comparing its build stamp, so an unchanged catalog there means *"not rebuilt"*, never *"nothing changed"*. **That script should warn on the mismatch — it does not.** |
+| 1a | AES key still valid | 🟩 | **Cleared on `25071553`.** Decoder mounts **76,321** files (was 76,310 at `24536482`) with the key unchanged at `decoder/Program.cs:28`. The IoStore index is AES-encrypted, so the mount *is* the test. |
+| 1b | usmap valid (or regenerated) | 🟥 | **RED. This is the blocker for the cycle.** `FWWeaponDefinition` on `DA_WPN_PLAYER_HRF01` decodes **30 properties where `mappings/provenance.json` records 57** — the same figure this gate's `24536482` note says it "was stopping at 30" before regeneration. No error, plausible values, exit 0: the documented silent-failure mode verbatim. `bConvergeADSAimToCamera` reads at index 28 of 30 rather than provenance's 46 of 57 — the "reads real bytes under neighbouring property names" symptom, consistent with `0.9.5.x` moving the weapon struct a third time. **Every value-level decode for this build is void, and no Class A pak may be rebuilt against it.** To clear: experimental UE4SS into `Binaries\Win64`, a Lua mod calling `DumpUSMAP()`, then remove UE4SS. Archive the outgoing `24536482` map under `mappings/archive/` with its build in the filename and update `provenance.json` in the same commit. **Needs a game launch — Sylvia's.** |
+| 2 | Re-decode + filelist diff | 🟨 | **Filelist half done; re-decode half is void under 1b.** `post-24536482` → `25071553` is **153 added / 142 removed**, and **most of it is directory-case churn that must not be read as movement** (`Posed/`→`posed/`, `DataLayers/`→`Datalayers/`, `images/`→`Images/`, `TOOTHY/`→`Toothy/`, `Bagman/`→`BagMan/`) — benign, because UE lowercases the package name before hashing `FPackageId`. **The genuinely new or moved content is only:** Europa soldier behaviour trees `Trees_v2`→`Trees_v3` plus new EQS queries (`EQS_FindSearchLocation`, `EQS_FleeTarget_V3`, `EQS_DangerCloseFireLine_V3`) and `BTDecorator_DangerCloseFoe` — the announced AI state-machine rework landing as assets; **`BTTask_AI_FindRandomSpotNearKey` removed**; Shaman MAY skin materials renamed (`MI_EUP_INF_head_V4`→`MI_SCV_SHM_Head`, `MI_EUP_INF_torso_2`→`MI_EUP_INF_torso`, `VMI_EUP_INF_eyes_2`→`MI_EUP_INF_eyes`); `SM_WPN_SHG05_RCV` split into `_IronSight`/`_NoIronSight`; a new `Toothy` AI definition set at the recased path. **The 722-dump re-decode cannot run until 1b clears.** |
+| 3 | RE-UE4SS attaches to new exe | ⬜ | **UNATTEMPTED — not merely unscored.** There is **no `UE4SS.log` anywhere** under `D:\MO2_InstanceData\TheForeverWinter`, so nothing has run against this exe. **All of Class B is unknown**, and the `-894` experimental pin has never been tested against a September binary. |
+| 3b | Signature Bypass matches new exe | ⬜ | **Unattempted.** Same launch as gate 3. The AOB pattern has survived every patch so far, but that is a prior, not a measurement. |
+| 5a | TFWWorkbench reads new paks | ⬜ | **Unattempted.** Falls out of the same launch. Class A rebuilds stay gated until it and 1b are both green. |
+
+### Previous cycle — `24536482` (kept for evidence; **not current state**)
+
 | # | Gate | Status | Notes |
 |---|---|---|---|
 | 0 | Baseline captured | 🟩 | **Green for the `24536482` cycle — captured 2026-08-03 before the patch downloaded, and `post-24536482` follows it.** `pre-24536482`: 0 warnings, 119 paks / 48,572,725,793 B hashed, 76,309 entries, datamine `6f76f425`, exe hash confirms it snapshots `24501089`. Prior cycle: `pre-24479102` (76,589) + `post-24479102` (76,309), datamine tagged `baseline-24097213` @ `36b068b8`, rollback key `6430523508700280691`. |
@@ -511,6 +605,31 @@ These block whole classes. Nothing below them means anything until they're resol
 | 5a | TFWWorkbench reads new paks | 🟩 | **CLEARED on `24536482` 2026-08-03 23:06:21**, from this repo's own capture — `baselines/post-24536482/UE4SS-gate3.log:999-1022`. Workbench ran `CollectData` over **7** DataTable dirs (`WeaponsDetailsData`, `WeaponPartStatsData`, `VendorData`, `CraftingRecipe`, `CraftingGroup`, `Item`, `ItemValue`) and configured 6 live tables including `WeaponConfigSetup → DT_WPN_Config_Setup` and `InventoryItemDetails → ItemDetailsData`, then wrote 20 dumps. **No error, failure or Lua exception on any Workbench line.** The evidence was already on disk from the gate-3 session; nothing was ever scored from it. **Class A rebuilds are unblocked.** |
 
 ## Class B — Lua (do first; cheap intel)
+
+### Restamped for `25071553` — 2026-09-10 ⚠ *unverified: the adversarial pass never ran*
+
+> ## 🟦 There is no Class B loadout on this machine at all.
+>
+> **Gate 3 is unattempted** — nothing has run against this exe — so every row here is unknown on
+> `25071553` for that reason alone. But the deeper problem is the loadout: **`TFWLootAll`,
+> `TFWStaggerControl`, `TFWQuestHUDToggle` and `TFWQuestItemTag` are all absent from SylG5's MO2
+> store entirely** — not disabled, *absent*, with no line in `modlist.txt` in either the `+` or the
+> `-` set. `RE-UE4SS` and `Signature Bypass` **are** `+`enabled, so the runtime host is deployed and
+> ready; there is simply nothing for it to load.
+>
+> **So gate 3 clearing does not clear Class B.** The precondition is either *deploy those four into
+> `D:\MO2_InstanceData\TheForeverWinter\mods`* — which is cheap, they are loose Lua — *or* defer
+> Class B until SylDesk is remediated and patched. This has been true and unstated for two cycles.
+
+| Repo | Status | Restamped finding |
+|---|---|---|
+| `TFWLootAll` | ⬜ | **Real stamp `24479102`, and load-only** — four lines in `post-24479102/UE4SS-classB.log` (mod started, both keybinds bound, `v0.1.0 PROBE` loaded). That is the entire runtime record; no DISCOVER output, no transfer ever exercised. **Its identifier contract was only ever decoded at `24097213`** — two builds older than its load test. **Structurally clean at `25071553`:** all four assets it resolves (`W_LootUI`, `W_LootItem`, `W_LootInRange`, `W_LootFailReason`) are present at byte-identical paths. usmap-independent, so **not** 1b-blocked. Not deployed, not released; a `v0.1.0` manual zip exists in `dist/`. |
+| `TFWQuestHUDToggle` | ⬜ | **Real stamp `24479102`** — load-only, same session, same limits. Not deployed. usmap-independent. Never functionally tested (needs Ctrl+Shift+Q in a quest HUD context). |
+| `TFWQuestItemTag` | 🟦 | **Never confirmed working in-game on ANY build.** The only positive evidence anywhere is `9a1c167`'s note (2026-07-14) that the READ path worked *on a third party's machine*, build unrecorded — and that same message states the `SetText` write path was the unproven piece, which is why v0.1.2 exists. **There is no green here to carry forward or to void.** Structurally the patch is clean: `WBP_ItemTooltips`, `WBP_BaseTooltip`, `BPFL_Tooltips`, `Blueprints/Data/ItemDetailsData` all present and unmoved, with **zero** changes in either directory across the diff. **The one action the board owes it is now blocked, not merely pending:** `tools/gen_manifest.py` reads decoded `ItemDetailsData` through `fwdata`, so regenerating the manifest today would **bake gate-1b-void data and exit 0**. Separately, the shipped manifest was **already 3 items short before this patch** — 43 committed vs 46 from `fwdata.query.quest_items()`, measured at `24536482` — upstream rule drift, not patch damage. The "recommended for release" static-pak vector has **never been built**: no build script, no retoc invocation, no `.pak` anywhere in the repo. |
+| `TFWStaggerControl` | ⬜ | **Not restamped — the audit was cut off before it ran.** Row below is `24479102`-era. Flagged as the highest-priority Class B re-test when one is possible: it hooks `GA_Player_HitReaction` and `BP_PlayerBase`, both combat-adjacent, and `0.9.5.0` is a ground-up combat AI rework. |
+| `TombstoneAlways` | ⬜ | **Not restamped — audit cut off.** May not be cloned on this machine at all. |
+
+### Previous cycle — `24479102` (**history, not state**)
 
 > ⚠ **Everything in this section is stamped `24479102`, measured on SylDesk 2026-07-30 17:57 — NOT
 > `24536482`.** It cannot be re-cleared on SylG5 as things stand: `TFWLootAll`, `TFWStaggerControl`
@@ -536,6 +655,25 @@ outcome, just not a useful one for Class A.
 | `TFWQuestItemTag` | ⬜ | **Not in the MO2 store at all**, so untestable here. Manifest must be regenerated after the re-decode regardless. |
 
 ## Class A — Paks (expensive; diff-driven)
+
+### Restamped for `25071553` — 2026-09-10 ⚠ *unverified: the adversarial pass never ran*
+
+**No Class A row here is 🟩 and none can be**, because `verify_build.sh` in every one of these
+repos passes `FW_USMAP` to the decoder, so every property-shape number they report is void under
+gate 1b. The useful asymmetry: several **builds** are byte-patch-only and are *not* 1b-blocked —
+only the verifies are.
+
+| Repo | Status | Restamped finding |
+|---|---|---|
+| `UnkillablesRebalanceFix` | 🟥 | **Real stamp `24536482`** (`7361403`, 2026-08-23) — a build *newer* than the old board row, which is stamped `24501089` and wrong in six particulars. **The harm is live and on this machine:** the MO2 profile reads `+UnkillablesRebalanceFix` — **ENABLED**, carrying the **v1.2** pak (`.ucas` 542,979 B, md5 `fe37303098c2…`, mtime 2026-08-01), a `24501089` cook measured at `24536482` to drop 9 property shapes from `BPC_IncomingDamageMod`, reverting the patch's faction- and suppressor-aware AI-noise change. **The old row's "deployed hash-verified, left disabled as found" is false on both counts**, and it makes the profile a smoke-test contaminant. **v1.3 exists, is better, and was never shipped** — statically verified on `24536482` (11 packages, 4525 refs / 0 dangling, 0 properties dropped, 11/11 FPackageIds), sitting in `dist/` awaiting an in-game test; Nexus #124 still serves v1.2. Nothing in the repo touched since 2026-08-24. **None of the genuinely-new `25071553` content reaches its 11 owned packages** — all 11 still present, and their name tables carry no `Trees_v2/v3`, `EQS_`, `BTDecorator`, `FindRandomSpotNearKey`, Shaman-material or `SHG05` strings; `TOOTHY/`→`Toothy/` is case-only. **But `BPC_IncomingDamageMod` carries `MakeAINoiseForFactions` and sits in the exact damage/AI-noise path `0.9.5.0` reworked, and it has drifted on two consecutive builds already.** A third drift is likely and is UNMEASURED. **`build_fix.sh` is retoc + byte-patch only — the rebuild can run today; only the verify is 1b-blocked.** ⚠ Its verifier degrades silently this cycle: `verify_build.sh` relied on the mod shipping `Euruska/Toothy/` while live had `TOOTHY/` so the decoder wrote two distinguishable dumps; at `25071553` the paths are byte-identical and it is last-write-wins under a non-deterministic mount. |
+| `HeavyRifleRebalanceFix` | 🟦 | **Board was a cycle stale on the fix and accurate on the harm.** **v2.1.0 WAS rebuilt and verified against `24536482`** on 2026-08-05/06 (`9f835cd` — 7/7 checks, 36/36 values, rifles decode 55–58 properties matching vanilla, `HRF02` picked up `SocketOptic` `"S_Aim"` for free). The board's last write (`25255fa`, 08-05) predates that commit by a day, so the 🟥 "BROKEN on `24536482`" half is **superseded**. **Still true and now worse: v2.1 was never uploaded.** Nexus #123 has served **2.0.0 — a `24501089` cook — for five weeks**, and on `25071553` it is at least two schema generations stale. The MO2 store holds an even older **v1.1** pak (2026-07-13, sha `2b5726b7…`), disabled. **State on `25071553` is UNKNOWN and unmeasurable:** both `build_fix.sh` and `verify_build.sh` bind `FW_USMAP`, and `rebalance.conf` is nothing but `FWWeaponDefinition` scalars, so every claim this repo can make is behind gate 1b. **None of the new content touches its 26 owned packages** — the `SM_WPN_SHG05_RCV` split is a *shotgun*; the mod overrides `SM_WPN_HRF05_RCV`, a different weapon in a different directory. **But the asset list is the wrong place to look:** `0.9.5.0` is a client-side shooting rework, `FWWeaponDefinition` has been extended by two consecutive builds, and gate 1b's own datum (HRF01 at 30 of 57) is the *exact fingerprint v2.0 showed when it broke*. **A stale usmap and a third re-shift are indistinguishable from disk.** Do **not** upload v2.1 until 1b clears and verify re-runs — uploading a `24536482`-targeted pak onto a live `25071553` risks shipping a second broken release. See also [`scriptobjects-25071553.md`](scriptobjects-25071553.md) §4: this repo has the **highest exposure** to the weapon-damage-override path, which could make its launch gate fail for reasons unrelated to the pak being correct. |
+| `ScavgirlCarryPerks` | 🟦 | **Real stamp `24479102`** (`5007c18`, 2026-07-31) — the last *real* full-mount verification. **Nothing in this repo was ever measured at `24536482`, and nothing at `25071553`.** The later `24501089` artifact is an undocumented, gitignored isolated re-run whose Unbalanced dump shows all 9 `ChildSkills` as literal `null` — **isolation demonstrably proves nothing about this mod's graft**, confirming the board's own "the method was unsound" note rather than resolving it. **Structurally clean:** it owns exactly one package (`SD_Skill_EarlyAccess_ScavGirl_ROOT`, id `e2129fe5f6accc68`) and nothing genuinely-new in `25071553` touches it or its read surface. **Six SCP folders in the store, all six DISABLED.** Released on Nexus; **page number recorded nowhere on disk** — a standing gap the WORKLOG names itself. 1b-blocked for any value-level re-verify. |
+| `forever-winter-skin-mods` | 🟦 | **Real stamp `24097213`** — the repo is untouched since 2026-07-09 and its skin maps were read at `24045295`. **Three builds of undetected drift.** **Corrects two stale board claims:** (1) the four skins the old row names (`101`–`104` — Slade, Luca, Bunco-chan, Kane) **left the store before the `24536482` baseline** and are in no smoke-test loadout — that clause was already wrong a cycle ago; (2) the store's one skin mod is **`UMP45`, Nexus #30 — the third-party *upstream source* mod this repo retargets**, files dated 2025-03-26, and `modlist.txt:3` reads `-UMP45`, disabled. None of the 8 built variants is deployed. **The flagged Shaman MAY material renames are a near-miss, examined and cleared:** they land inside `Skins/MAY/Materials/`, and `SHM_UMP45_ShamanMay_P` replaces `SK_SCV_SHM_MAY` wholesale with its own materials, so the renamed base materials are unreferenced once installed. All 8 slot meshes, both skeletons, `M_FW_Char` and the 2,142-file OLMA VO tree survive at identical paths. **🟦 not 🟩 because the contract is the unreadable part:** the `DT_SkinUIData` row→mesh mapping is value-level and void under 1b, and `fwrepath` loads the usmap unconditionally. **Queue `DT_SkinUIData` as the first re-decode consumer once 1b clears — one datatable, not a rebuild.** ⚠ Redistribution permission is unresolved on disk (Nexus #30 records no grant) — same class of blocker that gated AWU and HRF. |
+| `TFWCharModelSelFramework` | 🟨 | **Owned by a parallel session this cycle — deliberately not restamped here.** Its pak was rebuilt on the live cook and statically verified three ways that read no usmap (pawn `.uexp` = live_src + exactly 672 B; 199/199 `.uexp` payloads round-trip byte-identical through `retoc to-legacy`; `verify_build.sh` green incl. a new "built on THIS cook" check). **Staged in the store as `CMSF v0.2.5 rebuild 25071553`, correctly absent from `modlist.txt`, release zip deliberately unbuilt.** ⚠ **The currently-ENABLED `CMSF v0.2.1 dev` holds a Jul 25 pak and will crash — disable it before any launch.** **The rebuild is not a demonstrated fix:** container staleness was proposed as the crash cause, tested, and does not explain it — see [`scriptobjects-25071553.md`](scriptobjects-25071553.md) §2. |
+| `AllWeaponsUnlockableFix` | ⬜ | **Not restamped — the audit was cut off before it ran.** Row below is `24501089`-era. **It is `+`ENABLED in the profile**, so it is in whatever loadout the next launch uses. Weapon-table mod: see the integrity-subsystem exposure table in [`scriptobjects-25071553.md`](scriptobjects-25071553.md) §4. |
+| `TFWQuestGiverPortraitPatch` | ⬜ | **Not restamped — audit cut off.** Texture-only, so plausibly usmap-independent; that was never confirmed. |
+
+### Previous cycle — `24536482` and earlier (**history, not state**)
 
 | Repo | Status | Finding |
 |---|---|---|

@@ -48,7 +48,7 @@ EarlyAccessTrees/ScavGirl/SD_Skill_EarlyAccess_ScavGirl_ROOT  -> AllWeaponsUnloc
 Euruska/MeatMan/BP_AI_Euruska_MeatMan.uasset            -> UnkillablesRebalanceFix
 Euruska/OrgaMech/BP_AI_Euruska_OrgaMech.uasset          -> UnkillablesRebalanceFix
 Euruska/ShieldOfficer/BP_AI_Euruska_ShieldOfficer.uasset-> UnkillablesRebalanceFix
-Euruska/TOOTHY/BP_Mech_Toothy.uasset                    -> UnkillablesRebalanceFix  (dir is UPPERCASE)
+Euruska/Toothy/BP_Mech_Toothy.uasset                    -> UnkillablesRebalanceFix  (was TOOTHY; recased at 25071553)
 Eurasia/MotherCourage/BP_AI_Eurasia_MotherCourage.uasset-> UnkillablesRebalanceFix
 Eurasia/Opal/BP_AI_Eurasia_Opal.uasset                  -> UnkillablesRebalanceFix
 FW/AI/Characters/Shared/BPC_IncomingDamageMod.uasset    -> UnkillablesRebalanceFix
@@ -213,7 +213,7 @@ the whole collection.
 | `Euruska/MeatMan/BP_AI_Euruska_MeatMan` | blueprint | exact (`:49019`) | `tools/build_fix.sh:56`; `tools/patch_drifted.py:69` |
 | `Euruska/OrgaMech/BP_AI_Euruska_OrgaMech` | blueprint | exact (`:49029`) | `build_fix.sh:56`; `patch_drifted.py:70` |
 | `Euruska/ShieldOfficer/BP_AI_Euruska_ShieldOfficer` | blueprint | exact (`:49041`) | `build_fix.sh:57`; `patch_drifted.py:71` |
-| `Euruska/TOOTHY/BP_Mech_Toothy` | blueprint | **case** (`:49103`) | `build_fix.sh:57` writes `Toothy/`; game is `TOOTHY/` |
+| `Euruska/Toothy/BP_Mech_Toothy` | blueprint | **resolved** | `build_fix.sh:57` writes `Toothy/`; the game was `TOOTHY/` and **recased to `Toothy/` at 25071553**, so the paths are now byte-identical. `FPackageId` is unaffected either way (UE lowercases before hashing), but the case *difference* was load-bearing for `UnkillablesRebalanceFix`'s verifier: it relied on the two spellings producing two distinguishable dump files. They now collide on one filename under a non-deterministic mount. See status.md. |
 | `Eurasia/MotherCourage/BP_AI_Eurasia_MotherCourage` | blueprint | exact (`:48864`) | `build_fix.sh:58`; `patch_drifted.py:74` |
 | `Eurasia/Opal/BP_AI_Eurasia_Opal` | blueprint | exact (`:48877`) | `build_fix.sh:58`; `patch_drifted.py:75` |
 | `Shared/BPC_IncomingDamageMod` | blueprint | exact (`:49270`) | `build_fix.sh:59`; `patch_drifted.py:76` |
