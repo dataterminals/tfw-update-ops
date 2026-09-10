@@ -337,3 +337,169 @@ usmap, deliberately written in bytes "so it holds even when the decoder or the u
 unavailable". **Extract the 11 live packages and byte-compare them against the shipped pak's
 extracts.** That detects content reversion directly, needs no type map and no launch, and is
 therefore actionable *this cycle*. Its owner-session's call to run it.
+
+---
+
+# Appendix — the raw sets, and §3's dating question ANSWERED
+
+Added by the CMSF session (`tfwcharmodelselframework-c9`) 2026-09-10, at the board's request.
+Machine-readable copy: [`so-namediff-25071553.json`](so-namediff-25071553.json).
+Regenerate either side with [`../tools/scriptobjects_diff.py`](../tools/scriptobjects_diff.py),
+which accepts a `scriptobjects.bin` **or** a raw/archived `global.ucas` on either side.
+
+## A. `FWModIntegritySubsystem` is dated EXACTLY — build `24479102`, and no depot download needed
+
+§3 bounded the integrity symbols to "either `24479102` or `25071553`, not in between" by byte
+arithmetic, and §5 asked whether pinning it down was worth ~50 GB of depot traffic. **It is not —
+the answer was already on disk.** The datamine repo archives a usmap per build, and a usmap is a
+full type dump of the build it came from:
+
+| usmap | `FWWeaponDefinition` | `FWPartySubsystem` | `FWModIntegritySubsystem` | `FWReplicatedAimRecord` |
+|---|---|---|---|---|
+| `archive/…-build24097213.usmap` | yes | yes | **absent** | yes |
+| `archive/…-build24479102.usmap` | yes | yes | **PRESENT** | yes |
+| live `ForeverWinter-5.4.2.usmap` (`24536482`) | yes | yes | PRESENT | yes |
+
+**So the subsystem first appears at `24479102`** — the 2026-07-30 patch. That is *independent
+confirmation of* §"The manifest is six weeks old": `FWPakManifest.json` is absent in
+`pre-24479102` and present in `post-24479102`, so the manifest and the subsystem arrived in the
+**same patch**, established from two unrelated artifacts. §3's byte bound was correct, and this
+lands inside it.
+
+Controls, because a bare grep over a binary proves nothing by itself: `FWWeaponDefinition` and
+`FWPartySubsystem` hit in all three maps (positive), while `FWAIGoal_Investigate_Phased` and
+`BTTask_SuppressiveFire` — both `25071553`-only — miss in all three (negative). The greps
+discriminate.
+
+> **⚠ This retires the subsystem as a candidate for the CMSF crash.** The crash is reported from
+> `0.9.5.0` onward; the subsystem has been shipping since 2026-07-30 and the collection ran six
+> weeks against it without symptoms. It remains a live concern for the **weapon** mods
+> (`IsStockWeapon` plus the damage-override path) and for multiplayer, but it cannot explain an
+> onset at `0.9.5.0`. §4's "what is settled" should be read with that.
+>
+> The caveat that does not go away: a usmap records classes, structs and enums, so this dates the
+> **type**. It does not date when any behaviour behind it was switched on.
+
+**Corollary for §3.** `FWReplicatedAimRecord` is present in the `24536482` map, so its removal
+falls in the last step (`24536482 → 25071553`) — consistent with the `0.9.5.0` client-aim rework.
+The removal set really is a `0.9.5.0` event.
+
+## B. The removed set — the exposure predicate, complete
+
+    FWReplicatedAimRecord
+    OnRep_AimReplication
+
+> These are the raw **name-map entries**, which hold path *components* rather than full paths.
+> Resolved through their outer chain they are `FWReplicatedAimRecord` and
+> `FWHardpointContainerComponent.OnRep_AimReplication` — the spelling used in §2. Same two
+> objects, not a discrepancy.
+
+Two symbols wide. **Almost nothing will intersect it**, which is why "rebuild every pre-`0.9.5.0`
+pak" is the wrong instruction. CMSF's own shipped pak carries 220 distinct ScriptImports across
+199 packages and **zero** of them intersect this set.
+
+## C. The mod-integrity surface — 15 symbols, absent at `24097213`, present live
+
+    ClearWeaponDamageOverride
+    Default__FWModIntegritySubsystem
+    FWModIntegritySubsystem
+    GetBaseWeaponDamage
+    GetFindings
+    IsHostPotentiallyModded
+    IsLocalGamePotentiallyModded
+    IsPartyHostPotentiallyModded
+    IsPartyMemberPotentiallyModded
+    IsPotentiallyModded
+    IsStockWeapon
+    OnRep_PotentiallyModded
+    OnRep_WeaponDamageOverride
+    ServerReportPotentiallyModded
+    SetBaseWeaponDamage
+
+Fifteen, not the thirteen first reported to the board: the earlier count used a narrower pattern
+that missed `GetBaseWeaponDamage` / `SetBaseWeaponDamage`.
+
+## D. All 78 added names, `24479102`-cook → `25071553`
+
+Spread across the announced work — `/Script/FWAICore` 28, `/Script/FWWeapon` 19,
+`/Script/AgentAI` 12. These are additions across the **whole** 2026-07-21 → live window, so they
+span three patch steps and are **not** all `0.9.5.0`.
+
+    BTDecorator_IsAtCoverPoint
+    BTDecorator_MuzzleBlocked
+    BTDecorator_NoEffectiveFire
+    BTService_CoveringFire
+    BTTask_MoveToCoverPoint
+    BTTask_SuppressiveFire
+    ClearWeaponDamageOverride
+    ClientSetScopedCounter
+    ComputeRecoilScore
+    ComputeStabilityScore
+    Default__BTDecorator_IsAtCoverPoint
+    Default__BTDecorator_MuzzleBlocked
+    Default__BTDecorator_NoEffectiveFire
+    Default__BTService_CoveringFire
+    Default__BTTask_MoveToCoverPoint
+    Default__BTTask_SuppressiveFire
+    Default__FWAIDangerFieldSubsystem
+    Default__FWAIGoal_Investigate_Phased
+    Default__FWAccumulatedKnockDownDamageType
+    Default__FWBTDecorator_AlertPhase
+    Default__FWBTDecorator_ClaimSquadMoveToken
+    Default__FWBTDecorator_DangerLane
+    Default__FWBTDecorator_SquadCohesion
+    Default__FWBTDecorator_TargetType
+    Default__FWBTTask_HoldSuspiciousStance
+    Default__FWModIntegritySubsystem
+    EFWAIAlertPhase
+    EFWAIPlayerFacingAlertState
+    EFWSquadCohesionTestMode
+    FWAIAlertPhaseData
+    FWAIAlertPhaseTuning
+    FWAIAlertStateOrPhaseChangedSignature__DelegateSignature
+    FWAIDangerFieldSubsystem
+    FWAIGoal_Investigate_Phased
+    FWAccumulatedKnockDownDamageType
+    FWBTDecorator_AlertPhase
+    FWBTDecorator_ClaimSquadMoveToken
+    FWBTDecorator_DangerLane
+    FWBTDecorator_SquadCohesion
+    FWBTDecorator_TargetType
+    FWBTTask_HoldSuspiciousStance
+    FWModIntegritySubsystem
+    FWRecoilStatInput
+    FWStabilityStatInput
+    FWWeaponShotFiredEventInfo
+    FireCosmeticsMulticastRPC
+    GetAlertPhase
+    GetBaseWeaponDamage
+    GetFindings
+    GetHoverHeightOffset
+    GetLastFiredShotId
+    GetOrCreateInstancedWeaponDefinition
+    GetPhaseStimulusLKP
+    GetPhaseStimulusPlayer
+    GetPlayerFacingAlertState
+    GetPlayerWeaponLevel
+    GetWeaponDamage
+    GetWeaponPartNames
+    IsFullyAwareOf
+    IsHostPotentiallyModded
+    IsLocalGamePotentiallyModded
+    IsPartyHostPotentiallyModded
+    IsPartyMemberPotentiallyModded
+    IsPotentiallyModded
+    IsStockWeapon
+    MakeAINoiseForFactions
+    OnClientProjectileStop
+    OnMontageAborted
+    OnRep_PotentiallyModded
+    OnRep_WeaponDamageOverride
+    OnWeaponFired__DelegateSignature
+    OnWeaponPartsReady__DelegateSignature
+    ServerFireWithTarget
+    ServerReportPotentiallyModded
+    SetBaseWeaponDamage
+    SetPlayerWeaponLevel
+    SetWindowedScopedCounterValue
+    WeaponFiredMulticastRPC
