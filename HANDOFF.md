@@ -53,7 +53,10 @@ there is nothing for it to load. Deploy them first — they are loose Lua.
 
 > **✅ Remediated on SylDesk, 2026-09-10, measured on the machine itself.** The table below is kept
 > because its *method* still applies to the next cycle, but its SylDesk column is now history. What
-> was actually found is in the rows marked **was / now**. The patch was applied in the same sitting.
+> was actually found is in the rows marked **was / now**. The patch was applied in the same
+> sitting and **verified**: SylDesk's shipping exe now hashes `D87AE674…`, byte-identical to the
+> `post-25071553` baseline captured on SylG5, and its `FWPakManifest.json` hashes `5362C74E…`,
+> also identical to that baseline. The two machines are provably on the same cook.
 
 | | SylG5 | SylDesk — was | SylDesk — now |
 |---|---|---|---|

@@ -239,6 +239,48 @@ artifacts by two methods that share no inputs. The whole feature landed on 2026-
 the 118→119 delta *was* the feature arriving, and it sat unread in a baseline for six weeks. **A
 changed row count is a question, not a datum — read what the new row is.**
 
+### 🔬 The manifest's arithmetic, read off a live install (SylDesk, 2026-09-10)
+
+The entry format was described here as "name/size/`TailHash` plus a top-level `Signature`". Two of
+those three are now defined rather than named, measured on SylDesk immediately after it patched to
+`25071553`. Its `FWPakManifest.json` hashes `5362C74E…`, **identical to the `post-25071553`
+baseline captured on SylG5**, so this is the shipped artifact and not a machine-local one.
+
+**`TailHash` = SHA-1 of the last 65,536 bytes of the file**, or of the whole file when it is
+smaller than 64 KiB. **Verified on 89 of 89 entries, zero wrong, zero size mismatches.** The two
+ends were pinned separately: a 365-byte `pakchunk20-Windows.pak` whose `TailHash` equals its
+whole-file SHA-1, and a 1,186,328-byte `pakchunk20_s2-Windows.utoc` that matched at exactly 65,536
+and at no other power of two.
+
+**That the digest is a 64 KiB tail and not a whole-file hash is the load-bearing detail.** The
+whole check is ~5.8 MB of reads across 89 files against a 50 GB install. "Too expensive to run at
+startup" is therefore **not** available as an argument that the subsystem must be dormant — which
+raises the plausibility of the link rather than lowering it, and cuts against this document's own
+framing above.
+
+**The `Signature` did not reproduce, and that is a bounded result, not a conclusion.** 433 keyless
+constructions were tried: seven materials (tail-hash hex, names, sizes and their combinations)
+crossed with as-is and name-sorted order, six separators and five encodings including UTF-16LE;
+the manifest text with the `Signature` member excised; the raw concatenation of the per-file digest
+bytes; and the concatenation of the actual 64 KiB tail blobs. None matched
+`750a4d32542c8bb130101d1d740bb155b2cb0d6a`. So it is **not a plain digest of the data the manifest
+carries** — an HMAC, a salt, a different serialisation and a digest over something not in the file
+all remain open. **Do not report this as "the manifest is signed."**
+
+Incidentally, the manifest is already name-sorted: the manifest-order and name-sorted tail-blob
+concatenations produce the same digest.
+
+### ⚠ "Any unlisted file is a tamper" is refuted by the stock install
+
+The 89 entries are **bare filenames with no path component** — 30 `.ucas`, 30 `.utoc`, 29 `.pak`.
+But `Content\Paks\` on a clean, freshly patched install also contains **30 `.sig` files and
+`FWPakManifest.json` itself**, none of them listed. A rule of "flag any container in this directory
+that is not in the manifest" would make the shipped game flag itself, so that reading is dead.
+
+What survives is narrower and still live: an enumeration filtered by extension (`.pak`/`.ucas`/
+`.utoc`) would exclude every `.sig` while including a mod pak — **if** it recurses into
+subdirectories, which is where mods actually live and which cannot be read off this file.
+
 ### Blast radius: the weapon mods, not the cosmetics
 
 `IsStockWeapon` + `GetBaseWeaponDamage` / `SetBaseWeaponDamage` / `ClearWeaponDamageOverride` is a
